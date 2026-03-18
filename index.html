@@ -865,11 +865,11 @@ body.manager-mode{
         <button class="nav-item" onclick="navTo('pRBe',this)"><span class="icon">🏢</span>Relatório Bem-Estar</button>
         <button class="nav-item" onclick="navTo('pRE3',this)"><span class="icon">🎯</span>Relatório Eixo III</button>
         <button class="nav-item" onclick="navTo('pResp',this)"><span class="icon">📋</span>Respostas Individuais</button>
-        <div class="nav-sec" id="navContas" style="display:none">Administração</div>
-        <button class="nav-item" id="navContasBtn" style="display:none" onclick="navTo('pContas',this)"><span class="icon">👥</span>Contas Gerenciais</button>
+        <div class="nav-sec">Administração</div>
+        <button class="nav-item" onclick="navTo('pContas',this)"><span class="icon">👥</span>Contas Gerenciais</button>
       </nav>
       <div class="sb-footer">
-        <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role">Gerenciador</div></div></div>
+        <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role" id="sbRole">Gerenciador</div></div></div>
         <button class="sb-logout" onclick="doMgrLogout()">← Sair do painel</button>
       </div>
     </aside>
@@ -1066,7 +1066,7 @@ body.manager-mode{
             <button class="abtn ab-pri" onclick="openNewMgr()">+ Nova Conta</button>
           </div>
           <div class="dtable-wrap"><table class="dtable">
-            <thead><tr><th>Nome</th><th>Usuário (login)</th><th>Perfil</th><th>Empresas atribuídas</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Usuário (login)</th><th>Setor</th><th>Ações</th></tr></thead>
             <tbody id="mgrTable"></tbody>
           </table></div>
         </div>
@@ -1091,15 +1091,14 @@ body.manager-mode{
       <div class="m-fg" style="margin-bottom:13px"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Senha <span id="mgrPassHint" style="font-weight:400">(deixe em branco para manter a atual)</span></label>
         <input class="sel-s" id="mgrPass" type="password" placeholder="mínimo 6 caracteres" style="width:100%;padding:10px 12px;border-radius:9px"/>
       </div>
-      <div class="m-fg" style="margin-bottom:13px"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Perfil de acesso</label>
-        <select class="sel-s" id="mgrRole" onchange="mgrRoleChanged()" style="width:100%">
-          <option value="gestor">Gestor (empresas específicas)</option>
-          <option value="admin">Administrador (acesso total)</option>
+      <div class="m-fg" style="margin-bottom:13px"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Setor / Cargo</label>
+        <select class="sel-s" id="mgrSetor" style="width:100%">
+          <option value="Engenharia">Engenharia</option>
+          <option value="Psicologia">Psicologia</option>
+          <option value="Diretoria">Diretoria</option>
+          <option value="Administração">Administração</option>
+          <option value="Outro">Outro</option>
         </select>
-      </div>
-      <div id="mgrCoWrap" style="margin-bottom:13px">
-        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px">Empresas atribuídas</label>
-        <div id="mgrCoList" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;padding:10px"></div>
       </div>
       <div id="mgrAlert2" class="alert alert-e"></div>
     </div>
@@ -1455,9 +1454,8 @@ const CQ_SECS=[
 function loadManagers(){
   const saved=JSON.parse(localStorage.getItem('ambrac_managers')||'null');
   if(saved&&saved.length)return saved;
-  // Seed inicial (mude a senha após o primeiro acesso)
   const defaults=[
-    {id:'mgr0',user:'admin@ambrac.com.br',pass:'ambrac2025',name:'Administrador AMBRAC',role:'admin',companies:[]},
+    {id:'mgr0',user:'admin@ambrac.com.br',pass:'ambrac2025',name:'Administrador AMBRAC',setor:'Administração'},
   ];
   localStorage.setItem('ambrac_managers',JSON.stringify(defaults));
   return defaults;
@@ -1714,16 +1712,10 @@ function doMgrLogin(){
   if(!f){showA('mgrAlert','e','❌ Usuário ou senha incorretos.');return;}
   currentMgr=f;
   $('sbName').textContent=f.name;$('sbAv').textContent=f.name.charAt(0);
-  // Mostra painel de Contas apenas para admin
-  const isAdmin=f.role==='admin';
-  [$('navContas'),$('navContasBtn')].forEach(el=>{if(el)el.style.display=isAdmin?'':'none';});
+  $('sbRole').textContent=f.setor||'Gerenciador';
   syncExternalResponses();refreshMgr();showSc('sMgr');
 }
-// Retorna as empresas visíveis para o gestor atual
-function visibleCompanies(){
-  if(!currentMgr||currentMgr.role==='admin')return STATE.companies;
-  return STATE.companies.filter(c=>(currentMgr.companies||[]).includes(c.id));
-}
+function visibleCompanies(){return STATE.companies;}
 function doMgrLogout(){currentMgr=null;setTheme('participant');showSc('sLogin');}
 
 // ═══════════════════════════════════════
@@ -1732,17 +1724,14 @@ function doMgrLogout(){currentMgr=null;setTheme('participant');showSc('sLogin');
 function renderMgrTable(){
   const tb=$('mgrTable');if(!tb)return;
   tb.innerHTML=MANAGERS.map(m=>{
-    const coNames=(m.companies||[]).map(id=>STATE.companies.find(c=>c.id===id)?.nome||id).join(', ')||'—';
-    const roleBadge=m.role==='admin'?'<span class="badge bb">Admin</span>':'<span class="badge ba">Gestor</span>';
     const isSelf=currentMgr&&m.id===currentMgr.id;
     return `<tr>
       <td style="font-weight:600">${m.name}${isSelf?' <span style="font-size:10px;color:var(--muted)">(você)</span>':''}</td>
       <td style="color:var(--muted);font-size:12px">${m.user}</td>
-      <td>${roleBadge}</td>
-      <td style="font-size:12px;color:var(--muted)">${m.role==='admin'?'Todas':coNames}</td>
+      <td><span class="badge bb">${m.setor||'—'}</span></td>
       <td><div class="row-acts">
         <button class="icon-btn" onclick="editMgr('${m.id}')" title="Editar">✏️</button>
-        ${isSelf?'':` <button class="icon-btn del" onclick="deleteMgr('${m.id}')" title="Remover">🗑</button>`}
+        ${isSelf?'':'<button class="icon-btn del" onclick="deleteMgr(\''+m.id+'\')" title="Remover">🗑</button>'}
       </div></td>
     </tr>`;
   }).join('');
@@ -1751,32 +1740,19 @@ function renderMgrTable(){
 function openNewMgr(){
   $('mNewMgrTitle').textContent='Nova Conta Gerencial';
   $('mgrEditId').value='';$('mgrName').value='';$('mgrUser').value='';
-  $('mgrPass').value='';$('mgrRole').value='gestor';
+  $('mgrPass').value='';$('mgrSetor').value='Engenharia';
   $('mgrPassHint').textContent='';$('mgrAlert2').className='alert alert-e';
-  mgrRoleChanged();renderMgrCoList([]);openModal('mNewMgr');
+  openModal('mNewMgr');
 }
 
 function editMgr(id){
   const m=MANAGERS.find(x=>x.id===id);if(!m)return;
   $('mNewMgrTitle').textContent='Editar Conta — '+m.name;
   $('mgrEditId').value=id;$('mgrName').value=m.name;$('mgrUser').value=m.user;
-  $('mgrPass').value='';$('mgrRole').value=m.role||'gestor';
+  $('mgrPass').value='';$('mgrSetor').value=m.setor||'Engenharia';
   $('mgrPassHint').textContent='(deixe em branco para manter a atual)';
   $('mgrAlert2').className='alert alert-e';
-  mgrRoleChanged();renderMgrCoList(m.companies||[]);openModal('mNewMgr');
-}
-
-function mgrRoleChanged(){
-  const isGestor=$('mgrRole').value==='gestor';
-  $('mgrCoWrap').style.display=isGestor?'':'none';
-}
-
-function renderMgrCoList(selected){
-  $('mgrCoList').innerHTML=STATE.companies.map(c=>`
-    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:3px 0">
-      <input type="checkbox" value="${c.id}" ${selected.includes(c.id)?'checked':''} style="accent-color:var(--accent)"/>
-      ${c.nome}
-    </label>`).join('')||'<span style="color:var(--muted);font-size:12px">Nenhuma empresa cadastrada.</span>';
+  openModal('mNewMgr');
 }
 
 function saveMgrAccount(){
@@ -1784,8 +1760,7 @@ function saveMgrAccount(){
   const name=$('mgrName').value.trim();
   const user=$('mgrUser').value.trim().toLowerCase();
   const pass=$('mgrPass').value;
-  const role=$('mgrRole').value;
-  const companies=[...$('mgrCoList').querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.value);
+  const setor=$('mgrSetor').value;
 
   if(!name||!user){showA('mgrAlert2','e','⚠️ Preencha nome e usuário.');return;}
   if(!id&&!pass){showA('mgrAlert2','e','⚠️ Informe uma senha para a nova conta.');return;}
@@ -1794,10 +1769,10 @@ function saveMgrAccount(){
 
   if(id){
     const m=MANAGERS.find(x=>x.id===id);if(!m)return;
-    m.name=name;m.user=user;m.role=role;m.companies=role==='admin'?[]:companies;
+    m.name=name;m.user=user;m.setor=setor;
     if(pass)m.pass=pass;
   }else{
-    MANAGERS.push({id:'mgr'+Date.now(),user,pass,name,role,companies:role==='admin'?[]:companies});
+    MANAGERS.push({id:'mgr'+Date.now(),user,pass,name,setor});
   }
   saveManagers();closeModal('mNewMgr');renderMgrTable();
 }
