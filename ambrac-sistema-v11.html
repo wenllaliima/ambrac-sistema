@@ -3917,7 +3917,7 @@ function printReport(type) {
     </div>
   </div></body></html>`;
 
-  addToReportHist(type, isCQ?'COPSOQ II':'AOT', coName, secVal==='all'?'Todos setores':secLabel, resps.length, CM?.name||'—');
+  try { addToReportHist(type, isCQ?'COPSOQ II':'AOT', coName, secVal==='all'?'Todos setores':secLabel, resps.length, currentMgr?.name||'—'); } catch(e) { console.error('addToReportHist error:',e); }
   openHtmlTab(html);
 }
 
