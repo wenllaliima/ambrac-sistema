@@ -9,35 +9,28 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getFirestore, collection, getDocs, setDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = '';  // ← cole aqui ex: https://xyzxyz.supabase.co
+  const SUPABASE_KEY = '';  // ← cole aqui a anon/public key
 
-  const FIREBASE_CFG = {
-    apiKey:            '',   // ← cole aqui
-    authDomain:        '',   // ← ex: ambrac-xxx.firebaseapp.com
-    projectId:         '',   // ← ex: ambrac-xxx
-    storageBucket:     '',
-    messagingSenderId: '',
-    appId:             '',
-  };
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  if (FIREBASE_CFG.projectId) {
-    const app = initializeApp(FIREBASE_CFG);
-    const db  = getFirestore(app);
-
-    // Expõe funções ao escopo global para o restante do código usar
-    window._fbLoadManagers = async () => {
-      const snap = await getDocs(collection(db, 'managers'));
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window._sbLoadManagers = async () => {
+      const { data, error } = await _sb.from('managers').select('*');
+      if (error) throw error;
+      return data || [];
     };
-    window._fbSaveManager = async (m) => {
-      await setDoc(doc(db, 'managers', m.id), m);
+    window._sbSaveManager = async (m) => {
+      const { error } = await _sb.from('managers').upsert(m);
+      if (error) throw error;
     };
-    window._fbDeleteManager = async (id) => {
-      await deleteDoc(doc(db, 'managers', id));
+    window._sbDeleteManager = async (id) => {
+      const { error } = await _sb.from('managers').delete().eq('id', id);
+      if (error) throw error;
     };
-    window._firebaseReady = true;
+    window._firebaseReady = true; // reusa a mesma flag — não muda o resto do código
   }
 </script>
 <style>
@@ -1463,24 +1456,22 @@ function loadManagers(){
 }
 function saveManagers(){
   localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
-  // Sincroniza com Firebase se disponível
   if(window._firebaseReady){
-    MANAGERS.forEach(m=>window._fbSaveManager(m).catch(console.error));
+    MANAGERS.forEach(m=>window._sbSaveManager(m).catch(console.error));
   }
 }
-async function syncManagersFromFirebase(){
+async function syncManagersFromSupabase(){
   if(!window._firebaseReady)return;
   try{
-    const remote=await window._fbLoadManagers();
+    const remote=await window._sbLoadManagers();
     if(remote&&remote.length){
       MANAGERS.length=0;remote.forEach(m=>MANAGERS.push(m));
       localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
     }
-  }catch(e){console.error('Firebase sync error:',e);}
+  }catch(e){console.error('Supabase sync error:',e);}
 }
 let MANAGERS=loadManagers();
-// Sincroniza do Firebase ao carregar (se configurado)
-window.addEventListener('load',()=>setTimeout(syncManagersFromFirebase,1000));
+window.addEventListener('load',()=>setTimeout(syncManagersFromSupabase,1000));
 
 let STATE=JSON.parse(localStorage.getItem('ambrac_state')||'null')||{
   companies:[{id:'c1',nome:'Indústria Exemplo S.A.',cnpj:'00.000.000/0001-00',setor:'Indústria',rh:'Carlos Silva',email:'rh@exemplo.com',questionario:'ambos',status:'ativo',colaboradores:[],unidades:[],ghes:[],createdAt:new Date().toISOString()}],
@@ -1801,7 +1792,7 @@ function deleteMgr(id){
   const idx=MANAGERS.findIndex(m=>m.id===id);if(idx<0)return;
   MANAGERS.splice(idx,1);
   localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
-  if(window._firebaseReady)window._fbDeleteManager(id).catch(console.error);
+  if(window._firebaseReady)window._sbDeleteManager(id).catch(console.error);
   renderMgrTable();
 }
 
