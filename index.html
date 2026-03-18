@@ -30,7 +30,20 @@
       const { error } = await _sb.from('managers').delete().eq('id', id);
       if (error) throw error;
     };
-    window._firebaseReady = true; // reusa a mesma flag — não muda o resto do código
+    window._sbLoadCompanies = async () => {
+      const { data, error } = await _sb.from('companies').select('*');
+      if (error) throw error;
+      return (data || []).map(r => r.data);
+    };
+    window._sbSaveCompany = async (co) => {
+      const { error } = await _sb.from('companies').upsert({ id: co.id, data: co });
+      if (error) throw error;
+    };
+    window._sbDeleteCompany = async (id) => {
+      const { error } = await _sb.from('companies').delete().eq('id', id);
+      if (error) throw error;
+    };
+    window._firebaseReady = true;
   }
 </script>
 <style>
@@ -600,9 +613,28 @@ body.manager-mode{
         <p style="font-size:13.5px;color:var(--muted);margin-bottom:28px;line-height:1.6">Entre com a sua conta Google corporativa para acessar o questionário atribuído à sua empresa.</p>
 
         <!-- GOOGLE SIGN-IN -->
-        <div id="gSignInWrap" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:24px">
+        <div id="gSignInWrap" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:20px">
           <div id="googleBtn"></div>
           <div id="errGoogle" class="alert alert-e" style="width:100%;text-align:center"></div>
+        </div>
+
+        <!-- DIVISOR -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:12px;color:var(--muted);white-space:nowrap">ou acesse com matrícula/CPF</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+
+        <!-- CPF / MATRÍCULA LOGIN -->
+        <div id="cpfLoginWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div class="fg" style="margin:0">
+            <input id="iCpfNome" placeholder="Nome completo" style="width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;color:var(--text);outline:none"/>
+          </div>
+          <div class="fg" style="margin:0">
+            <input id="iCpf" placeholder="CPF (000.000.000-00) ou Matrícula" style="width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;color:var(--text);outline:none"/>
+          </div>
+          <div id="errCpf" class="alert alert-e" style="margin:0"></div>
+          <button onclick="loginWithCpf()" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Entrar</button>
         </div>
 
         <!-- Elementos mantidos no DOM (usados por funções JS internas) mas invisíveis -->
@@ -1211,7 +1243,8 @@ body.manager-mode{
         <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Adicionar manualmente</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div class="form-group" style="margin:0"><label>Nome</label><input id="ec_add_nome" placeholder="João da Silva"/></div>
-          <div class="form-group" style="margin:0"><label>E-mail</label><input id="ec_add_email" placeholder="joao@empresa.com.br"/></div>
+          <div class="form-group" style="margin:0"><label>E-mail <span style="font-weight:300;color:var(--muted)">(opcional)</span></label><input id="ec_add_email" placeholder="joao@empresa.com.br"/></div>
+          <div class="form-group" style="margin:0"><label>CPF / Matrícula</label><input id="ec_add_cpf" placeholder="000.000.000-00"/></div>
           <div class="form-group" style="margin:0"><label>Função</label><input id="ec_add_funcao" placeholder="Analista"/></div>
           <div class="form-group" style="margin:0"><label>Setor</label><input id="ec_add_setor_col" placeholder="RH"/></div>
         </div>
@@ -1233,6 +1266,7 @@ body.manager-mode{
           <thead style="position:sticky;top:0;background:var(--surface2)"><tr>
             <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">Nome</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">E-mail</th>
+            <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">CPF/Matr.</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">Função</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">Setor</th>
             <th style="padding:8px 12px;width:70px;border-bottom:1px solid var(--border)"></th>
@@ -1463,23 +1497,30 @@ function saveManagers(){
     MANAGERS.forEach(m=>window._sbSaveManager(m).catch(console.error));
   }
 }
-async function syncManagersFromSupabase(){
+async function syncFromSupabase(){
   if(!window._firebaseReady)return;
   try{
-    const remote=await window._sbLoadManagers();
-    if(remote&&remote.length){
-      // Supabase tem dados → usa como fonte de verdade
-      MANAGERS.length=0;remote.forEach(m=>MANAGERS.push(m));
+    // — Managers —
+    const remoteMgrs=await window._sbLoadManagers();
+    if(remoteMgrs&&remoteMgrs.length){
+      MANAGERS.length=0;remoteMgrs.forEach(m=>MANAGERS.push(m));
       localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
     } else if(MANAGERS.length){
-      // Supabase vazio → envia localStorage para lá (migração inicial)
       await Promise.all(MANAGERS.map(m=>window._sbSaveManager(m)));
-      console.log('Managers migrados para o Supabase.');
+    }
+    // — Companies —
+    const remoteCos=await window._sbLoadCompanies();
+    if(remoteCos&&remoteCos.length){
+      STATE.companies.length=0;
+      remoteCos.forEach(c=>{if(!c.unidades)c.unidades=[];if(!c.ghes)c.ghes=[];STATE.companies.push(c);});
+      localStorage.setItem('ambrac_state',JSON.stringify(STATE));
+    } else if(STATE.companies.length){
+      await Promise.all(STATE.companies.map(c=>window._sbSaveCompany(c)));
     }
   }catch(e){console.error('Supabase sync error:',e);}
 }
 let MANAGERS=loadManagers();
-window.addEventListener('load',()=>setTimeout(syncManagersFromSupabase,1000));
+window.addEventListener('load',()=>setTimeout(syncFromSupabase,1000));
 
 let STATE=JSON.parse(localStorage.getItem('ambrac_state')||'null')||{
   companies:[{id:'c1',nome:'Indústria Exemplo S.A.',cnpj:'00.000.000/0001-00',setor:'Indústria',rh:'Carlos Silva',email:'rh@exemplo.com',questionario:'ambos',status:'ativo',colaboradores:[],unidades:[],ghes:[],createdAt:new Date().toISOString()}],
@@ -1547,10 +1588,53 @@ function handleGoogleLogin(response) {
   }
 }
 
+function loginWithCpf() {
+  const nome = ($('iCpfNome').value || '').trim();
+  const cpf  = ($('iCpf').value || '').trim().replace(/\D/g, '');
+  const err  = $('errCpf');
+  err.className = 'alert alert-e';
+  if (!nome || !cpf) {
+    err.className = 'alert alert-e show';
+    err.textContent = '⚠️ Preencha o nome e o CPF/Matrícula.';
+    return;
+  }
+  let found = null, foundCo = null;
+  for (const co of STATE.companies) {
+    const col = co.colaboradores.find(c => {
+      const nomeOk = (c.nome || '').trim().toLowerCase() === nome.toLowerCase();
+      const cpfOk  = (c.cpf  || '').replace(/\D/g,'') === cpf;
+      return nomeOk && cpfOk;
+    });
+    if (col) { found = col; foundCo = co; break; }
+  }
+  if (!found) {
+    err.className = 'alert alert-e show';
+    err.innerHTML = '⚠️ Nome ou CPF/Matrícula não encontrado. Verifique os dados ou entre em contato com o gestor.';
+    return;
+  }
+  CU = { nome: found.nome, email: found.email || found.cpf || '', empresa: foundCo.id, questionario: foundCo.questionario };
+  const first = CU.nome.split(' ')[0];
+  $('gName').textContent = `Olá, ${first}!`;
+  $('avLetter').textContent = first.charAt(0).toUpperCase();
+  updateCards();
+  if (CU.questionario && CU.questionario !== 'ambos') {
+    const key = (CU.email || found.cpf) + '_' + CU.questionario;
+    if (!done[key]) startQ(CU.questionario);
+    else showSc('sSel');
+  } else {
+    showSc('sSel');
+  }
+}
+
 // Inicializa quando o script do Google carregar
 window.addEventListener('load', () => setTimeout(initGoogleSignIn, 500));
 
-function saveState(){localStorage.setItem('ambrac_state',JSON.stringify(STATE));}
+function saveState(){
+  localStorage.setItem('ambrac_state',JSON.stringify(STATE));
+  if(window._firebaseReady){
+    STATE.companies.forEach(co=>window._sbSaveCompany(co).catch(console.error));
+  }
+}
 function syncExternalResponses(){
   const ext=JSON.parse(localStorage.getItem('ambrac_responses')||'[]');
   let added=0;
@@ -1918,13 +2002,14 @@ function switchEcTab(n){
 function renderEcColabList(){
   const id=$('mEditCo').dataset.editId;const c=STATE.companies.find(x=>x.id===id);if(!c)return;
   const q=($('ecSearch')?.value||'').toLowerCase();
-  const list=c.colaboradores.filter(x=>!q||x.nome.toLowerCase().includes(q)||x.email.toLowerCase().includes(q));
+  const list=c.colaboradores.filter(x=>!q||x.nome.toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q)||(x.cpf||'').toLowerCase().includes(q));
   $('ecColabCount').textContent=c.colaboradores.length;$('ecColabInfo').textContent=`${list.length} de ${c.colaboradores.length} colaborador(es)`;
   const tb=$('ecColabBody');
-  if(!list.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);font-size:13px">${c.colaboradores.length?'Nenhum resultado.':'Nenhum colaborador.'}</td></tr>`;return;}
+  if(!list.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);font-size:13px">${c.colaboradores.length?'Nenhum resultado.':'Nenhum colaborador.'}</td></tr>`;return;}
   tb.innerHTML=list.map(col=>`<tr style="border-bottom:1px solid var(--border)">
     <td style="padding:8px 12px;font-size:12.5px">${col.nome}</td>
-    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.email}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.email||'—'}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.cpf||'—'}</td>
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.funcao||'—'}</td>
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.setor||'—'}</td>
     <td style="padding:8px 12px;text-align:center"><div style="display:flex;gap:4px;justify-content:center">
@@ -1935,23 +2020,28 @@ function renderEcColabList(){
 }
 function ecAddColab(){
   const id=$('mEditCo').dataset.editId;const co=STATE.companies.find(x=>x.id===id);if(!co)return;
-  const nome=$('ec_add_nome').value.trim();const email=$('ec_add_email').value.trim().toLowerCase();
+  const nome=$('ec_add_nome').value.trim();
+  const email=$('ec_add_email').value.trim().toLowerCase();
+  const cpf=($('ec_add_cpf')?.value||'').trim();
   const funcao=$('ec_add_funcao')?.value.trim()||'';const setor=$('ec_add_setor_col')?.value.trim()||'';
-  if(!nome||!email){alert('Preencha nome e e-mail.');return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('E-mail inválido.');return;}
-  if(co.colaboradores.find(x=>x.email===email)){alert('E-mail já cadastrado nesta empresa.');return;}
-  co.colaboradores.push({id:'col'+Date.now(),nome,email,funcao,setor});saveState();
-  ['ec_add_nome','ec_add_email','ec_add_funcao','ec_add_setor_col'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  if(!nome){alert('Preencha o nome.');return;}
+  if(!email&&!cpf){alert('Preencha o e-mail ou o CPF/Matrícula.');return;}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('E-mail inválido.');return;}
+  if(email&&co.colaboradores.find(x=>x.email===email)){alert('E-mail já cadastrado nesta empresa.');return;}
+  co.colaboradores.push({id:'col'+Date.now(),nome,email,cpf,funcao,setor});saveState();
+  ['ec_add_nome','ec_add_email','ec_add_cpf','ec_add_funcao','ec_add_setor_col'].forEach(id=>{const el=$(id);if(el)el.value='';});
   renderEcColabList();renderCo();
 }
 function ecEditColab(colId){
   const id=$('mEditCo').dataset.editId;const co=STATE.companies.find(x=>x.id===id);if(!co)return;
   const col=co.colaboradores.find(x=>x.id===colId);if(!col)return;
   const nome=prompt('Nome:',col.nome);if(nome===null)return;
-  const email=prompt('E-mail:',col.email);if(email===null)return;
+  const email=prompt('E-mail (deixe vazio se não houver):',col.email||'');if(email===null)return;
+  const cpf=prompt('CPF / Matrícula:',col.cpf||'');if(cpf===null)return;
   const funcao=prompt('Função:',col.funcao||'');const setor=prompt('Setor:',col.setor||'');
-  if(!nome.trim()||!email.trim()){alert('Nome e e-mail são obrigatórios.');return;}
-  col.nome=nome.trim();col.email=email.trim().toLowerCase();col.funcao=(funcao||'').trim();col.setor=(setor||'').trim();
+  if(!nome.trim()){alert('Nome é obrigatório.');return;}
+  if(!email.trim()&&!cpf.trim()){alert('Informe o e-mail ou o CPF/Matrícula.');return;}
+  col.nome=nome.trim();col.email=email.trim().toLowerCase();col.cpf=(cpf||'').trim();col.funcao=(funcao||'').trim();col.setor=(setor||'').trim();
   saveState();renderEcColabList();renderCo();
 }
 function ecDelColab(colId){
@@ -1969,8 +2059,8 @@ function ecImportFile(event){
       if(file.name.endsWith('.csv')){const lines=ev.target.result.split('\n').filter(l=>l.trim());const headers=lines[0].split(',').map(h=>h.trim().replace(/"/g,''));data=lines.slice(1).map(l=>{const v=l.split(',').map(x=>x.trim().replace(/"/g,''));return Object.fromEntries(headers.map((h,i)=>[h,v[i]||'']));});}
       else{const wb=XLSX.read(ev.target.result,{type:'binary'});data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);}
       const id=$('mEditCo').dataset.editId;const c=STATE.companies.find(x=>x.id===id);if(!c)return;
-      const list=data.map((r,i)=>{const nome=(r.Nome||r.nome||r.NOME||r.name||Object.values(r)[0]||'').trim();const email=(r['E-mail']||r.Email||r.email||r.EMAIL||Object.values(r)[1]||'').trim().toLowerCase();const funcao=(r['Função']||r.Funcao||r.funcao||r.Cargo||r.cargo||'').trim();const setor=(r.Setor||r.setor||r.SETOR||r.Departamento||r.departamento||'').trim();return{id:'col'+Date.now()+i,nome,email,funcao,setor};}).filter(x=>x.nome&&x.email);
-      const added=list.filter(nc=>!c.colaboradores.find(ec=>ec.email===nc.email));
+      const list=data.map((r,i)=>{const nome=(r.Nome||r.nome||r.NOME||r.name||Object.values(r)[0]||'').trim();const email=(r['E-mail']||r.Email||r.email||r.EMAIL||'').trim().toLowerCase();const cpf=(r.CPF||r.cpf||r['CPF/Matrícula']||r.Matricula||r.matricula||r['Matrícula']||'').trim();const funcao=(r['Função']||r.Funcao||r.funcao||r.Cargo||r.cargo||'').trim();const setor=(r.Setor||r.setor||r.SETOR||r.Departamento||r.departamento||'').trim();return{id:'col'+Date.now()+i,nome,email,cpf,funcao,setor};}).filter(x=>x.nome&&(x.email||x.cpf));
+      const added=list.filter(nc=>{if(nc.email&&c.colaboradores.find(ec=>ec.email===nc.email))return false;if(!nc.email&&nc.cpf&&c.colaboradores.find(ec=>ec.cpf===nc.cpf))return false;return true;});
       c.colaboradores=[...c.colaboradores,...added];saveState();renderEcColabList();renderCo();
       st.textContent=`✓ ${added.length} adicionado(s), ${list.length-added.length} duplicata(s) ignorada(s).`;st.style.color='var(--green)';event.target.value='';
     }catch(err){st.textContent='Erro: '+err.message;st.style.color='var(--red)';}
@@ -2166,8 +2256,19 @@ function showPrev(data){
 }
 function confirmUpload(){
   if(!pendingUpload)return;const co=STATE.companies.find(c=>c.id===$('upTarget').value);if(!co){alert('Selecione empresa.');return;}
-  const list=pendingUpload.map((r,i)=>{const nome=r.Nome||r.nome||r.NOME||r.name||Object.values(r)[0]||'';const email=(r['E-mail']||r.Email||r.email||r.EMAIL||Object.values(r)[1]||'').trim().toLowerCase();return{id:'col'+Date.now()+i,nome:nome.trim(),email};}).filter(c=>c.nome&&c.email);
-  const added=list.filter(nc=>!co.colaboradores.find(ec=>ec.email===nc.email));
+  const list=pendingUpload.map((r,i)=>{
+    const nome=(r.Nome||r.nome||r.NOME||r.name||Object.values(r)[0]||'').trim();
+    const email=(r['E-mail']||r.Email||r.email||r.EMAIL||'').trim().toLowerCase();
+    const cpf=(r.CPF||r.cpf||r['CPF/Matrícula']||r.Matricula||r.matricula||r['Matrícula']||'').trim();
+    const funcao=(r.Função||r.Funcao||r.funcao||r.Cargo||r.cargo||'').trim();
+    const setor=(r.Setor||r.setor||'').trim();
+    return{id:'col'+Date.now()+i,nome,email,cpf,funcao,setor};
+  }).filter(c=>c.nome&&(c.email||c.cpf));
+  const added=list.filter(nc=>{
+    if(nc.email&&co.colaboradores.find(ec=>ec.email===nc.email))return false;
+    if(!nc.email&&nc.cpf&&co.colaboradores.find(ec=>ec.cpf===nc.cpf))return false;
+    return true;
+  });
   co.colaboradores=[...co.colaboradores,...added];saveState();cancelUpload();
   alert(`✓ ${added.length} colaborador(es) importado(s).`);renderCo();
 }
@@ -2272,7 +2373,7 @@ function dlRespTemplate(type){
 function dlTemplate(){
   const wb=XLSX.utils.book_new();
   const wsEmp=XLSX.utils.aoa_to_sheet([['Nome','CNPJ','Ramo','Contato RH','E-mail RH'],['Empresa Exemplo Ltda','00.000.000/0001-00','Indústria','João Silva','rh@empresa.com']]);
-  const wsCol=XLSX.utils.aoa_to_sheet([['Nome','E-mail','Função','Setor'],['Ana Souza','ana@empresa.com','Analista','RH'],['Carlos Lima','carlos@empresa.com','Operador','Produção']]);
+  const wsCol=XLSX.utils.aoa_to_sheet([['Nome','E-mail','CPF/Matrícula','Função','Setor'],['Ana Souza','ana@empresa.com','123.456.789-00','Analista','RH'],['Carlos Lima','','MAT-4521','Operador','Produção']]);
   XLSX.utils.book_append_sheet(wb,wsEmp,'Empresa');XLSX.utils.book_append_sheet(wb,wsCol,'Colaboradores');
   XLSX.writeFile(wb,'modelo_ambrac.xlsx');
 }
