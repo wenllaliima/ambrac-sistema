@@ -692,7 +692,7 @@ body.manager-mode{
       </div>
       <div class="qcard gld" id="cBe" onclick="startQ('bemestar')">
         <div class="qci">🏢</div><div class="qtag amber">AMBRAC · PGR / NR-1</div>
-        <h3>Bem-Estar e Organização do Trabalho</h3>
+        <h3>Avaliação de Organização do Trabalho (AOT)</h3>
         <p>Instrumento AMBRAC para identificar fatores psicossociais que impactam o bem-estar, em conformidade com a NR-1.</p>
         <div class="qmeta"><div class="qchip">⏱ ~10 min</div><div class="qchip">📋 24 questões</div><div class="qchip">🇧🇷 PGR / NR-1</div></div>
         <div class="qcstart"><span id="beLabel">Iniciar questionário →</span></div>
@@ -718,12 +718,12 @@ body.manager-mode{
 <!-- PARTICIPANT: BEM-ESTAR -->
 <div id="sBe" class="screen">
   <div class="q-topbar">
-    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">Bem-Estar e Organização do Trabalho · AMBRAC</span></div>
+    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">Avaliação de Organização do Trabalho (AOT) · AMBRAC</span></div>
     <div class="pbwrap"><span class="plabel" id="bePct">0%</span><div class="ptrack"><div class="pfill" id="beFill" style="width:0%"></div></div></div>
   </div>
   <div class="qwrap">
     <div class="qsec">
-      <div class="sechead" style="background:var(--gold)"><h3>🏢 Avaliação do Bem-Estar e Organização do Trabalho</h3><p>AMBRAC · PGR / NR-1 &nbsp;|&nbsp; Escala: 1-Nunca · 2-Raramente · 3-Às vezes · 4-Frequentemente · 5-Sempre</p></div>
+      <div class="sechead" style="background:var(--gold)"><h3>🏢 Avaliação de Organização do Trabalho (AOT)</h3><p>AMBRAC · PGR / NR-1 &nbsp;|&nbsp; Escala: 1-Nunca · 2-Raramente · 3-Às vezes · 4-Frequentemente · 5-Sempre</p></div>
       <div class="secbody">
         <div style="padding:16px 18px;font-size:13.5px;color:var(--muted);line-height:1.8;border-bottom:1px solid var(--border)"><strong style="color:var(--text)">Objetivo:</strong> Identificar fatores na organização do trabalho que possam impactar o bem-estar dos colaboradores.</div>
         <div class="openq" style="border-bottom:1px solid var(--border)"><label>Setor / Departamento <span style="color:var(--muted);font-weight:300">(opcional)</span></label><input type="text" id="be_setor" placeholder="Ex.: Produção, Administrativo, RH…" class="tinput" style="resize:none;min-height:unset"/></div>
@@ -888,10 +888,7 @@ body.manager-mode{
       <div class="m-fg"><label>Usuário</label><input type="text" id="mUser" placeholder="admin [at] ambrac.com.br"/></div>
       <div class="m-fg"><label>Senha</label><input type="password" id="mPass" placeholder="••••••••"/></div>
       <button class="m-btn" onclick="doMgrLogin()">Entrar no painel ›</button>
-      <div class="demo-box">
-        <strong>🔐 Credenciais de demonstração:</strong>
-        Usuário: <code id="mgr-demo-user"></code><br/>Senha: <code>ambrac2025</code>
-      </div>
+      <div id="mgr-demo-user" style="display:none"></div>
       <button class="back-to-part" onclick="goToParticipant()">← Voltar ao portal do colaborador</button>
     </div>
   </div>
@@ -910,7 +907,7 @@ body.manager-mode{
         <button class="nav-item" onclick="navTo('pUp',this)"><span class="icon">📤</span>Importar Colaboradores</button>
         <div class="nav-sec">Relatórios</div>
         <button class="nav-item" onclick="navTo('pRCq',this)"><span class="icon">🧠</span>Relatório COPSOQ II</button>
-        <button class="nav-item" onclick="navTo('pRBe',this)"><span class="icon">🏢</span>Relatório Bem-Estar</button>
+        <button class="nav-item" onclick="navTo('pRBe',this)"><span class="icon">🏢</span>Relatório AOT</button>
         <button class="nav-item" onclick="navTo('pRE3',this)"><span class="icon">🎯</span>Relatório Eixo III</button>
         <button class="nav-item" onclick="navTo('pResp',this)"><span class="icon">📋</span>Respostas Individuais</button>
         <div class="nav-sec">Administração</div>
@@ -1030,7 +1027,7 @@ body.manager-mode{
                 <select class="sel-s" id="respUpType" style="width:100%" onchange="respTypeChanged()">
                   <option value="">Selecione o instrumento…</option>
                   <option value="copsoq">COPSOQ II (76 questões)</option>
-                  <option value="bemestar">Bem-Estar / AOT (24 questões)</option>
+                  <option value="bemestar">AOT — Organização do Trabalho (24 questões)</option>
                 </select>
               </div>
               <div>
@@ -1054,7 +1051,7 @@ body.manager-mode{
             </div>
             <div style="display:flex;gap:8px;margin-top:10px">
               <button class="abtn ab-ghost" onclick="dlRespTemplate('copsoq')" style="font-size:12px">⬇ Modelo COPSOQ II</button>
-              <button class="abtn ab-ghost" onclick="dlRespTemplate('bemestar')" style="font-size:12px">⬇ Modelo Bem-Estar</button>
+              <button class="abtn ab-ghost" onclick="dlRespTemplate('bemestar')" style="font-size:12px">⬇ Modelo AOT</button>
             </div>
           </div>
         </div>
@@ -1078,7 +1075,7 @@ body.manager-mode{
             <button class="abtn ab-ghost" onclick="renderBE()">↻ Atualizar</button>
             <button class="abtn ab-pdf" id="bePdfBtn" onclick="printReport('be')" title="Imprimir / Salvar como PDF">🖨 Imprimir / PDF</button>
           </div>
-          <div id="beRepContent"><div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta de Bem-Estar recebida ainda.</p></div></div>
+          <div id="beRepContent"><div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta AOT recebida ainda.</p></div></div>
         </div>
 
         <!-- RELATÓRIO EIXO III -->
@@ -2032,7 +2029,7 @@ document.addEventListener('keydown',e=>{
   else if($('sMgrLogin').classList.contains('active'))doMgrLogin();
 });
 
-const PANEL_MAP={pOv:['Dashboard','Visão geral'],pCo:['Empresas','Gerencie empresas cadastradas'],pUp:['Importar Colaboradores','Upload de planilhas'],pRCq:['Relatório COPSOQ II','Diagnóstico de riscos psicossociais'],pRBe:['Relatório Bem-Estar','Avaliação AMBRAC NR-1'],pRE3:['Relatório Eixo III','Validação Qualitativa Participativa — GHE'],pResp:['Respostas Individuais','Todas as respostas recebidas'],pHist:['Histórico de Relatórios','Todos os relatórios gerados'],pContas:['Contas Gerenciais','Gerencie acessos ao painel']};
+const PANEL_MAP={pOv:['Dashboard','Visão geral'],pCo:['Empresas','Gerencie empresas cadastradas'],pUp:['Importar Colaboradores','Upload de planilhas'],pRCq:['Relatório COPSOQ II','Diagnóstico de riscos psicossociais'],pRBe:['Relatório AOT','Avaliação de Organização do Trabalho — NR-1'],pRE3:['Relatório Eixo III','Validação Qualitativa Participativa — GHE'],pResp:['Respostas Individuais','Todas as respostas recebidas'],pHist:['Histórico de Relatórios','Todos os relatórios gerados'],pContas:['Contas Gerenciais','Gerencie acessos ao painel']};
 function navTo(pid,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
@@ -3580,6 +3577,14 @@ setInterval(()=>{if(currentMgr){syncExternalResponses();$('lastUpd').textContent
 // UTILITÁRIO: ABRIR HTML VIA BLOB (sem popup bloqueado)
 // ═══════════════════════════════════════
 function openHtmlTab(htmlStr) {
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.open();
+    w.document.write(htmlStr);
+    w.document.close();
+    return;
+  }
+  // Fallback: blob URL (quando popup bloqueado)
   const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -3599,8 +3604,8 @@ function printCSS(accentColor) {
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
   @page { size:A4 portrait; margin:12mm 13mm 16mm 13mm; }
   body { font-family:'Segoe UI',Arial,sans-serif; font-size:10.5px; color:#1e2235; background:#fff; line-height:1.55; }
-  .rp-topbar { background:#1e2235; color:#fff; padding:6px 14px; font-size:9px; letter-spacing:.4px; text-transform:uppercase; }
-  .rp-header { border-bottom:3px solid ${accentColor}; padding-bottom:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .rp-topbar { background:${accentColor}; color:#fff; padding:6px 14px; font-size:9px; letter-spacing:.4px; text-transform:uppercase; }
+  .rp-header { border-bottom:3px solid ${accentColor}; padding-bottom:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; }
   .rp-brand  { font-size:22px; font-weight:900; color:${accentColor}; letter-spacing:-.5px; }
   .rp-brand-sub { font-size:8.5px; color:#94a3b8; margin-top:1px; }
   .rp-header-right { text-align:right; }
@@ -3610,7 +3615,7 @@ function printCSS(accentColor) {
   .id-table td { border:1px solid #d1d5db; padding:5px 10px; vertical-align:top; }
   .id-table td:first-child { font-weight:700; background:#f8faff; width:160px; color:${accentColor}; white-space:nowrap; }
   .rp-sec { margin-bottom:14px; }
-  .rp-sec-title { font-size:11px; font-weight:800; text-align:center; color:#1e2235; background:#f1f5f9; border:1px solid #d1d5db; padding:5px 10px; margin-bottom:8px; letter-spacing:.3px; text-transform:uppercase; }
+  .rp-sec-title { font-size:11px; font-weight:800; text-align:center; color:#fff; background:${accentColor}; border:1px solid ${accentColor}; padding:5px 10px; margin-bottom:8px; letter-spacing:.3px; text-transform:uppercase; }
   .rp-body-text { font-size:10px; color:#374151; line-height:1.65; }
   .met-table { width:100%; border-collapse:collapse; font-size:10px; }
   .met-table td { border:1px solid #d1d5db; padding:5px 10px; vertical-align:top; }
@@ -3625,7 +3630,7 @@ function printCSS(accentColor) {
   .badge-mod   { display:inline-block; padding:2px 8px; border-radius:4px; font-weight:800; font-size:9px; background:#fffbeb; color:#d97706; border:1px solid #fcd34d; }
   .badge-baixo { display:inline-block; padding:2px 8px; border-radius:4px; font-weight:800; font-size:9px; background:#f0fdf4; color:#16a34a; border:1px solid #86efac; }
   .interp-table { width:100%; border-collapse:collapse; font-size:10px; margin-bottom:14px; }
-  .interp-table th { background:#1e2235; color:#fff; padding:5px 10px; font-size:9px; text-align:left; font-weight:700; }
+  .interp-table th { background:${accentColor}; color:#fff; padding:5px 10px; font-size:9px; text-align:left; font-weight:700; }
   .interp-table td { border-bottom:1px solid #e5e7eb; padding:5px 10px; }
   .interp-table td:first-child { font-weight:700; width:90px; }
   .fav  { color:#16a34a; font-weight:800; }
@@ -3639,7 +3644,7 @@ function printCSS(accentColor) {
   .bar-bg   { background:#f3f4f6; height:6px; border-radius:99px; overflow:hidden; }
   .bar-fill { height:6px; border-radius:99px; }
   .actions-table { width:100%; border-collapse:collapse; font-size:9.5px; margin-bottom:14px; }
-  .actions-table th { background:#374151; color:#fff; padding:5px 8px; font-size:8.5px; font-weight:700; text-transform:uppercase; }
+  .actions-table th { background:#2d6b52; color:#fff; padding:5px 8px; font-size:8.5px; font-weight:700; text-transform:uppercase; }
   .actions-table td { border-bottom:1px solid #f3f4f6; padding:5px 8px; vertical-align:top; }
   .actions-table tr:nth-child(even) td { background:#fafafa; }
   .profile-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
@@ -3714,9 +3719,10 @@ function printReport(type) {
   const dims    = isCQ ? CQ_DIMS    : BE_DIMS;
   const factors = isCQ ? CQ_FACTORS : BE_FACTORS;
   const actions = isCQ ? CQ_ACTIONS : BE_ACTIONS;
-  const accent  = isCQ ? '#3d7aed' : '#d4a030';
-  const instrName = isCQ ? 'Copenhagen Psychosocial Questionnaire (COPSOQ-II)' : 'AMBRAC — Instrumento de Bem-Estar Ocupacional (NR-1)';
-  const repTitle  = isCQ ? 'Relatório Diagnóstico de Percepção de Riscos Psicossociais' : 'Relatório de Bem-Estar Ocupacional';
+  const accent  = '#1e4d3a';
+  const accent2 = '#c4922a';
+  const instrName = isCQ ? 'Copenhagen Psychosocial Questionnaire (COPSOQ-II)' : 'Avaliação de Organização do Trabalho — AOT (AMBRAC · NR-1)';
+  const repTitle  = isCQ ? 'Relatório Diagnóstico de Riscos Psicossociais — COPSOQ II' : 'Relatório de Avaliação de Organização do Trabalho (AOT)';
   const dateStr   = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 
   const fs={};
@@ -3786,14 +3792,30 @@ function printReport(type) {
 
   const coName=co?.nome||coLabel;
 
+  const logoSvg=`<svg width="160" height="48" viewBox="0 0 160 48" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="48" rx="4" fill="#1e4d3a"/>
+    <text x="12" y="30" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="-0.5">AMBRAC<tspan fill="#c4922a">.</tspan></text>
+    <text x="12" y="43" font-family="Arial,sans-serif" font-size="7.5" fill="rgba(255,255,255,0.65)" letter-spacing="0.3">Medicina e Segurança do Trabalho</text>
+  </svg>`;
+
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} — AMBRAC</title>
-  <style>${printCSS(accent)}</style></head><body>
-  <div class="no-print">✅ <strong>Para salvar como PDF:</strong> pressione <strong>Ctrl+P</strong> (ou ⌘P no Mac) → Destino: "Salvar como PDF" → clique Imprimir</div>
-  <div class="rp-topbar">Diagnóstico da Percepção do Colaborador sobre os Fatores de Risco Psicossociais</div>
+  <style>${printCSS(accent)}</style>
+  <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},500);});<\/script>
+  </head><body>
+  <div class="no-print" style="background:#e8f2ed;color:#1e4d3a;border:1px solid #2d6b52;padding:10px 16px;border-radius:8px;font-size:12px;margin-bottom:16px;font-family:sans-serif">
+    📄 O diálogo de impressão abrirá automaticamente. Para salvar como PDF: selecione <strong>"Salvar como PDF"</strong> como destino.
+  </div>
+  <div class="rp-topbar" style="background:#1e4d3a">${isCQ?'COPSOQ II — Diagnóstico de Riscos Psicossociais':'AOT — Avaliação de Organização do Trabalho · NR-1'}</div>
   <div style="padding:12px 0 0">
-    <div class="rp-header">
-      <div><div class="rp-brand">AMBRAC</div><div class="rp-brand-sub">Sistema de Avaliação Ergonômica e Riscos Psicossociais</div></div>
-      <div class="rp-header-right"><div class="rp-title">${repTitle}</div><div class="rp-meta">Emitido em: ${dateStr}</div></div>
+    <div class="rp-header" style="border-bottom:3px solid #1e4d3a">
+      <div style="display:flex;align-items:center;gap:14px">
+        ${logoSvg}
+        <div style="border-left:2px solid #e2e8f0;padding-left:14px">
+          <div style="font-size:12px;font-weight:800;color:#1e4d3a;letter-spacing:.3px">${repTitle}</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">Sistema AMBRAC · PGR / NR-1</div>
+        </div>
+      </div>
+      <div class="rp-header-right"><div style="font-size:10px;color:#6b7280">Emitido em: ${dateStr}</div></div>
     </div>
     <table class="id-table">
       <tr><td>EMPRESA</td><td>${coName}${co?.cnpj?' &nbsp;·&nbsp; CNPJ: '+co.cnpj:''}</td></tr>
@@ -3877,12 +3899,12 @@ function printReport(type) {
       <div class="sign-crp">CRP: &nbsp;</div>
     </div>
     <div class="rp-footer">
-      <span>AMBRAC — Avaliação Ergonômica Preliminar de Riscos Psicossociais</span>
+      <span>AMBRAC · Medicina e Segurança do Trabalho — ${repTitle}</span>
       <span>Documento gerado automaticamente. Análise técnica sob responsabilidade de profissional habilitado.</span>
     </div>
   </div></body></html>`;
 
-  addToReportHist(type, isCQ?'COPSOQ II':'Bem-Estar', coName, secVal==='all'?'Todos setores':secLabel, resps.length, CM?.name||'—');
+  addToReportHist(type, isCQ?'COPSOQ II':'AOT', coName, secVal==='all'?'Todos setores':secLabel, resps.length, CM?.name||'—');
   openHtmlTab(html);
 }
 
