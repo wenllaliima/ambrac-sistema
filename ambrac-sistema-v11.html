@@ -1056,8 +1056,11 @@ body.manager-mode{
         <!-- CONTAS GERENCIAIS -->
         <div class="panel" id="pContas">
           <div class="toolbar">
-            <div class="toolbar-l"><span style="font-size:13px;color:var(--muted)">Gerencie os acessos ao painel gerencial. Só administradores veem esta tela.</span></div>
-            <button class="abtn ab-pri" onclick="openNewMgr()">+ Nova Conta</button>
+            <div class="toolbar-l"><span style="font-size:13px;color:var(--muted)">Gerencie os acessos ao painel gerencial. Contas sincronizadas em todos os dispositivos via Supabase.</span></div>
+            <div style="display:flex;gap:8px">
+              <button class="abtn ab-ghost" onclick="forceSyncManagers()" title="Sincronizar com Supabase">☁ Sincronizar</button>
+              <button class="abtn ab-pri" onclick="openNewMgr()">+ Nova Conta</button>
+            </div>
           </div>
           <div class="dtable-wrap"><table class="dtable">
             <thead><tr><th>Nome</th><th>Usuário (login)</th><th>Setor</th><th>Ações</th></tr></thead>
@@ -1465,8 +1468,13 @@ async function syncManagersFromSupabase(){
   try{
     const remote=await window._sbLoadManagers();
     if(remote&&remote.length){
+      // Supabase tem dados → usa como fonte de verdade
       MANAGERS.length=0;remote.forEach(m=>MANAGERS.push(m));
       localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
+    } else if(MANAGERS.length){
+      // Supabase vazio → envia localStorage para lá (migração inicial)
+      await Promise.all(MANAGERS.map(m=>window._sbSaveManager(m)));
+      console.log('Managers migrados para o Supabase.');
     }
   }catch(e){console.error('Supabase sync error:',e);}
 }
@@ -1727,6 +1735,14 @@ function doMgrLogin(){
 }
 function visibleCompanies(){return STATE.companies;}
 function doMgrLogout(){currentMgr=null;setTheme('participant');showSc('sLogin');}
+
+async function forceSyncManagers(){
+  if(!window._firebaseReady){alert('Supabase não configurado.');return;}
+  try{
+    await Promise.all(MANAGERS.map(m=>window._sbSaveManager(m)));
+    alert(`✓ ${MANAGERS.length} conta(s) sincronizada(s) com o Supabase.`);
+  }catch(e){alert('Erro ao sincronizar: '+e.message);}
+}
 
 // ═══════════════════════════════════════
 // GESTÃO DE CONTAS GERENCIAIS
