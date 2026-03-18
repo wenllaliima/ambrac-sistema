@@ -9,6 +9,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, getDocs, setDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const FIREBASE_CFG = {
+    apiKey:            '',   // ← cole aqui
+    authDomain:        '',   // ← ex: ambrac-xxx.firebaseapp.com
+    projectId:         '',   // ← ex: ambrac-xxx
+    storageBucket:     '',
+    messagingSenderId: '',
+    appId:             '',
+  };
+
+  if (FIREBASE_CFG.projectId) {
+    const app = initializeApp(FIREBASE_CFG);
+    const db  = getFirestore(app);
+
+    // Expõe funções ao escopo global para o restante do código usar
+    window._fbLoadManagers = async () => {
+      const snap = await getDocs(collection(db, 'managers'));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    };
+    window._fbSaveManager = async (m) => {
+      await setDoc(doc(db, 'managers', m.id), m);
+    };
+    window._fbDeleteManager = async (id) => {
+      await deleteDoc(doc(db, 'managers', id));
+    };
+    window._firebaseReady = true;
+  }
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.6}
@@ -576,48 +607,18 @@ body.manager-mode{
         <p style="font-size:13.5px;color:var(--muted);margin-bottom:28px;line-height:1.6">Entre com a sua conta Google corporativa para acessar o questionário atribuído à sua empresa.</p>
 
         <!-- GOOGLE SIGN-IN -->
-        <div id="gSignInWrap" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:20px">
+        <div id="gSignInWrap" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:24px">
           <div id="googleBtn"></div>
           <div id="errGoogle" class="alert alert-e" style="width:100%;text-align:center"></div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-          <div style="flex:1;height:1px;background:var(--border)"></div>
-          <span style="font-size:11px;color:var(--muted)">ou acesso de demonstração</span>
-          <div style="flex:1;height:1px;background:var(--border)"></div>
-        </div>
-
-        <!-- OTP (DEMO / FALLBACK) -->
-        <div>
-          <div class="step-ind">
-            <div class="step-dot active" id="dot1">1</div>
-            <div class="step-line" id="line1"></div>
-            <div class="step-dot" id="dot2">2</div>
-          </div>
-          <div class="otp-step active" id="step1">
-            <div id="errLogin" class="alert alert-e"></div>
-            <div class="fg"><label>Nome completo</label><input type="text" id="iNome" placeholder="Ex.: João da Silva"/></div>
-            <div class="fg"><label>E-mail corporativo</label><input type="email" id="iEmail" placeholder="seu@empresa.com.br"/></div>
-            <button class="p-btn" style="background:var(--surface3);color:var(--text);border:1px solid var(--border)" onclick="sendOtp()">Entrar com e-mail + código ›</button>
-          </div>
-          <div class="otp-step" id="step2">
-            <div id="infoOtp" class="alert alert-i"></div>
-            <div id="errOtp" class="alert alert-e"></div>
-            <div class="otp-display">
-              <span style="font-size:12px;opacity:.85">🔐 Código de demonstração:</span>
-              <span class="otp-code" id="otpShow">——</span>
-            </div>
-            <div class="fg" style="margin-bottom:8px"><label>Digite o código de 6 dígitos</label>
-              <input class="otp-in" type="text" id="iOtp" maxlength="6" placeholder="· · · · · ·" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')"/>
-            </div>
-            <div class="otp-timer" id="otpTimer"></div>
-            <button class="p-btn" style="margin-top:11px" onclick="verifyOtp()">Verificar e entrar ›</button>
-            <div style="text-align:center;margin-top:11px;font-size:12.5px;color:var(--muted)">
-              <button class="txt-btn" onclick="backTo1()">← Corrigir dados</button>
-              &nbsp;·&nbsp;
-              <button class="txt-btn" id="resendBtn" onclick="resendOtp()" disabled>Reenviar código</button>
-            </div>
-          </div>
+        <!-- Elementos mantidos no DOM (usados por funções JS internas) mas invisíveis -->
+        <div style="display:none">
+          <input id="iNome"/><input id="iEmail"/><input id="iOtp"/>
+          <div id="errLogin"></div><div id="errOtp"></div><div id="infoOtp"></div>
+          <div id="otpTimer"></div><span id="otpShow"></span>
+          <div id="dot1"></div><div id="dot2"></div><div id="line1"></div>
+          <button id="resendBtn"></button>
         </div>
 
         <button class="mgr-link" onclick="goToManagerLogin()">🔑 Acesso ao Painel Gerencial</button>
@@ -1460,8 +1461,26 @@ function loadManagers(){
   localStorage.setItem('ambrac_managers',JSON.stringify(defaults));
   return defaults;
 }
-function saveManagers(){localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));}
+function saveManagers(){
+  localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
+  // Sincroniza com Firebase se disponível
+  if(window._firebaseReady){
+    MANAGERS.forEach(m=>window._fbSaveManager(m).catch(console.error));
+  }
+}
+async function syncManagersFromFirebase(){
+  if(!window._firebaseReady)return;
+  try{
+    const remote=await window._fbLoadManagers();
+    if(remote&&remote.length){
+      MANAGERS.length=0;remote.forEach(m=>MANAGERS.push(m));
+      localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
+    }
+  }catch(e){console.error('Firebase sync error:',e);}
+}
 let MANAGERS=loadManagers();
+// Sincroniza do Firebase ao carregar (se configurado)
+window.addEventListener('load',()=>setTimeout(syncManagersFromFirebase,1000));
 
 let STATE=JSON.parse(localStorage.getItem('ambrac_state')||'null')||{
   companies:[{id:'c1',nome:'Indústria Exemplo S.A.',cnpj:'00.000.000/0001-00',setor:'Indústria',rh:'Carlos Silva',email:'rh@exemplo.com',questionario:'ambos',status:'ativo',colaboradores:[],unidades:[],ghes:[],createdAt:new Date().toISOString()}],
@@ -1780,7 +1799,10 @@ function saveMgrAccount(){
 function deleteMgr(id){
   if(!confirm('Remover esta conta gerencial?'))return;
   const idx=MANAGERS.findIndex(m=>m.id===id);if(idx<0)return;
-  MANAGERS.splice(idx,1);saveManagers();renderMgrTable();
+  MANAGERS.splice(idx,1);
+  localStorage.setItem('ambrac_managers',JSON.stringify(MANAGERS));
+  if(window._firebaseReady)window._fbDeleteManager(id).catch(console.error);
+  renderMgrTable();
 }
 
 document.addEventListener('keydown',e=>{
