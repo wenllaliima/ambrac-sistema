@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.6}
@@ -583,28 +583,23 @@ body.manager-mode{
     <div class="p-login-right">
       <div class="p-form-inner">
         <div class="p-logo">AMBRAC<span>.</span></div>
-        <h2 style="font-family:'Fraunces',serif;font-size:24px;font-weight:500;margin-bottom:18px">Acesse o questionário</h2>
-        <div class="login-tabs">
-          <button class="login-tab active" id="tabQr" onclick="switchLoginTab('qr')">📲 Link / QR Code</button>
-          <button class="login-tab" id="tabEmail" onclick="switchLoginTab('email')">✉️ E-mail + OTP</button>
+        <h2 style="font-family:'Fraunces',serif;font-size:24px;font-weight:500;margin-bottom:6px">Acesse o questionário</h2>
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:28px;line-height:1.6">Entre com a sua conta Google corporativa para acessar o questionário atribuído à sua empresa.</p>
+
+        <!-- GOOGLE SIGN-IN -->
+        <div id="gSignInWrap" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:20px">
+          <div id="googleBtn"></div>
+          <div id="errGoogle" class="alert alert-e" style="width:100%;text-align:center"></div>
         </div>
 
-        <!-- ABA QR / TOKEN -->
-        <div id="loginQr">
-          <div id="errQr" class="alert alert-e"></div>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Digite o código do seu QR code ou acesse diretamente pelo link enviado pelo gestor.</p>
-          <div class="fg">
-            <label>Código de acesso (8 caracteres)</label>
-            <input class="token-input" type="text" id="iToken" maxlength="8" placeholder="XXXXXXXX"
-              oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()"
-              onkeydown="if(event.key==='Enter')loginWithToken($('iToken').value)"/>
-          </div>
-          <button class="p-btn" onclick="loginWithToken($('iToken').value)">Entrar ›</button>
-          <button class="mgr-link" onclick="goToManagerLogin()">🔑 Acesso ao Painel Gerencial</button>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:11px;color:var(--muted)">ou acesso de demonstração</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
         </div>
 
-        <!-- ABA E-MAIL + OTP -->
-        <div id="loginEmail" style="display:none">
+        <!-- OTP (DEMO / FALLBACK) -->
+        <div>
           <div class="step-ind">
             <div class="step-dot active" id="dot1">1</div>
             <div class="step-line" id="line1"></div>
@@ -614,21 +609,14 @@ body.manager-mode{
             <div id="errLogin" class="alert alert-e"></div>
             <div class="fg"><label>Nome completo</label><input type="text" id="iNome" placeholder="Ex.: João da Silva"/></div>
             <div class="fg"><label>E-mail corporativo</label><input type="email" id="iEmail" placeholder="seu@empresa.com.br"/></div>
-            <button class="p-btn" onclick="sendOtp()">Enviar código de acesso ›</button>
-            <div class="hint-box">
-              <strong>👋 Usuários de teste:</strong>
-              <code>Ana Paula Souza</code> / <code id="demo1"></code><br/>
-              <code>Carlos Mendes</code> / <code id="demo2"></code><br/>
-              <code>Maria Fernanda Lima</code> / <code id="demo3"></code>
-            </div>
+            <button class="p-btn" style="background:var(--surface3);color:var(--text);border:1px solid var(--border)" onclick="sendOtp()">Entrar com e-mail + código ›</button>
           </div>
           <div class="otp-step" id="step2">
             <div id="infoOtp" class="alert alert-i"></div>
             <div id="errOtp" class="alert alert-e"></div>
             <div class="otp-display">
-              <span style="font-size:12px;opacity:.85">🔐 Código gerado para demonstração:</span>
+              <span style="font-size:12px;opacity:.85">🔐 Código de demonstração:</span>
               <span class="otp-code" id="otpShow">——</span>
-              <span style="font-size:10.5px;opacity:.65">(Em produção, enviado somente ao e-mail)</span>
             </div>
             <div class="fg" style="margin-bottom:8px"><label>Digite o código de 6 dígitos</label>
               <input class="otp-in" type="text" id="iOtp" maxlength="6" placeholder="· · · · · ·" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')"/>
@@ -641,8 +629,9 @@ body.manager-mode{
               <button class="txt-btn" id="resendBtn" onclick="resendOtp()" disabled>Reenviar código</button>
             </div>
           </div>
-          <button class="mgr-link" onclick="goToManagerLogin()">🔑 Acesso ao Painel Gerencial</button>
         </div>
+
+        <button class="mgr-link" onclick="goToManagerLogin()">🔑 Acesso ao Painel Gerencial</button>
       </div>
     </div>
   </div>
@@ -1458,6 +1447,67 @@ let STATE=JSON.parse(localStorage.getItem('ambrac_state')||'null')||{
 
 // Migrate old companies missing unidades/ghes fields
 STATE.companies.forEach(c=>{if(!c.unidades)c.unidades=[];if(!c.ghes)c.ghes=[];});
+
+// ═══════════════════════════════════════
+// GOOGLE SIGN-IN
+// ═══════════════════════════════════════
+const GOOGLE_CLIENT_ID = '384229946150-pc96quvo7eq900rjcrrait1voq69aqfv.apps.googleusercontent.com';
+
+function initGoogleSignIn() {
+  if (typeof google === 'undefined') return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('googleBtn'),
+    { theme: 'outline', size: 'large', text: 'continue_with', shape: 'rectangular', width: 320 }
+  );
+}
+
+function handleGoogleLogin(response) {
+  try {
+    // Decodifica o JWT sem verificar assinatura (seguro para dados públicos como email/nome)
+    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const email = payload.email.toLowerCase().trim();
+    const nome  = payload.name || payload.given_name || '';
+
+    // Busca colaborador pelo e-mail Google
+    let found = null, foundCo = null;
+    for (const co of STATE.companies) {
+      const col = co.colaboradores.find(c => c.email.toLowerCase().trim() === email);
+      if (col) { found = col; foundCo = co; break; }
+    }
+    if (!found) {
+      const err = $('errGoogle');
+      err.className = 'alert alert-e show';
+      err.innerHTML = `⚠️ O e-mail <strong>${email}</strong> não está cadastrado em nenhuma empresa. Entre em contato com o gestor.`;
+      return;
+    }
+    // Login bem-sucedido
+    CU = { nome: found.nome || nome, email: found.email, empresa: foundCo.id, questionario: foundCo.questionario };
+    const first = CU.nome.split(' ')[0];
+    $('gName').textContent = `Olá, ${first}!`;
+    $('avLetter').textContent = first.charAt(0).toUpperCase();
+    updateCards();
+    if (CU.questionario && CU.questionario !== 'ambos') {
+      if (!done[CU.email + '_' + CU.questionario]) startQ(CU.questionario);
+      else showSc('sSel');
+    } else {
+      showSc('sSel');
+    }
+  } catch(e) {
+    console.error('Google login error:', e);
+    const err = $('errGoogle');
+    err.className = 'alert alert-e show';
+    err.textContent = '❌ Erro ao processar login. Tente novamente.';
+  }
+}
+
+// Inicializa quando o script do Google carregar
+window.addEventListener('load', () => setTimeout(initGoogleSignIn, 500));
 
 function saveState(){localStorage.setItem('ambrac_state',JSON.stringify(STATE));}
 function syncExternalResponses(){
