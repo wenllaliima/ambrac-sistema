@@ -3577,22 +3577,44 @@ setInterval(()=>{if(currentMgr){syncExternalResponses();$('lastUpd').textContent
 // UTILITÁRIO: ABRIR HTML VIA BLOB (sem popup bloqueado)
 // ═══════════════════════════════════════
 function openHtmlTab(htmlStr) {
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.open();
-    w.document.write(htmlStr);
-    w.document.close();
-    return;
-  }
-  // Fallback: blob URL (quando popup bloqueado)
-  const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.target = '_blank'; a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 20000);
+  // Remove overlay anterior se existir
+  const prev = document.getElementById('_repOverlay');
+  if (prev) prev.remove();
+
+  // Wrapper de tela cheia
+  const wrap = document.createElement('div');
+  wrap.id = '_repOverlay';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;background:#fff';
+
+  // Barra de ferramentas
+  const bar = document.createElement('div');
+  bar.style.cssText = 'background:#1e4d3a;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px';
+  bar.innerHTML = '<span style="font-size:13px;font-weight:600">Relatório AMBRAC — pronto para impressão</span>';
+
+  const btnPrint = document.createElement('button');
+  btnPrint.textContent = '🖨 Imprimir / Salvar PDF';
+  btnPrint.style.cssText = 'padding:7px 18px;background:#c4922a;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit';
+  btnPrint.onclick = () => iframe.contentWindow.print();
+
+  const btnClose = document.createElement('button');
+  btnClose.textContent = '✕ Fechar';
+  btnClose.style.cssText = 'padding:7px 14px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:7px;cursor:pointer;font-size:13px;font-family:inherit';
+  btnClose.onclick = () => wrap.remove();
+
+  const btnGroup = document.createElement('div');
+  btnGroup.style.cssText = 'display:flex;gap:8px';
+  btnGroup.appendChild(btnPrint);
+  btnGroup.appendChild(btnClose);
+  bar.appendChild(btnGroup);
+
+  // Iframe com o HTML do relatório
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'flex:1;border:none;width:100%;background:#fff';
+  iframe.srcdoc = htmlStr;
+
+  wrap.appendChild(bar);
+  wrap.appendChild(iframe);
+  document.body.appendChild(wrap);
 }
 
 // ═══════════════════════════════════════
@@ -3800,11 +3822,7 @@ function printReport(type) {
 
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} — AMBRAC</title>
   <style>${printCSS(accent)}</style>
-  <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},500);});<\/script>
   </head><body>
-  <div class="no-print" style="background:#e8f2ed;color:#1e4d3a;border:1px solid #2d6b52;padding:10px 16px;border-radius:8px;font-size:12px;margin-bottom:16px;font-family:sans-serif">
-    📄 O diálogo de impressão abrirá automaticamente. Para salvar como PDF: selecione <strong>"Salvar como PDF"</strong> como destino.
-  </div>
   <div class="rp-topbar" style="background:#1e4d3a">${isCQ?'COPSOQ II — Diagnóstico de Riscos Psicossociais':'AOT — Avaliação de Organização do Trabalho · NR-1'}</div>
   <div style="padding:12px 0 0">
     <div class="rp-header" style="border-bottom:3px solid #1e4d3a">
