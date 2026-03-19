@@ -2737,34 +2737,88 @@ const DRPS_ALIB=[
 // ═══════════════════════════════════════
 // COPSOQ SCORES & REPORT
 // ═══════════════════════════════════════
+// COPSOQ II — Versão Média (29 fatores, 76 questões)
+// invertedQs = fatores protetores: score = 1 − (x−1)/4  (maior resposta → menor risco)
 const CQ_FACTORS=[
-  {name:'Exigências quantitativas',qs:[0,1,2],dim:'EL'},{name:'Ritmo de trabalho acelerado',qs:[3],dim:'EL'},
-  {name:'Altas exigências cognitivas',qs:[4,5,6],dim:'EL'},{name:'Altas exigências emocionais',qs:[7],dim:'EL'},
-  {name:'Pouca influência no trabalho',qs:[8,9,10,11],dim:'OTC'},{name:'Baixa possibilidades de desenvolvimento',qs:[12,13,14],dim:'OTC'},
-  {name:'Pouca previsibilidade de rotina',qs:[15,16],dim:'OTC'},{name:'Pouca transparência do papel laboral',qs:[17,18,19],dim:'OTC'},
-  {name:'Déficit nas recompensas',qs:[20,21,22],dim:'RSL'},{name:'Conflitos laborais',qs:[23,24,25],dim:'RSL'},
-  {name:'Pouco apoio social de colegas',qs:[26,27,28],dim:'RSL'},{name:'Pouco apoio social dos superiores',qs:[29,30,31],dim:'RSL'},
-  {name:'Pouca cooperação no trabalho',qs:[32,33,34],dim:'RSL'},{name:'Má qualidade da liderança',qs:[35,36,37,38],dim:'RSL'},
-  {name:'Baixa confiança entre pares',qs:[39,40,41],dim:'VLT'},{name:'Baixa confiança na gerência',qs:[42,43,44],dim:'VLT'},
-  {name:'Injustiça e desrespeito',qs:[45,46,47],dim:'VLT'},{name:'Baixa autoeficácia',qs:[48,49],dim:'P'},
-  {name:'Trabalho sem significado',qs:[50,51,52],dim:'OTC'},{name:'Pouco compromisso face ao trabalho',qs:[53,54],dim:'OTC'},
-  {name:'Insatisfação no trabalho',qs:[55,56,57,58],dim:'ITI'},{name:'Insegurança laboral',qs:[59],dim:'ITI'},
-  {name:'Falta de saúde geral',qs:[60],dim:'SBE'},{name:'Conflito trabalho/família',qs:[61,62,63],dim:'ITI'},
-  {name:'Problemas em dormir',qs:[64,65],dim:'SBE'},{name:'Burnout',qs:[66,67],dim:'SBE'},
-  {name:'Estresse',qs:[68,69],dim:'SBE'},{name:'Sintomas depressivos',qs:[70,71],dim:'SBE'},
-  {name:'Comportamentos ofensivos',qs:[72,73,74,75],dim:'CO'},
+  {name:'Exigências Quantitativas',           qs:[0,1,2],                                dim:'EL'},
+  {name:'Ritmo de Trabalho',                  qs:[3],                                    dim:'EL'},
+  {name:'Exigências Cognitivas',              qs:[4,5,6],                                dim:'EL'},
+  {name:'Exigências Emocionais',              qs:[7],                                    dim:'EL'},
+  {name:'Influência no Trabalho',             qs:[8,9,10,11],   invertedQs:[8,9,10,11], dim:'OTC'},
+  {name:'Possibilidades de Desenvolvimento',  qs:[12,13,14],    invertedQs:[12,13,14],  dim:'OTC'},
+  {name:'Previsibilidade',                    qs:[15,16],       invertedQs:[15,16],      dim:'OTC'},
+  {name:'Transparência do Papel',             qs:[17,18,19],    invertedQs:[17,18,19],   dim:'OTC'},
+  {name:'Reconhecimento e Recompensas',       qs:[20,21,22],    invertedQs:[20,21,22],  dim:'REL'},
+  {name:'Conflitos de Papel',                 qs:[23,24,25],                             dim:'REL'},
+  {name:'Apoio Social de Colegas',            qs:[26,27,28],    invertedQs:[26,27,28],  dim:'REL'},
+  {name:'Apoio Social de Superiores',         qs:[29,30,31],    invertedQs:[29,30,31],  dim:'REL'},
+  {name:'Comunidade Social no Trabalho',      qs:[32,33,34],    invertedQs:[32,33,34],  dim:'REL'},
+  {name:'Qualidade da Liderança',             qs:[35,36,37,38], invertedQs:[35,36,37,38],dim:'REL'},
+  {name:'Confiança Horizontal',               qs:[39,40,41],                             dim:'REL'},
+  {name:'Confiança Vertical',                 qs:[42,43,44],    invertedQs:[42,43],      dim:'ITI'},
+  {name:'Justiça e Respeito',                 qs:[45,46,47],    invertedQs:[45,46,47],  dim:'ITI'},
+  {name:'Auto-Eficácia',                      qs:[48,49],       invertedQs:[48,49],      dim:'ITI'},
+  {name:'Significado do Trabalho',            qs:[50,51,52],    invertedQs:[50,51,52],  dim:'VLT'},
+  {name:'Compromisso com o Local de Trabalho',qs:[53,54],       invertedQs:[53,54],      dim:'VLT'},
+  {name:'Satisfação Laboral',                 qs:[55,56,57,58], invertedQs:[55,56,57,58],dim:'VLT'},
+  {name:'Insegurança Laboral',                qs:[59],                                   dim:'VLT'},
+  {name:'Saúde Geral',                        qs:[60],          invertedQs:[60],         dim:'PER'},
+  {name:'Conflito Trabalho-Família',          qs:[61,62,63],                             dim:'SAU'},
+  {name:'Problemas de Sono',                  qs:[64,65],                                dim:'SAU'},
+  {name:'Burnout',                            qs:[66,67],                                dim:'SAU'},
+  {name:'Stress',                             qs:[68,69],                                dim:'SAU'},
+  {name:'Sintomas Depressivos',               qs:[70,71],                                dim:'SAU'},
+  {name:'Comportamentos Ofensivos',           qs:[72,73,74,75],                          dim:'CO'},
 ];
 const CQ_DIMS=[
-  {id:'EL',name:'Exigências Laborais',factors:['Exigências quantitativas','Ritmo de trabalho acelerado','Altas exigências cognitivas','Altas exigências emocionais']},
-  {id:'OTC',name:'Organização do Trabalho e Conteúdo',factors:['Pouca influência no trabalho','Baixa possibilidades de desenvolvimento','Pouca previsibilidade de rotina','Pouca transparência do papel laboral','Trabalho sem significado','Pouco compromisso face ao trabalho']},
-  {id:'RSL',name:'Relações Sociais e Liderança',factors:['Déficit nas recompensas','Conflitos laborais','Pouco apoio social de colegas','Pouco apoio social dos superiores','Pouca cooperação no trabalho','Má qualidade da liderança']},
-  {id:'ITI',name:'Interface Trabalho–Indivíduo',factors:['Insatisfação no trabalho','Insegurança laboral','Conflito trabalho/família']},
-  {id:'VLT',name:'Valores no Local de Trabalho',factors:['Baixa confiança entre pares','Baixa confiança na gerência','Injustiça e desrespeito']},
-  {id:'P',name:'Personalidade',factors:['Baixa autoeficácia']},
-  {id:'SBE',name:'Saúde e Bem-Estar',factors:['Falta de saúde geral','Problemas em dormir','Burnout','Estresse','Sintomas depressivos']},
-  {id:'CO',name:'Comportamentos Ofensivos',factors:['Comportamentos ofensivos']},
+  {id:'EL', name:'Exigências Laborais',               color:'#ef4444',desc:'Demandas quantitativas, cognitivas, emocionais e ritmo de trabalho.',
+    factors:['Exigências Quantitativas','Ritmo de Trabalho','Exigências Cognitivas','Exigências Emocionais']},
+  {id:'OTC',name:'Organização do Trabalho e Conteúdo',color:'#f59e0b',desc:'Influência, desenvolvimento, previsibilidade e clareza de papel.',
+    factors:['Influência no Trabalho','Possibilidades de Desenvolvimento','Previsibilidade','Transparência do Papel']},
+  {id:'REL',name:'Relações Sociais e Liderança',      color:'#3b82f6',desc:'Apoio, reconhecimento, liderança, cooperação e confiança entre pares.',
+    factors:['Reconhecimento e Recompensas','Conflitos de Papel','Apoio Social de Colegas','Apoio Social de Superiores','Comunidade Social no Trabalho','Qualidade da Liderança','Confiança Horizontal']},
+  {id:'ITI',name:'Interface Trabalho–Indivíduo',      color:'#8b5cf6',desc:'Confiança na gestão, justiça organizacional e autoeficácia.',
+    factors:['Confiança Vertical','Justiça e Respeito','Auto-Eficácia']},
+  {id:'VLT',name:'Valores no Local de Trabalho',      color:'#10b981',desc:'Significado, comprometimento, satisfação e segurança no emprego.',
+    factors:['Significado do Trabalho','Compromisso com o Local de Trabalho','Satisfação Laboral','Insegurança Laboral']},
+  {id:'PER',name:'Personalidade',                     color:'#06b6d4',desc:'Percepção geral de saúde e bem-estar individual.',
+    factors:['Saúde Geral']},
+  {id:'SAU',name:'Saúde e Bem-Estar',                 color:'#ec4899',desc:'Impacto do trabalho na saúde: sono, exaustão, estresse e sintomas depressivos.',
+    factors:['Conflito Trabalho-Família','Problemas de Sono','Burnout','Stress','Sintomas Depressivos']},
+  {id:'CO', name:'Comportamentos Ofensivos',          color:'#64748b',desc:'Assédio, violência e comportamentos hostis no ambiente de trabalho.',
+    factors:['Comportamentos Ofensivos']},
 ];
-const CQ_ACTIONS={'Exigências quantitativas':'Reorganizar tarefas e redistribuir carga de trabalho.','Ritmo de trabalho acelerado':'Rever prazos; incluir pausas programadas.','Altas exigências cognitivas':'Fornecer suporte técnico e treinamentos.','Altas exigências emocionais':'Criar espaços de escuta ativa e suporte psicológico.','Pouca influência no trabalho':'Ampliar participação dos colaboradores nas decisões.','Baixa possibilidades de desenvolvimento':'Estabelecer plano de carreira e treinamentos.','Pouca previsibilidade de rotina':'Garantir clareza na agenda e planejamento de demandas.','Pouca transparência do papel laboral':'Comunicar claramente cargos e responsabilidades.','Déficit nas recompensas':'Implementar sistema de reconhecimento por desempenho.','Conflitos laborais':'Criar comitê de mediação e treinamentos em comunicação.','Pouco apoio social de colegas':'Promover integração por meio de projetos colaborativos.','Pouco apoio social dos superiores':'Capacitar líderes em gestão humanizada e empática.','Pouca cooperação no trabalho':'Estimular trabalho em equipe com metas compartilhadas.','Má qualidade da liderança':'Avaliação 360° e programa de desenvolvimento de líderes.','Baixa confiança entre pares':'Estimular ética e respeito; aplicar códigos de conduta.','Baixa confiança na gerência':'Aumentar transparência das decisões da gestão.','Injustiça e desrespeito':'Criar políticas claras de justiça organizacional.','Baixa autoeficácia':'Oferecer feedbacks positivos e oportunidades de desenvolvimento.','Trabalho sem significado':'Realinhar tarefas ao propósito organizacional.','Pouco compromisso face ao trabalho':'Fortalecer vínculo com ações de valorização e pertencimento.','Insatisfação no trabalho':'Aplicar pesquisas de clima e agir sobre pontos críticos.','Insegurança laboral':'Garantir estabilidade com contratos claros.','Falta de saúde geral':'Criar programas de saúde física e mental.','Conflito trabalho/família':'Adotar políticas de flexibilidade de horário.','Problemas em dormir':'Promover higiene do sono e equilíbrio jornada/descanso.','Burnout':'Reduzir sobrecarga e investir em suporte emocional.','Estresse':'Implantar programas de mindfulness e ginástica laboral.','Sintomas depressivos':'Disponibilizar atendimento psicológico contínuo.','Comportamentos ofensivos':'Canal de denúncia seguro e política de tolerância zero.'};
+const CQ_ACTIONS={
+  'Exigências Quantitativas':'Reorganizar tarefas e redistribuir carga; revisar prazos e volume de trabalho.',
+  'Ritmo de Trabalho':'Rever ritmo produtivo; incluir pausas programadas e metas alcançáveis.',
+  'Exigências Cognitivas':'Fornecer suporte técnico, treinamentos e simplificação de processos.',
+  'Exigências Emocionais':'Criar espaços de escuta ativa e suporte psicológico para a equipe.',
+  'Influência no Trabalho':'Ampliar participação dos colaboradores nas decisões que os afetam.',
+  'Possibilidades de Desenvolvimento':'Estabelecer plano de carreira claro e oferecer treinamentos regulares.',
+  'Previsibilidade':'Garantir comunicação antecipada de mudanças e planejamento transparente.',
+  'Transparência do Papel':'Comunicar claramente cargos, metas e responsabilidades de cada função.',
+  'Reconhecimento e Recompensas':'Implementar sistema de reconhecimento formal e informal por desempenho.',
+  'Conflitos de Papel':'Revisar descrições de cargo; eliminar sobreposição de responsabilidades.',
+  'Apoio Social de Colegas':'Promover integração e cultura colaborativa com projetos em equipe.',
+  'Apoio Social de Superiores':'Capacitar líderes em gestão humanizada, escuta ativa e feedback.',
+  'Comunidade Social no Trabalho':'Estimular senso de pertencimento com atividades e espaços de convivência.',
+  'Qualidade da Liderança':'Avaliação 360° e programa de desenvolvimento de líderes.',
+  'Confiança Horizontal':'Estimular ética, respeito e transparência entre colegas.',
+  'Confiança Vertical':'Aumentar transparência das decisões da gestão; comunicação direta com a equipe.',
+  'Justiça e Respeito':'Criar e aplicar políticas claras de justiça organizacional.',
+  'Auto-Eficácia':'Oferecer feedbacks positivos e oportunidades graduais de desenvolvimento.',
+  'Significado do Trabalho':'Realinhar tarefas ao propósito organizacional e ao perfil do colaborador.',
+  'Compromisso com o Local de Trabalho':'Fortalecer vínculo com ações de valorização e pertencimento.',
+  'Satisfação Laboral':'Aplicar pesquisas de clima periodicamente e agir sobre pontos críticos.',
+  'Insegurança Laboral':'Garantir estabilidade com contratos claros e comunicação transparente.',
+  'Saúde Geral':'Criar programas de saúde física e mental; acompanhamento preventivo.',
+  'Conflito Trabalho-Família':'Adotar políticas de flexibilidade de horário e possibilidade de teletrabalho.',
+  'Problemas de Sono':'Promover higiene do sono; equilibrar jornada e descanso adequado.',
+  'Burnout':'Reduzir sobrecarga, implantar pausas estruturadas e investir em suporte emocional.',
+  'Stress':'Implantar programas de mindfulness, ginástica laboral e gestão do estresse.',
+  'Sintomas Depressivos':'Disponibilizar atendimento psicológico contínuo e gratuito.',
+  'Comportamentos Ofensivos':'Canal de denúncia seguro, política de tolerância zero e capacitação.',
+};
 
 // ─── BANCO DE AÇÕES DETALHADAS (Plano de Ação AEP — Wenlla Lima, Nov/2025) ───
 // Mapeamento: fator do questionário → ações práticas + treinamentos por complexidade/público
@@ -3240,7 +3294,7 @@ function buildE3RepHTML(resps,sortedF,dimScores,co){
 
 
 function calcCQ(resps){
-  const fs={};CQ_FACTORS.forEach(f=>{const v=[];resps.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push((x-1)/4);});});fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
+  const fs={};CQ_FACTORS.forEach(f=>{const inv=new Set(f.invertedQs||[]);const v=[];resps.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);});});fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
   const ds={};CQ_DIMS.forEach(d=>{const v=d.factors.map(fn=>fs[fn]).filter(x=>x!=null);ds[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
   return{fs,ds};
 }
@@ -3261,29 +3315,49 @@ function renderCQ(){
 // ═══════════════════════════════════════
 // BEM-ESTAR SCORES & REPORT
 // ═══════════════════════════════════════
+// AOT — Avaliação da Organização do Trabalho (12 fatores, 24 questões, 6 dimensões)
 const BE_FACTORS=[
-  {name:'Sobrecarga e pressão',desc:'Excesso de trabalho e pressão por prazo',qs:[0,1],dim:'EQ'},
-  {name:'Subocupação e monotonia',desc:'Poucas tarefas, trabalho repetitivo',qs:[2,3],dim:'EQ'},
-  {name:'Falta de autonomia',desc:'Pouca liberdade e ritmo imposto',qs:[4,5],dim:'OR'},
-  {name:'Falta de suporte da liderança',desc:'Dificuldade de apoio da supervisão',qs:[6],dim:'RS'},
-  {name:'Falta de suporte dos colegas',desc:'Dificuldade de ajuda da equipe',qs:[7],dim:'RS'},
-  {name:'Conflito e ambiguidade de papel',desc:'Responsabilidades e objetivos confusos',qs:[8,9],dim:'OR'},
-  {name:'Clima organizacional negativo',desc:'Conflitos e desconfiança no setor',qs:[10,11],dim:'RS'},
-  {name:'Falta de reconhecimento',desc:'Esforço pouco valorizado',qs:[12,13],dim:'VR'},
-  {name:'Injustiça e desigualdade',desc:'Distribuição injusta de tarefas',qs:[14,15],dim:'VR'},
-  {name:'Falha na comunicação',desc:'Comunicação deficiente em mudanças',qs:[16,17],dim:'CO'},
-  {name:'Barreiras de comunicação',desc:'Ruído, distância e ferramentas inadequadas',qs:[18,19],dim:'CO'},
-  {name:'Violência e assédio',desc:'Humilhação, piadas ofensivas, agressões',qs:[20,21,22,23],dim:'VA'},
+  {name:'Excesso de Demandas',         qs:[0,1],   dim:'EL'},
+  {name:'Ociosidade',                  qs:[2,3],   dim:'EL'},
+  {name:'Baixo Controle',              qs:[4,5],   dim:'ITI'},
+  {name:'Falta de Apoio',              qs:[6,7],   dim:'RSL'},
+  {name:'Baixa Clareza',               qs:[8,9],   dim:'OTC'},
+  {name:'Conflitos e Más Relações',    qs:[10,11], dim:'RSL'},
+  {name:'Falta de Reconhecimento',     qs:[12,13], dim:'VLT'},
+  {name:'Injustiça no Trabalho',       qs:[14,15], dim:'VLT'},
+  {name:'Má Gestão de Mudanças',       qs:[16,17], dim:'OTC'},
+  {name:'Problemas de Comunicação',    qs:[18,19], dim:'RSL'},
+  {name:'Assédio',                     qs:[20,21], dim:'CO'},
+  {name:'Violência e Agressão',        qs:[22,23], dim:'CO'},
 ];
 const BE_DIMS=[
-  {id:'EQ',name:'Exigências Quantitativas e Qualitativas',factors:['Sobrecarga e pressão','Subocupação e monotonia']},
-  {id:'OR',name:'Organização e Conteúdo do Trabalho',factors:['Falta de autonomia','Conflito e ambiguidade de papel']},
-  {id:'RS',name:'Relações Sociais no Trabalho',factors:['Falta de suporte da liderança','Falta de suporte dos colegas','Clima organizacional negativo']},
-  {id:'VR',name:'Valorização e Reconhecimento',factors:['Falta de reconhecimento','Injustiça e desigualdade']},
-  {id:'CO',name:'Comunicação Organizacional',factors:['Falha na comunicação','Barreiras de comunicação']},
-  {id:'VA',name:'Violência e Assédio',factors:['Violência e assédio']},
+  {id:'EL', name:'Exigências Laborais',              color:'#4f8ef7',desc:'Carga física e mental: pressão por prazos, volume de tarefas e demandas emocionais.',
+    factors:['Excesso de Demandas','Ociosidade']},
+  {id:'OTC',name:'Organização do Trabalho',          color:'#22c55e',desc:'Clareza de tarefas, autonomia, variedade, previsibilidade e gestão de mudanças.',
+    factors:['Baixa Clareza','Má Gestão de Mudanças']},
+  {id:'RSL',name:'Relações Sociais',                 color:'#7c5cfc',desc:'Qualidade das relações com colegas e líderes, apoio e comunicação.',
+    factors:['Falta de Apoio','Conflitos e Más Relações','Problemas de Comunicação']},
+  {id:'ITI',name:'Interface Trabalho-Indivíduo',     color:'#06b6d4',desc:'Grau de autonomia e controle sobre o próprio trabalho.',
+    factors:['Baixo Controle']},
+  {id:'VLT',name:'Valores no Trabalho',              color:'#f59e0b',desc:'Alinhamento entre valores pessoais e organizacionais: reconhecimento e justiça.',
+    factors:['Falta de Reconhecimento','Injustiça no Trabalho']},
+  {id:'CO', name:'Comportamentos Ofensivos',         color:'#ec4899',desc:'Assédio, violência, discriminação ou bullying no ambiente de trabalho.',
+    factors:['Assédio','Violência e Agressão']},
 ];
-const BE_ACTIONS={'Sobrecarga e pressão':'Redistribuir tarefas e revisar prazos; incluir pausas.','Subocupação e monotonia':'Enriquecer funções com tarefas variadas e projetos.','Falta de autonomia':'Ampliar participação nas decisões operacionais.','Falta de suporte da liderança':'Capacitar líderes em gestão humanizada.','Falta de suporte dos colegas':'Promover cultura colaborativa com atividades em grupo.','Conflito e ambiguidade de papel':'Clarificar descrições de cargo e responsabilidades.','Clima organizacional negativo':'Mediação de conflitos e diagnóstico de clima periódico.','Falta de reconhecimento':'Programas de reconhecimento formal e informal.','Injustiça e desigualdade':'Políticas auditáveis de distribuição de tarefas.','Falha na comunicação':'Canais de comunicação claros para mudanças.','Barreiras de comunicação':'Investir em ferramentas de comunicação eficazes.','Violência e assédio':'Canal de denúncia seguro e política de tolerância zero.'};
+const BE_ACTIONS={
+  'Excesso de Demandas':'Redistribuir tarefas e revisar prazos; incluir pausas programadas na jornada.',
+  'Ociosidade':'Enriquecer funções com tarefas variadas, projetos desafiadores e capacitações.',
+  'Baixo Controle':'Ampliar participação dos colaboradores nas decisões que afetam seu trabalho.',
+  'Falta de Apoio':'Capacitar líderes em gestão humanizada; promover cultura colaborativa.',
+  'Baixa Clareza':'Clarificar descrições de cargo, metas, responsabilidades e expectativas.',
+  'Conflitos e Más Relações':'Mediação de conflitos e diagnóstico periódico de clima organizacional.',
+  'Falta de Reconhecimento':'Programas de reconhecimento formal e informal pelo desempenho.',
+  'Injustiça no Trabalho':'Políticas auditáveis e transparentes de distribuição de tarefas e oportunidades.',
+  'Má Gestão de Mudanças':'Comunicar mudanças com antecedência e oferecer suporte à adaptação.',
+  'Problemas de Comunicação':'Investir em canais eficazes de comunicação interna e ferramentas adequadas.',
+  'Assédio':'Canal de denúncia seguro, política de tolerância zero e programa de prevenção.',
+  'Violência e Agressão':'Protocolo de segurança, suporte psicológico imediato e medidas preventivas.',
+};
 
 function calcBE(resps){
   const fs={};BE_FACTORS.forEach(f=>{const v=[];resps.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push((x-1)/4);});});fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
@@ -3750,7 +3824,7 @@ function printReport(type) {
   const fs={};
   factors.forEach(f => {
     const v=[];
-    resps.forEach(r => { f.qs.forEach(qi => { const x=r.respostas['q'+qi]; if(x!=null)v.push((x-1)/4); }); });
+    resps.forEach(r => { const inv=new Set(f.invertedQs||[]); f.qs.forEach(qi => { const x=r.respostas['q'+qi]; if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4); }); });
     fs[f.name] = v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
   });
   const ds={};
@@ -3809,7 +3883,7 @@ function printReport(type) {
     return `<div class="prof-row"><div class="prof-label"><span>${o}</span><span style="font-weight:700;color:${c}">${n} (${p}%)</span></div><div class="prof-bar-bg"><div class="prof-bar-fill" style="width:${p}%;background:${c}"></div></div></div>`;
   }).join('');
 
-  const defsMap={EL:'verificam a carga física e mental do trabalho, como pressão por prazos, volume de tarefas e demandas emocionais.',OTC:'analisam a clareza das tarefas, autonomia, variedade e previsibilidade no trabalho.',RSL:'medem a qualidade das relações com colegas e líderes, incluindo apoio, confiança e justiça organizacional.',ITI:'avalia como o trabalho afeta a vida pessoal, incluindo equilíbrio entre vida profissional e pessoal e segurança no emprego.',VLT:'exploram o alinhamento entre os valores pessoais e os da organização, além do reconhecimento e significado do trabalho.',P:'considera traços individuais como autoestima, otimismo e estratégias de enfrentamento do estresse.',SBE:'avaliam o impacto do trabalho na saúde física e mental, incluindo sono, exaustão e satisfação geral.',CO:'identificam experiências de assédio, violência, discriminação ou bullying no ambiente de trabalho.'};
+  const defsMap={EL:'Avalia a intensidade das demandas de trabalho: quantidade, ritmo, cognitivas e emocionais.',OTC:'Analisa a clareza das tarefas, autonomia, desenvolvimento, previsibilidade e transparência de papel.',REL:'Mede relações interpessoais, apoio de colegas e líderes, cooperação, reconhecimento e liderança.',RSL:'Mede a qualidade das relações com colegas e líderes, apoio e comunicação.',ITI:'Avalia confiança na gestão, justiça organizacional, autoeficácia e equilíbrio trabalho-vida.',VLT:'Examina significado, comprometimento, satisfação e valores alinhados ao ambiente organizacional.',PER:'Percepção geral de saúde e bem-estar individual do trabalhador.',P:'Considera traços individuais como autoeficácia e resiliência no enfrentamento do estresse.',SAU:'Avalia impactos do trabalho na saúde: sono, exaustão, estresse, burnout e sintomas depressivos.',SBE:'Avalia impacto do trabalho na saúde física e mental, incluindo sono, exaustão e satisfação.',CO:'Identifica assédio, violência, discriminação e comportamentos ofensivos no trabalho.'};
   const defLines=dims.map(d=>`<strong>${d.name}</strong> ${defsMap[d.id]||''}`).join('<br>');
 
   const coName=co?.nome||coLabel;
@@ -3834,7 +3908,7 @@ function printReport(type) {
   const sectorAnalysis = sectors.map(sec => {
     const sR = resps.filter(r => (r.respostas?.setor||'').toLowerCase() === sec.toLowerCase());
     const sFs = {};
-    factors.forEach(f => { const v=[]; sR.forEach(r=>{ f.qs.forEach(qi=>{ const x=r.respostas['q'+qi]; if(x!=null)v.push((x-1)/4); }); }); sFs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null; });
+    factors.forEach(f => { const inv=new Set(f.invertedQs||[]); const v=[]; sR.forEach(r=>{ f.qs.forEach(qi=>{ const x=r.respostas['q'+qi]; if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4); }); }); sFs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null; });
     const sDs = {};
     dims.forEach(d => { const v=d.factors.map(fn=>sFs[fn]).filter(x=>x!=null); sDs[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null; });
     const vals = Object.values(sDs).filter(v=>v!=null);
@@ -3856,7 +3930,10 @@ function printReport(type) {
     OR:'Analisa o grau de autonomia, a clareza dos papéis e a organização das atividades laborais, identificando ambiguidade de funções e falta de flexibilidade.',
     RS:'Examina a qualidade das relações interpessoais, incluindo suporte das lideranças, apoio dos colegas e clima geral de confiança e cooperação na equipe.',
     VR:'Mede a percepção dos trabalhadores quanto ao reconhecimento de seu esforço, à equidade na distribuição de tarefas e à valorização profissional.',
-    VA:'Identifica situações de violência física ou psicológica, assédio moral ou sexual e outros comportamentos abusivos presentes no ambiente de trabalho.'
+    VA:'Identifica situações de violência física ou psicológica, assédio moral ou sexual e outros comportamentos abusivos presentes no ambiente de trabalho.',
+    REL:'Mede as relações sociais e interpessoais no trabalho: apoio de colegas e líderes, cooperação, reconhecimento, liderança e confiança entre equipes.',
+    PER:'Avalia a percepção geral de saúde e o bem-estar individual do trabalhador no contexto ocupacional.',
+    SAU:'Avalia os efeitos do trabalho sobre a saúde: qualidade do sono, exaustão emocional, estresse, burnout e sintomas depressivos.'
   };
   const dimDetailRows = dims.map(d => {
     const s=ds[d.id], pct=s!=null?Math.round(s*100):null, rc=RC(s||0);
