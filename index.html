@@ -437,6 +437,41 @@ body.manager-mode{
   .p-login-left{display:none}.p-login-right{width:100%;min-width:unset}
 }
 
+/* ─── MOBILE QUESTIONNAIRE ─── */
+@media(max-width:767px){
+  .qwrap{padding:16px 12px 60px}
+  .ltable thead th:first-child{min-width:180px;font-size:12px}
+  .ltable tbody td:first-child{font-size:12px;min-width:180px;padding-right:6px}
+  .colw{width:40px}
+  .lhlabel{font-size:9px}
+  .lradio{width:18px;height:18px}
+  .lradio.sel::after{width:7px;height:7px}
+  .opill{font-size:12px;padding:5px 10px}
+  .sechead h3{font-size:14px}
+  .sechead p{font-size:11px}
+  .q-topbar{padding:10px 14px}
+  .q-ttitle{font-size:12.5px}
+  .ptrack{width:70px}
+  /* Make the table scroll container work */
+  .secbody{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* NPS scale on mobile */
+  .npsscale{gap:3px}
+  .npsbtn{font-size:11px}
+  /* Demographic options */
+  .dopts{flex-wrap:wrap;gap:5px}
+  .opill{font-size:11.5px;padding:5px 9px}
+}
+
+/* ─── WAVE CARDS (Survey Cycles) ─── */
+.wave-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wave-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600}
+.wave-ativo{background:rgba(34,197,94,.12);color:#22c55e}
+.wave-encerrado{background:var(--surface3);color:var(--muted)}
+
+/* ─── PGR EXPORT BUTTON ─── */
+.ab-pgr{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;display:flex;align-items:center;gap:6px;font-weight:600}
+.ab-pgr:hover{background:linear-gradient(135deg,#15803d,#166534);transform:translateY(-1px);box-shadow:0 4px 12px rgba(22,163,74,.4)}
+
 /* ─── DETAILED ACTIONS BLOCK ─── */
 .da-filters{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:14px;display:flex;flex-direction:column;gap:14px}
 .da-filter-group{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -841,14 +876,17 @@ body.manager-mode{
         <button class="nav-item" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
         <button class="nav-item" onclick="navTo('pRBe',this)">Relatório AOT</button>
         <button class="nav-item" onclick="navTo('pResp',this)">Respostas Individuais</button>
+        <button class="nav-item" onclick="navTo('pPlano',this)">Plano de Ação</button>
+        <button class="nav-item" onclick="navTo('pPulso',this)">Pulso Mensal</button>
         <div class="nav-sec">Academy</div>
         <button class="nav-item" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
         <div class="nav-sec">Administração</div>
         <button class="nav-item" onclick="navTo('pHist',this)">Histórico de Relatórios</button>
         <button class="nav-item" onclick="navTo('pContas',this)">Contas Gerenciais</button>
+        <button class="nav-item" onclick="navTo('pConfig',this)">Configurações</button>
       </nav>
       <div class="sb-footer">
-        <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role" id="sbRole">Gerenciador</div></div></div>
+        <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role" id="sbRole">Gerenciador</div><div id="sbPlan" style="font-size:10px;background:var(--accent-pale);color:var(--accent);border-radius:99px;padding:2px 8px;display:inline-block;margin-top:3px;font-weight:600">Essencial</div></div></div>
         <button class="sb-logout" onclick="doMgrLogout()">← Sair do painel</button>
       </div>
     </aside>
@@ -996,6 +1034,7 @@ body.manager-mode{
             <select class="sel-s" id="cqSecFilter" onchange="renderCQ()"><option value="all">Todos os setores</option></select>
             <button class="abtn ab-ghost" onclick="renderCQ()">↻ Atualizar</button>
             <button class="abtn ab-pdf" id="cqPdfBtn" onclick="printReport('cq')" title="Imprimir / Salvar como PDF">PDF</button>
+            <button class="abtn ab-pgr" onclick="exportPGR('cq')" title="Exportar capítulo de riscos psicossociais para o PGR">Exportar PGR</button>
           </div>
           <div id="cqRepContent"><div class="empty-st"><p>Nenhuma resposta COPSOQ II recebida ainda.</p></div></div>
         </div>
@@ -1007,6 +1046,7 @@ body.manager-mode{
             <select class="sel-s" id="beSecFilter" onchange="renderBE()"><option value="all">Todos os setores</option></select>
             <button class="abtn ab-ghost" onclick="renderBE()">↻ Atualizar</button>
             <button class="abtn ab-pdf" id="bePdfBtn" onclick="printReport('be')" title="Imprimir / Salvar como PDF">PDF</button>
+            <button class="abtn ab-pgr" onclick="exportPGR('be')" title="Exportar capítulo de riscos psicossociais para o PGR">Exportar PGR</button>
           </div>
           <div id="beRepContent"><div class="empty-st"><p>Nenhuma resposta AOT recebida ainda.</p></div></div>
         </div>
@@ -1052,6 +1092,78 @@ body.manager-mode{
             <thead><tr><th>Nome</th><th>Usuário (login)</th><th>Setor</th><th>Ações</th></tr></thead>
             <tbody id="mgrTable"></tbody>
           </table></div>
+        </div>
+
+        <!-- PLANO DE AÇÃO -->
+        <div class="panel" id="pPlano">
+          <div class="toolbar">
+            <div class="toolbar-l">
+              <select class="sel-s" id="planoCoFilter" onchange="renderPlano()"><option value="all">Todas as empresas</option></select>
+              <select class="sel-s" id="planoStatusFilter" onchange="renderPlano()">
+                <option value="all">Todos os status</option>
+                <option value="pendente">Pendente</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluido">Concluído</option>
+              </select>
+            </div>
+            <button class="abtn ab-pri" onclick="openModal('mNewAction')">+ Nova Ação</button>
+          </div>
+          <div id="planoContent"></div>
+        </div>
+
+        <!-- PULSO MENSAL -->
+        <div class="panel" id="pPulso">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+            <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:6px">Pulso Mensal</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Envie uma pesquisa rápida (3–5 perguntas) mensalmente para acompanhar tendências entre os diagnósticos completos. Não substitui o diagnóstico — é um sinal de alerta precoce.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+              <select class="sel-s" id="pulsoCoSel" onchange="renderPulsoHistory()"><option value="">Selecione a empresa...</option></select>
+            </div>
+            <div id="pulsoFormQuestions" style="margin-bottom:14px"></div>
+            <button class="abtn ab-pri" onclick="sendPulso($('pulsoCoSel').value)" style="margin-bottom:8px">Enviar Pulso</button>
+          </div>
+          <div id="pulsoHistory" style="padding:8px 0"></div>
+        </div>
+
+        <!-- CONFIGURAÇÕES -->
+        <div class="panel" id="pConfig">
+          <div class="ucard">
+            <h3>Integração com Inteligência Artificial</h3>
+            <p class="desc">Configure sua chave de API OpenAI para habilitar a geração automática de análises narrativas nos relatórios. A chave é armazenada apenas no seu navegador e nunca enviada para nossos servidores.</p>
+            <div class="form-group" style="max-width:500px;margin-bottom:14px">
+              <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:6px">Chave API OpenAI</label>
+              <input id="aiKeyInput" type="password" placeholder="sk-..." style="width:100%;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:13px;color:var(--text);outline:none"/>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="abtn ab-pri" onclick="saveAIKey()">Salvar chave</button>
+              <button class="abtn ab-ghost" onclick="clearAIKey()">Remover chave</button>
+              <span id="aiKeyStatus" style="font-size:12.5px;color:var(--muted)"></span>
+            </div>
+            <div style="margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12.5px;color:var(--muted);max-width:500px">
+              <strong style="color:var(--text);display:block;margin-bottom:6px">Como obter sua chave:</strong>
+              Acesse platform.openai.com, crie uma conta, vá em "API Keys" e clique em "Create new secret key". Cole a chave acima. O modelo usado é o gpt-4o-mini (custo aproximado: R$ 0,02 por relatório).
+            </div>
+          </div>
+          <div class="ucard" style="margin-top:0">
+            <h3>Lembretes Automáticos (EmailJS)</h3>
+            <p class="desc">Configure o EmailJS para enviar lembretes automáticos de pesquisa por e-mail aos colaboradores que ainda não responderam.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:700px;margin-bottom:14px">
+              <div class="form-group"><label>Public Key</label><input id="ejs_pubkey" placeholder="user_..." style="width:100%;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Service ID</label><input id="ejs_service" placeholder="service_..." style="width:100%;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Template ID</label><input id="ejs_template" placeholder="template_..." style="width:100%;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/></div>
+            </div>
+            <button class="abtn ab-pri" onclick="saveEmailJSConfig()">Salvar configuração</button>
+            <div style="margin-top:12px;font-size:12px;color:var(--muted)">
+              Template esperado: use as variáveis {{to_name}}, {{to_email}}, {{company_name}}, {{survey_link}} no template do EmailJS.
+            </div>
+          </div>
+          <div class="ucard">
+            <h3>Sincronização com Supabase</h3>
+            <p class="desc">Dados sincronizados com o banco de dados em nuvem. Use os botões abaixo para forçar uma sincronização.</p>
+            <div style="display:flex;gap:10px">
+              <button class="abtn ab-ghost" onclick="syncFromSupabase().then(()=>{refreshMgr();alert('Sincronizado com sucesso.')})">Sincronizar agora</button>
+            </div>
+          </div>
         </div>
 
         <!-- ACADEMY / CURSOS -->
@@ -1161,6 +1273,20 @@ body.manager-mode{
           <option value="Outro">Outro</option>
         </select>
       </div>
+      <div class="m-fg" style="margin-bottom:13px"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Papel / Nível de Acesso</label>
+        <select class="sel-s" id="mgrRole" style="width:100%">
+          <option value="superadmin">Super Admin (acesso total)</option>
+          <option value="gestor">Gestor (empresas atribuídas)</option>
+          <option value="visualizador">Visualizador (somente leitura)</option>
+        </select>
+      </div>
+      <div class="m-fg" id="mgrPlanRow" style="margin-bottom:13px;display:none"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Plano</label>
+        <select class="sel-s" id="mgrPlan" style="width:100%">
+          <option value="essencial">Essencial</option>
+          <option value="profissional">Profissional</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </div>
       <div id="mgrAlert2" class="alert alert-e"></div>
     </div>
     <div class="modal-footer">
@@ -1253,6 +1379,7 @@ body.manager-mode{
       <button id="ecTab2" onclick="switchEcTab(2)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Colaboradores <span id="ecColabCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
       <button id="ecTab3" onclick="switchEcTab(3)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Unidades <span id="ecUnidCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
       <button id="ecTab4" onclick="switchEcTab(4)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">GHEs <span id="ecGheCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
+      <button id="ecTab5" onclick="switchEcTab(5)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Ciclos <span id="ecCicloCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
     </div>
 
     <!-- Tab 1: Dados -->
@@ -1368,10 +1495,33 @@ body.manager-mode{
       <div style="font-size:11.5px;color:var(--muted);margin-top:7px" id="ecGheInfo"></div>
     </div>
 
+    <!-- Tab 5: Ciclos -->
+    <div class="modal-body" id="ecPanel5" style="display:none">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ciclos de pesquisa permitem comparar resultados ao longo do tempo, atendendo ao requisito de reavaliação periódica da NR-1.</p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Novo Ciclo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="form-group" style="margin:0"><label>Nome do Ciclo *</label><input id="ec_ciclo_nome" placeholder="Ex.: Diagnóstico 2025.1"/></div>
+          <div class="form-group" style="margin:0"><label>Instrumento</label>
+            <select id="ec_ciclo_inst" style="width:100%;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+              <option value="copsoq">COPSOQ II</option>
+              <option value="bemestar">AOT</option>
+              <option value="ambos">Ambos</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0"><label>Data de Início</label><input id="ec_ciclo_inicio" type="date"/></div>
+          <div class="form-group" style="margin:0"><label>Data de Término</label><input id="ec_ciclo_fim" type="date"/></div>
+        </div>
+        <button class="abtn ab-pri" style="height:36px" onclick="ecAddCiclo()">+ Criar ciclo</button>
+      </div>
+      <div id="ecCicloBody" style="margin-top:8px"></div>
+    </div>
+
     <div class="modal-footer" id="ecFooter1"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Cancelar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar alterações</button></div>
     <div class="modal-footer" id="ecFooter2" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
     <div class="modal-footer" id="ecFooter3" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEcUnids()">Salvar unidades</button></div>
     <div class="modal-footer" id="ecFooter4" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
+    <div class="modal-footer" id="ecFooter5" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
   </div>
 </div>
 
@@ -1381,6 +1531,42 @@ body.manager-mode{
     <div class="modal-hdr"><h3>Detalhes da Resposta</h3><button class="modal-close" onclick="closeModal('mRespDet')">×</button></div>
     <div class="modal-body" id="mRespDetBody"></div>
     <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mRespDet')">Fechar</button></div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA AÇÃO DO PLANO -->
+<div class="modal-ov" id="mNewAction">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-hdr"><h3>Nova Ação do Plano</h3><button class="modal-close" onclick="closeModal('mNewAction')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Empresa *</label><select id="pa_empresa" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"></select></div>
+        <div class="form-group"><label>Fator de Risco</label><input id="pa_fator" placeholder="Ex.: Excesso de Demandas"/></div>
+      </div>
+      <div class="form-group" style="margin-bottom:13px"><label>Título da Ação *</label><input id="pa_titulo" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none" placeholder="Ex.: Redistribuir tarefas no setor Produção"/></div>
+      <div class="form-group" style="margin-bottom:13px"><label>Descrição</label><textarea id="pa_desc" style="width:100%;min-height:70px;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical" placeholder="Detalhes da ação..."></textarea></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Responsável</label><input id="pa_responsavel" placeholder="Nome ou cargo"/></div>
+        <div class="form-group"><label>Prazo</label><input id="pa_prazo" type="date"/></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Complexidade</label>
+          <select id="pa_complexidade" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+            <option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Público-Alvo</label>
+          <select id="pa_publico" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+            <option value="todos">Todos</option><option value="chefia_superior">Chefia Superior</option><option value="chefia_intermediaria">Chefia Intermediária</option><option value="operacional">Operacional</option>
+          </select>
+        </div>
+      </div>
+      <div id="paAlert" class="alert alert-e"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="abtn ab-ghost" onclick="closeModal('mNewAction')">Cancelar</button>
+      <button class="abtn ab-pri" onclick="saveAction()">Salvar ação</button>
+    </div>
   </div>
 </div>
 
@@ -4033,6 +4219,747 @@ function deleteCourse(id){
 }
 
 function showAlert(id,msg){const el=$(id);if(!el)return;el.className='alert alert-e show';el.textContent=msg;setTimeout(()=>{el.className='alert alert-e';},3000);}
+
+// ═══════════════════════════════════════
+// #11 — ANONYMITY THRESHOLD
+// ═══════════════════════════════════════
+const MIN_ANON = 5;
+
+// ═══════════════════════════════════════
+// #14 — SUBSCRIPTION TIERS
+// ═══════════════════════════════════════
+const PLANS = {
+  essencial:    { label:'Essencial',    color:'#6b728f', maxCos:3,  maxColabs:50,  ai:false, pgr:false, pulso:false },
+  profissional: { label:'Profissional', color:'#3d7aed', maxCos:20, maxColabs:500, ai:true,  pgr:true,  pulso:true  },
+  enterprise:   { label:'Enterprise',  color:'#a855f7', maxCos:999, maxColabs:99999, ai:true, pgr:true, pulso:true  }
+};
+function getPlan(mgr){ return PLANS[(mgr||currentMgr)?.plan] || PLANS.essencial; }
+function requirePlan(feature){
+  const plan = getPlan();
+  if(!plan[feature]){ showPlanUpgradeModal(feature); return false; }
+  return true;
+}
+function showPlanUpgradeModal(feature){
+  alert(`Esta funcionalidade requer o plano Profissional ou Enterprise.\n\nRecurso solicitado: "${feature}"\n\nEntre em contato com o suporte AMBRAC para fazer upgrade.`);
+}
+
+// ═══════════════════════════════════════
+// #1 — RBAC: UPDATE EXISTING FUNCTIONS
+// ═══════════════════════════════════════
+// Override visibleCompanies with RBAC filter
+visibleCompanies = function(){
+  if(!currentMgr) return STATE.companies;
+  if(currentMgr.role==='superadmin') return STATE.companies;
+  if(currentMgr.role==='visualizador' || currentMgr.role==='gestor'){
+    const assigned = currentMgr.assignedCos || [];
+    if(!assigned.length) return STATE.companies; // if none assigned, show all
+    return STATE.companies.filter(c => assigned.includes(c.id));
+  }
+  return STATE.companies;
+};
+
+// Patch doMgrLogin to update plan badge
+const _origDoMgrLogin = doMgrLogin;
+doMgrLogin = function(){
+  _origDoMgrLogin();
+  if(currentMgr){
+    const planObj = getPlan(currentMgr);
+    const sbPlan = $('sbPlan');
+    if(sbPlan){
+      sbPlan.textContent = planObj.label;
+      sbPlan.style.background = planObj.color+'22';
+      sbPlan.style.color = planObj.color;
+    }
+  }
+};
+
+// Patch renderMgrTable to show role badge
+const _origRenderMgrTable = renderMgrTable;
+renderMgrTable = function(){
+  const tb=$('mgrTable');if(!tb)return;
+  const isSA = currentMgr?.role==='superadmin' || !currentMgr?.role;
+  tb.innerHTML=MANAGERS.map(m=>{
+    const isSelf=currentMgr&&m.id===currentMgr.id;
+    const roleLabel={superadmin:'Super Admin',gestor:'Gestor',visualizador:'Visualizador'}[m.role||'superadmin']||'Super Admin';
+    const roleColor={superadmin:'#a855f7',gestor:'#3d7aed',visualizador:'#22c55e'}[m.role||'superadmin']||'#a855f7';
+    const planLabel = PLANS[m.plan||'essencial']?.label||'Essencial';
+    return `<tr>
+      <td style="font-weight:600">${m.name}${isSelf?' <span style="font-size:10px;color:var(--muted)">(você)</span>':''}</td>
+      <td style="color:var(--muted);font-size:12px">${m.user}</td>
+      <td><span class="badge bb">${m.setor||'—'}</span></td>
+      <td><span style="font-size:11px;padding:2px 7px;border-radius:99px;background:${roleColor}20;color:${roleColor};font-weight:600">${roleLabel}</span></td>
+      <td><span style="font-size:11px;color:var(--muted)">${planLabel}</span></td>
+      <td><div class="row-acts">
+        <button class="icon-btn" onclick="editMgr('${m.id}')" title="Editar">Editar</button>
+        ${isSelf?'':'<button class="icon-btn del" onclick="deleteMgr(\''+m.id+'\')" title="Remover">Excluir</button>'}
+      </div></td>
+    </tr>`;
+  }).join('');
+};
+
+// Patch openNewMgr to show/hide plan row
+const _origOpenNewMgr = openNewMgr;
+openNewMgr = function(){
+  _origOpenNewMgr();
+  const isSA = currentMgr?.role==='superadmin'||!currentMgr?.role;
+  const roleEl=$('mgrRole');if(roleEl)roleEl.value='gestor';
+  const planRow=$('mgrPlanRow');if(planRow)planRow.style.display=isSA?'block':'none';
+  const planEl=$('mgrPlan');if(planEl)planEl.value='essencial';
+};
+
+// Patch editMgr to populate role/plan
+const _origEditMgr = editMgr;
+editMgr = function(id){
+  _origEditMgr(id);
+  const m=MANAGERS.find(x=>x.id===id);if(!m)return;
+  const roleEl=$('mgrRole');if(roleEl)roleEl.value=m.role||'superadmin';
+  const isSA = currentMgr?.role==='superadmin'||!currentMgr?.role;
+  const planRow=$('mgrPlanRow');if(planRow)planRow.style.display=isSA?'block':'none';
+  const planEl=$('mgrPlan');if(planEl)planEl.value=m.plan||'essencial';
+};
+
+// Patch saveMgrAccount to save role/plan
+const _origSaveMgrAccount = saveMgrAccount;
+saveMgrAccount = function(){
+  const id=$('mgrEditId').value;
+  const role=$('mgrRole')?.value||'gestor';
+  const plan=$('mgrPlan')?.value||'essencial';
+  // call original first (it saves and closes modal)
+  _origSaveMgrAccount();
+  // then update role/plan on the saved record
+  const target = MANAGERS.find(m=>m.id===id) || MANAGERS[MANAGERS.length-1];
+  if(target){ target.role=role; target.plan=plan; saveManagers(); }
+};
+
+// Patch loadManagers default to include role/plan
+const _origLoadManagers = loadManagers;
+// Ensure default admin has role/plan set
+if(MANAGERS.length && !MANAGERS[0].role){ MANAGERS[0].role='superadmin'; MANAGERS[0].plan='enterprise'; }
+
+// ═══════════════════════════════════════
+// #7 — TOKEN-BASED ACCESS LINKS
+// ═══════════════════════════════════════
+function genToken(){ return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10); }
+
+function getAccessLink(coId, colToken){
+  const base = location.origin + location.pathname;
+  return `${base}?empresa=${coId}&token=${colToken}`;
+}
+
+// Token detection on page load
+(function checkToken(){
+  const params = new URLSearchParams(location.search);
+  const empresa = params.get('empresa');
+  const token = params.get('token');
+  if(!empresa || !token) return;
+  // Wait for STATE to be ready
+  setTimeout(()=>{
+    const co = STATE.companies.find(c=>c.id===empresa);
+    if(!co) return;
+    const col = (co.colaboradores||[]).find(c=>c.token===token);
+    if(!col) return;
+    // Pre-fill company on survey start
+    window._tokenEmpresa = empresa;
+    window._tokenColab = col;
+    // Auto-navigate to survey if not logged in
+    if(!currentMgr){
+      const startBtn = document.querySelector('[onclick*="showSc(\'sQuest\')"]') || document.querySelector('[onclick*="sQuest"]');
+      if(startBtn){
+        // Set company selector if available
+        const coSel = $('qCoSel');
+        if(coSel){ coSel.value = empresa; }
+      }
+    }
+  }, 300);
+})();
+
+// Patch renderEcColabList to include token link column + reminder button
+const _origRenderEcColabList = renderEcColabList;
+renderEcColabList = function(){
+  const id=$('mEditCo').dataset.editId;const c=STATE.companies.find(x=>x.id===id);if(!c)return;
+  const q=($('ecSearch')?.value||'').toLowerCase();
+  const list=c.colaboradores.filter(x=>!q||x.nome.toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q)||(x.cpf||'').toLowerCase().includes(q));
+  $('ecColabCount').textContent=c.colaboradores.length;
+  $('ecColabInfo').textContent=`${list.length} de ${c.colaboradores.length} colaborador(es)`;
+  const tb=$('ecColabBody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);font-size:13px">${c.colaboradores.length?'Nenhum resultado.':'Nenhum colaborador.'}</td></tr>`;return;}
+  tb.innerHTML=list.map(col=>{
+    if(!col.token){ col.token=genToken(); }
+    const link = getAccessLink(id, col.token);
+    return `<tr style="border-bottom:1px solid var(--border)">
+    <td style="padding:8px 12px;font-size:12.5px">${col.nome}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.email||'—'}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.cpf||'—'}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.funcao||'—'}</td>
+    <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.setor||'—'}</td>
+    <td style="padding:8px 12px;text-align:center">
+      <button class="icon-btn" onclick="navigator.clipboard.writeText('${link.replace(/'/g,'\\x27')}');this.textContent='✓ Copiado!';setTimeout(()=>this.textContent='Link',1500)" title="Copiar link de acesso">Link</button>
+      ${col.email?`<button class="icon-btn" onclick="sendSurveyReminder('${id}','${col.id}')" title="Enviar lembrete por e-mail">Lembrete</button>`:''}
+    </td>
+    <td style="padding:8px 12px;text-align:center"><div style="display:flex;gap:4px;justify-content:center">
+      <button class="icon-btn" onclick="ecEditColab('${col.id}')" title="Editar">Editar</button>
+      <button class="icon-btn del" onclick="ecDelColab('${col.id}')" title="Remover">Excluir</button>
+    </div></td>
+    </tr>`;
+  }).join('');
+  saveState();
+};
+
+function copyAllLinks(coId){
+  const co = STATE.companies.find(c=>c.id===coId);
+  if(!co||!co.colaboradores.length){ alert('Nenhum colaborador cadastrado.'); return; }
+  co.colaboradores.forEach(col=>{ if(!col.token) col.token=genToken(); });
+  saveState();
+  const lines = co.colaboradores.map(col=>`${col.nome}: ${getAccessLink(coId, col.token)}`);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>alert(`✓ ${lines.length} links copiados para a área de transferência.`)).catch(()=>alert(lines.join('\n')));
+}
+
+// ═══════════════════════════════════════
+// #3 — SURVEY WAVES (CICLOS)
+// ═══════════════════════════════════════
+// Patch switchEcTab to handle tab 5
+const _origSwitchEcTab = switchEcTab;
+switchEcTab = function(n){
+  [1,2,3,4,5].forEach(i=>{
+    const p=$('ecPanel'+i);const f=$('ecFooter'+i);const t=$('ecTab'+i);
+    if(p)p.style.display=n===i?'block':'none';
+    if(f)f.style.display=n===i?'flex':'none';
+    if(t){t.style.borderBottomColor=n===i?'var(--accent)':'transparent';t.style.color=n===i?'var(--accent)':'var(--muted)';t.style.fontWeight=n===i?'600':'500';}
+  });
+  if(n===2)renderEcColabList();
+  if(n===3)renderEcUnidList();
+  if(n===4)renderEcGheList();
+  if(n===5)renderEcCicloList();
+};
+
+function ecAddCiclo(){
+  const id=$('mEditCo').dataset.editId;
+  const co=STATE.companies.find(x=>x.id===id);if(!co)return;
+  const nome=($('ec_ciclo_nome')?.value||'').trim();
+  if(!nome){alert('Informe o nome do ciclo.');return;}
+  if(!co.ciclos)co.ciclos=[];
+  co.ciclos.push({
+    id:'cic'+Date.now(),
+    nome,
+    instrumento:$('ec_ciclo_inst')?.value||'copsoq',
+    inicio:$('ec_ciclo_inicio')?.value||'',
+    fim:$('ec_ciclo_fim')?.value||'',
+    ativo:true,
+    criadoEm:new Date().toISOString()
+  });
+  saveState();
+  ['ec_ciclo_nome','ec_ciclo_inicio','ec_ciclo_fim'].forEach(fid=>{const el=$(fid);if(el)el.value='';});
+  renderEcCicloList();
+}
+
+function renderEcCicloList(){
+  const id=$('mEditCo').dataset.editId;
+  const co=STATE.companies.find(x=>x.id===id);if(!co)return;
+  if(!co.ciclos)co.ciclos=[];
+  const body=$('ecCicloBody');if(!body)return;
+  const count=$('ecCicloCount');if(count)count.textContent=co.ciclos.length;
+  if(!co.ciclos.length){
+    body.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Nenhum ciclo cadastrado.</div>`;
+    return;
+  }
+  body.innerHTML=co.ciclos.map(cic=>{
+    const badgeCls=cic.ativo?'wave-ativo':'wave-encerrado';
+    const badgeTxt=cic.ativo?'● Ativo':'● Encerrado';
+    const inst={copsoq:'COPSOQ II',bemestar:'AOT / Bem-Estar',ambos:'Ambos'}[cic.instrumento]||cic.instrumento;
+    return `<div class="wave-card">
+      <div>
+        <div style="font-weight:600;font-size:13px">${cic.nome}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${inst} · ${cic.inicio||'—'} → ${cic.fim||'—'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="wave-badge ${badgeCls}">${badgeTxt}</span>
+        <button class="icon-btn" onclick="toggleCiclo('${id}','${cic.id}')">${cic.ativo?'Encerrar':'Reativar'}</button>
+        <button class="icon-btn del" onclick="deleteCiclo('${id}','${cic.id}')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCiclo(coId, cicId){
+  const co=STATE.companies.find(x=>x.id===coId);if(!co||!co.ciclos)return;
+  const cic=co.ciclos.find(x=>x.id===cicId);if(!cic)return;
+  cic.ativo=!cic.ativo;saveState();renderEcCicloList();
+}
+
+function deleteCiclo(coId, cicId){
+  if(!confirm('Excluir este ciclo?'))return;
+  const co=STATE.companies.find(x=>x.id===coId);if(!co||!co.ciclos)return;
+  co.ciclos=co.ciclos.filter(x=>x.id!==cicId);saveState();renderEcCicloList();
+}
+
+function buildLongitudinalHTML(coId, prefix, factors){
+  const co=STATE.companies.find(x=>x.id===coId);if(!co||!co.ciclos||co.ciclos.length<2)return'';
+  const ciclos=co.ciclos.filter(c=>!c.ativo||c.fim);// use closed ciclos
+  if(ciclos.length<2)return'';
+  const respsAll=STATE.responses.filter(r=>r.empresa===coId&&r.questionario===(prefix==='cq'?'copsoq':'bemestar'));
+  const rows=factors.slice(0,8).map(f=>{
+    const cols=ciclos.map(cic=>{
+      const start=cic.inicio?new Date(cic.inicio).getTime():0;
+      const end=cic.fim?new Date(cic.fim).getTime():Date.now();
+      const cResps=respsAll.filter(r=>{const t=new Date(r.timestamp).getTime();return t>=start&&t<=end;});
+      if(cResps.length<MIN_ANON)return`<td style="text-align:center;color:var(--muted);font-size:12px">—</td>`;
+      const calcFn=prefix==='cq'?calcCQ:calcBE;
+      const sc=calcFn(cResps);
+      const val=sc.fs[f.name];
+      if(val==null)return`<td style="text-align:center;color:var(--muted)">N/A</td>`;
+      const pct=Math.round(val*100);
+      const rc=riskClass(val);
+      return`<td style="text-align:center;font-weight:600;color:${rc.color}">${pct}%</td>`;
+    }).join('');
+    return`<tr><td style="font-size:12px">${f.name}</td>${cols}</tr>`;
+  }).join('');
+  const headers=ciclos.map(c=>`<th style="text-align:center;min-width:90px">${c.nome}</th>`).join('');
+  return`<div class="sec-title" style="margin-top:22px">Comparativo Longitudinal por Ciclo</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr><th style="text-align:left">Fator</th>${headers}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ═══════════════════════════════════════
+// #6 — ACTION PLAN PERSISTENCE
+// ═══════════════════════════════════════
+function loadActionPlans(){ return JSON.parse(localStorage.getItem('ambrac_action_plans')||'[]'); }
+function saveActionPlansStore(){ localStorage.setItem('ambrac_action_plans',JSON.stringify(ACTION_PLANS)); }
+let ACTION_PLANS = loadActionPlans();
+
+function renderPlano(){
+  const coFilter=$('planoCoFilter')?.value||'all';
+  const statusFilter=$('planoStatusFilter')?.value||'all';
+  let list=[...ACTION_PLANS];
+  if(coFilter!=='all')list=list.filter(a=>a.empresa===coFilter);
+  if(statusFilter!=='all')list=list.filter(a=>a.status===statusFilter);
+  const cont=$('planoContent');if(!cont)return;
+  if(!list.length){
+    cont.innerHTML=`<div class="empty-st"><p>Nenhum plano de ação cadastrado ainda.<br>Clique em "+ Nova Ação" para começar.</p></div>`;
+    return;
+  }
+  const statusColors={pendente:'#f59e0b',em_andamento:'#3d7aed',concluido:'#22c55e',cancelado:'#ef4444'};
+  const statusLabels={pendente:'Pendente',em_andamento:'Em Andamento',concluido:'Concluído',cancelado:'Cancelado'};
+  const compLabels={baixa:'Baixa',media:'Média',alta:'Alta'};
+  cont.innerHTML=`<div style="display:grid;gap:10px">${list.map(a=>{
+    const co=STATE.companies.find(x=>x.id===a.empresa);
+    const sc=statusColors[a.status]||'#6b728f';
+    const sl=statusLabels[a.status]||a.status;
+    return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px;margin-bottom:3px">${a.titulo}</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${co?.nome||'—'} · ${a.fator||'—'}</div>
+          ${a.desc?`<div style="font-size:12.5px;color:var(--text);margin-bottom:6px">${a.desc}</div>`:''}
+          <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)">
+            ${a.responsavel?`<span>👤 ${a.responsavel}</span>`:''}
+            ${a.prazo?`<span>📅 ${a.prazo}</span>`:''}
+            ${a.complexidade?`<span>⚡ ${compLabels[a.complexidade]||a.complexidade}</span>`:''}
+            ${a.publico?`<span>🎯 ${a.publico}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <span style="font-size:11px;padding:3px 9px;border-radius:99px;background:${sc}20;color:${sc};font-weight:600">${sl}</span>
+          <select style="font-size:11px;padding:3px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit" onchange="updateActionStatus('${a.id}',this.value)">
+            <option value="pendente"${a.status==='pendente'?' selected':''}>Pendente</option>
+            <option value="em_andamento"${a.status==='em_andamento'?' selected':''}>Em Andamento</option>
+            <option value="concluido"${a.status==='concluido'?' selected':''}>Concluído</option>
+            <option value="cancelado"${a.status==='cancelado'?' selected':''}>Cancelado</option>
+          </select>
+          <button class="icon-btn del" onclick="deleteAction('${a.id}')">Excluir</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function saveAction(){
+  const titulo=($('pa_titulo')?.value||'').trim();
+  if(!titulo){alert('Informe o título da ação.');return;}
+  const action={
+    id:'pa'+Date.now(),
+    empresa:$('pa_empresa')?.value||'',
+    fator:($('pa_fator')?.value||'').trim(),
+    titulo,
+    desc:($('pa_desc')?.value||'').trim(),
+    responsavel:($('pa_responsavel')?.value||'').trim(),
+    prazo:$('pa_prazo')?.value||'',
+    complexidade:$('pa_complexidade')?.value||'media',
+    publico:$('pa_publico')?.value||'todos',
+    status:'pendente',
+    criadoEm:new Date().toISOString()
+  };
+  ACTION_PLANS.unshift(action);
+  saveActionPlansStore();
+  closeModal('mNewAction');
+  renderPlano();
+}
+
+function updateActionStatus(id, status){
+  const a=ACTION_PLANS.find(x=>x.id===id);if(!a)return;
+  a.status=status;a.atualizadoEm=new Date().toISOString();
+  saveActionPlansStore();
+  renderPlano();
+}
+
+function deleteAction(id){
+  if(!confirm('Excluir esta ação do plano?'))return;
+  const idx=ACTION_PLANS.findIndex(x=>x.id===id);if(idx<0)return;
+  ACTION_PLANS.splice(idx,1);
+  saveActionPlansStore();
+  renderPlano();
+}
+
+// ═══════════════════════════════════════
+// #15 — MONTHLY PULSE
+// ═══════════════════════════════════════
+const PULSO_QUESTIONS = [
+  {id:'p1', text:'Como você avalia seu bem-estar geral esta semana?', scale:5},
+  {id:'p2', text:'Você se sentiu sobrecarregado(a) com o volume de trabalho?', scale:5},
+  {id:'p3', text:'Você recebeu apoio da sua liderança quando precisou?', scale:5},
+  {id:'p4', text:'Você se sentiu reconhecido(a) pelo seu trabalho?', scale:5},
+  {id:'p5', text:'Em uma escala de 0 a 10, qual a probabilidade de você recomendar esta empresa como um bom lugar para trabalhar?', scale:10}
+];
+
+function sendPulso(coId){
+  if(!requirePlan('pulso'))return;
+  const co=STATE.companies.find(x=>x.id===coId);if(!co)return;
+  const answers={};
+  PULSO_QUESTIONS.forEach(q=>{
+    const el=$('pulso_'+q.id);
+    if(el)answers[q.id]=parseInt(el.value)||null;
+  });
+  const hasAny=Object.values(answers).some(v=>v!=null);
+  if(!hasAny){alert('Preencha pelo menos uma resposta.');return;}
+  const hist=JSON.parse(localStorage.getItem('ambrac_pulso_hist')||'{}');
+  if(!hist[coId])hist[coId]=[];
+  hist[coId].unshift({
+    ts:Date.now(),
+    data:new Date().toLocaleDateString('pt-BR'),
+    answers,
+    empresa:coId
+  });
+  localStorage.setItem('ambrac_pulso_hist',JSON.stringify(hist));
+  alert('✓ Pulso registrado com sucesso!');
+  renderPulsoHistory();
+}
+
+function renderPulsoHistory(){
+  const coId=$('pulsoCoSel')?.value||'';
+  const hist=JSON.parse(localStorage.getItem('ambrac_pulso_hist')||'{}');
+  const cont=$('pulsoHistory');if(!cont)return;
+  if(!coId||!hist[coId]||!hist[coId].length){
+    cont.innerHTML=`<div class="empty-st"><p>Nenhum pulso registrado para esta empresa.</p></div>`;
+    return;
+  }
+  const records=hist[coId].slice(0,10);
+  const qMap=Object.fromEntries(PULSO_QUESTIONS.map(q=>[q.id,q.text]));
+  cont.innerHTML=records.map(rec=>{
+    const items=Object.entries(rec.answers).filter(([,v])=>v!=null).map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">${qMap[k]?.slice(0,60)||k}…</span><span style="font-weight:600;color:var(--accent)">${v}</span></div>`).join('');
+    return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px">Pulso — ${rec.data}</div>
+      ${items}
+    </div>`;
+  }).join('');
+  // Render pulso form questions
+  const formCont=$('pulsoFormQuestions');
+  if(formCont&&coId){
+    formCont.innerHTML=PULSO_QUESTIONS.map(q=>`<div style="margin-bottom:12px">
+      <label style="font-size:13px;color:var(--text);display:block;margin-bottom:6px">${q.text}</label>
+      <input id="pulso_${q.id}" type="number" min="0" max="${q.scale}" placeholder="0–${q.scale}"
+        style="width:80px;padding:6px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/>
+    </div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════
+// #9 — AI NARRATIVE (OpenAI)
+// ═══════════════════════════════════════
+function saveAIKey(){
+  const key=($('aiKeyInput')?.value||'').trim();
+  if(!key.startsWith('sk-')){alert('Chave inválida. Deve começar com "sk-".');return;}
+  localStorage.setItem('ambrac_ai_key',key);
+  if($('aiKeyInput'))$('aiKeyInput').value='';
+  if($('aiKeyStatus'))$('aiKeyStatus').textContent='✓ Chave salva com sucesso.';
+  setTimeout(()=>{if($('aiKeyStatus'))$('aiKeyStatus').textContent='';},3000);
+}
+function clearAIKey(){
+  localStorage.removeItem('ambrac_ai_key');
+  if($('aiKeyStatus'))$('aiKeyStatus').textContent='Chave removida.';
+  setTimeout(()=>{if($('aiKeyStatus'))$('aiKeyStatus').textContent='';},2000);
+}
+function getAIKey(){ return localStorage.getItem('ambrac_ai_key')||''; }
+
+async function generateAINarrative(prefix, resps, sortedF, dimScores, dims){
+  if(!requirePlan('ai'))return null;
+  const key=getAIKey();
+  if(!key){
+    if($('aiKeyStatus'))$('aiKeyStatus').textContent='Configure a chave de API OpenAI nas Configurações.';
+    return null;
+  }
+  const topFactors=sortedF.slice(0,5).map(f=>`${f.name} (${Math.round(f.score*100)}%)`).join(', ');
+  const dimSummary=dims.map(d=>`${d.name}: ${dimScores[d.id]!=null?Math.round(dimScores[d.id]*100)+'%':'N/A'}`).join('; ');
+  const prompt=`Você é um psicólogo organizacional especialista em saúde ocupacional. Com base nos resultados de avaliação psicossocial (${prefix==='cq'?'COPSOQ II':'AOT/Bem-Estar'}) de uma empresa brasileira com ${resps.length} respondentes, gere um parágrafo executivo de 3 a 4 frases em português brasileiro, objetivo e técnico, destacando os principais achados e recomendações estratégicas.\n\nTop fatores de risco: ${topFactors}\nDimensões: ${dimSummary}`;
+  try{
+    const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0.4})
+    });
+    if(!resp.ok)throw new Error('API error '+resp.status);
+    const data=await resp.json();
+    return data.choices?.[0]?.message?.content?.trim()||null;
+  }catch(e){
+    console.error('AI narrative error:',e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════
+// #2 — EMAILJS REMINDERS
+// ═══════════════════════════════════════
+function saveEmailJSConfig(){
+  const serviceId=($('ejs_service')?.value||'').trim();
+  const templateId=($('ejs_template')?.value||'').trim();
+  const publicKey=($('ejs_pubkey')?.value||'').trim();
+  if(!serviceId||!templateId||!publicKey){alert('Preencha todos os campos do EmailJS.');return;}
+  localStorage.setItem('ambrac_emailjs',JSON.stringify({serviceId,templateId,publicKey}));
+  if(window.emailjs)emailjs.init(publicKey);
+  if($('ejsStatus'))$('ejsStatus').textContent='✓ Configuração salva.';
+  setTimeout(()=>{if($('ejsStatus'))$('ejsStatus').textContent='';},3000);
+}
+function getEmailJSConfig(){ return JSON.parse(localStorage.getItem('ambrac_emailjs')||'null'); }
+
+async function sendSurveyReminder(coId, colId){
+  const cfg=getEmailJSConfig();
+  if(!cfg){alert('Configure o EmailJS nas Configurações antes de enviar lembretes.');return;}
+  const co=STATE.companies.find(x=>x.id===coId);if(!co)return;
+  const col=(co.colaboradores||[]).find(x=>x.id===colId);if(!col||!col.email){alert('Colaborador sem e-mail cadastrado.');return;}
+  if(!col.token)col.token=genToken();
+  saveState();
+  const link=getAccessLink(coId,col.token);
+  if(window.emailjs){
+    emailjs.init(cfg.publicKey);
+    try{
+      await emailjs.send(cfg.serviceId,cfg.templateId,{
+        to_name:col.nome,
+        to_email:col.email,
+        empresa_nome:co.nome,
+        survey_link:link
+      });
+      alert(`✓ Lembrete enviado para ${col.email}.`);
+    }catch(e){alert('Erro ao enviar: '+e.text||e.message);}
+  }else{
+    alert('EmailJS SDK não carregado. Verifique a conexão e tente novamente.');
+  }
+}
+
+// ═══════════════════════════════════════
+// #4 — PGR EXPORT
+// ═══════════════════════════════════════
+function exportPGR(type){
+  if(!requirePlan('pgr'))return;
+  const isCQ=type==='cq';
+  const cf=$(isCQ?'cqCoFilter':'beCoFilter')?.value||'all';
+  const sf=$(isCQ?'cqSecFilter':'beSecFilter')?.value||'all';
+  let resps=STATE.responses.filter(r=>r.questionario===(isCQ?'copsoq':'bemestar'));
+  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
+  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
+  if(!resps.length){alert('Nenhuma resposta disponível para exportar.');return;}
+
+  const co=cf!=='all'?STATE.companies.find(x=>x.id===cf):null;
+  const coName=co?.nome||'Empresa';
+  const cnpj=co?.cnpj||'';
+  const sc=isCQ?calcCQ(resps):calcBE(resps);
+  const factors=isCQ?CQ_FACTORS:BE_FACTORS;
+  const dims=isCQ?CQ_DIMS:BE_DIMS;
+  const sortedF=factors.map(f=>({...f,score:sc.fs[f.name]})).filter(f=>f.score!=null).sort((a,b)=>b.score-a.score);
+  const riskFactors=sortedF.filter(f=>f.score>=0.5);
+  const avgAll=Object.values(sc.ds).filter(v=>v!=null).reduce((a,b)=>a+b,0)/(Object.values(sc.ds).filter(v=>v!=null).length||1);
+  const overallRC=riskClass(avgAll);
+  const dateStr=new Date().toLocaleDateString('pt-BR');
+  const mgr=currentMgr?.name||'—';
+  const instrLabel=isCQ?'COPSOQ II — Versão Média':'AOT — Avaliação da Organização do Trabalho';
+
+  const factorRows=riskFactors.map(f=>{
+    const pct=Math.round(f.score*100);
+    const rc=riskClass(f.score);
+    const actions=isCQ?(CQ_ACTIONS[f.name]||'Monitorar e implementar medidas preventivas.'):(BE_ACTIONS[f.name]||'Monitorar e implementar medidas preventivas.');
+    return`<tr>
+      <td style="padding:8px;border:1px solid #e5e7eb;font-size:11px">${f.name}</td>
+      <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;font-size:11px;font-weight:700;color:${rc.color}">${pct}% — ${rc.label}</td>
+      <td style="padding:8px;border:1px solid #e5e7eb;font-size:11px">${actions}</td>
+    </tr>`;
+  }).join('');
+
+  const dimRows=dims.map(d=>{
+    const val=sc.ds[d.id];
+    const pct=val!=null?Math.round(val*100):null;
+    const rc=val!=null?riskClass(val):{cls:'bb',label:'N/A',color:'#6b728f'};
+    return`<tr>
+      <td style="padding:8px;border:1px solid #e5e7eb;font-size:11px;font-weight:600">${d.name}</td>
+      <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;font-size:11px;font-weight:700;color:${rc.color}">${pct!=null?pct+'%':'—'}</td>
+      <td style="padding:8px;border:1px solid #e5e7eb;font-size:11px">${d.desc||''}</td>
+    </tr>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/>
+<title>PGR — ${coName}</title>
+<style>
+  body{font-family:'Arial',sans-serif;font-size:12px;color:#1e2235;margin:0;padding:30px;max-width:800px;margin:0 auto}
+  h1{font-size:22px;color:#1e4d3a;margin-bottom:4px}
+  h2{font-size:15px;color:#1e4d3a;margin-top:24px;margin-bottom:8px;border-bottom:2px solid #1e4d3a;padding-bottom:4px}
+  h3{font-size:13px;color:#1e2235;margin-top:16px;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px}
+  th{background:#1e4d3a;color:#fff;padding:8px;text-align:left;font-size:11px}
+  .cover{text-align:center;padding:40px 0 30px}
+  .cover-sub{font-size:13px;color:#6b7280;margin-top:6px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .meta-item label{font-size:10px;text-transform:uppercase;color:#6b7280;display:block}
+  .meta-item span{font-weight:600}
+  @media print{body{padding:0}button{display:none}}
+</style>
+</head><body>
+<div class="cover">
+  <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">PROGRAMA DE GERENCIAMENTO DE RISCOS — NR-1</div>
+  <h1>Relatório PGR Psicossocial</h1>
+  <div class="cover-sub">${instrLabel}</div>
+  <div class="cover-sub" style="margin-top:16px"><strong>${coName}</strong>${cnpj?' · CNPJ: '+cnpj:''}</div>
+  <div class="cover-sub">Data de emissão: ${dateStr} · Responsável: ${mgr}</div>
+  <div style="margin-top:16px"><span class="badge" style="background:${overallRC.color}20;color:${overallRC.color}">${overallRC.label} — Score Geral: ${Math.round(avgAll*100)}%</span></div>
+</div>
+
+<h2>1. Identificação</h2>
+<div class="meta-grid">
+  <div class="meta-item"><label>Empresa</label><span>${coName}</span></div>
+  <div class="meta-item"><label>CNPJ</label><span>${cnpj||'—'}</span></div>
+  <div class="meta-item"><label>Instrumento</label><span>${instrLabel}</span></div>
+  <div class="meta-item"><label>Respondentes</label><span>${resps.length}</span></div>
+  <div class="meta-item"><label>Data de Avaliação</label><span>${dateStr}</span></div>
+  <div class="meta-item"><label>Responsável Técnico</label><span>${mgr}</span></div>
+</div>
+
+<h2>2. Objetivo</h2>
+<p>Este documento integra o Programa de Gerenciamento de Riscos (PGR) da empresa ${coName}, atendendo à Norma Regulamentadora NR-1 (Portaria MTE nº 1.419/2024), que passou a exigir a identificação e avaliação sistemática dos riscos psicossociais no ambiente de trabalho. O objetivo é identificar, avaliar e propor medidas de controle para os fatores de risco psicossocial presentes na organização.</p>
+
+<h2>3. Metodologia</h2>
+<p>Foram aplicadas ${resps.length} respostas ao instrumento <strong>${instrLabel}</strong>, validado científica e internacionalmente para avaliação de riscos psicossociais no trabalho. Os dados foram coletados de forma anônima, garantindo o sigilo e a conformidade com a LGPD (Lei nº 13.709/2018). A análise considera dimensões e fatores de risco conforme o modelo ${isCQ?'COPSOQ II (Copenhagen Psychosocial Questionnaire)':'AOT — Avaliação da Organização do Trabalho'}.</p>
+
+<h2>4. Resultados por Dimensão</h2>
+<table>
+  <thead><tr><th>Dimensão</th><th style="width:120px">Score</th><th>Descrição</th></tr></thead>
+  <tbody>${dimRows}</tbody>
+</table>
+
+<h2>5. Fatores de Risco Identificados (Moderado e Alto)</h2>
+${riskFactors.length?`<table>
+  <thead><tr><th>Fator de Risco</th><th style="width:140px">Score / Classificação</th><th>Ação Recomendada</th></tr></thead>
+  <tbody>${factorRows}</tbody>
+</table>`:'<p>Nenhum fator com risco moderado ou alto identificado nesta avaliação.</p>'}
+
+<h2>6. Plano de Ação</h2>
+<p>As ações recomendadas devem ser implementadas com responsáveis e prazos definidos conforme o nível de risco identificado:</p>
+<table>
+  <thead><tr><th>Nível de Risco</th><th>Prazo Recomendado</th><th>Tipo de Intervenção</th></tr></thead>
+  <tbody>
+    <tr><td>Alto (≥ 75%)</td><td>Até 30 dias</td><td>Intervenção imediata — ações corretivas urgentes</td></tr>
+    <tr><td>Moderado (50–74%)</td><td>Até 90 dias</td><td>Planejar e implementar ações preventivas</td></tr>
+    <tr><td>Baixo (< 50%)</td><td>6 a 12 meses</td><td>Monitoramento contínuo e reavaliação periódica</td></tr>
+  </tbody>
+</table>
+
+<h2>7. Reaplicação e Monitoramento</h2>
+<p>Conforme a NR-1, o PGR deve ser revisado periodicamente ou quando houver alterações nas condições de trabalho. Recomenda-se a reaplicação do instrumento em até 12 meses, ou em 6 meses para fatores classificados como alto risco.</p>
+
+<h2>8. Responsabilidade Técnica</h2>
+<div style="margin-top:30px">
+  <div style="border-bottom:1.5px solid #1e2235;margin-bottom:8px;height:36px;max-width:300px"></div>
+  <div style="font-weight:700">${mgr}</div>
+  <div style="color:#6b7280">Responsável Técnico — AMBRAC</div>
+  <div style="color:#6b7280;margin-top:3px">CRP/CRM: ______________________</div>
+  <div style="color:#6b7280;margin-top:3px">Data: ${dateStr}</div>
+</div>
+
+<div style="margin-top:40px;text-align:center;font-size:10px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:12px">
+  AMBRAC · Medicina e Segurança do Trabalho · Documento técnico sigiloso — uso exclusivo para gestão ocupacional
+</div>
+<script>setTimeout(()=>window.print(),400);<\/script>
+</body></html>`;
+
+  openHtmlTab(html);
+}
+
+// ═══════════════════════════════════════
+// UPDATE navTo, PANEL_MAP, updateMgrSelects
+// ═══════════════════════════════════════
+// Extend PANEL_MAP
+Object.assign(PANEL_MAP,{
+  pPlano:  ['Plano de Ação',    'Gerencie ações corretivas e preventivas'],
+  pPulso:  ['Pulso Mensal',     'Monitoramento contínuo de bem-estar'],
+  pConfig: ['Configurações',    'Integrações e preferências do sistema']
+});
+
+// Patch navTo to handle new panels
+const _origNavTo = navTo;
+navTo = function(pid, btn){
+  _origNavTo(pid, btn);
+  if(pid==='pPlano') renderPlano();
+  if(pid==='pPulso') renderPulsoHistory();
+};
+
+// Patch updateMgrSelects to populate new selects
+const _origUpdateMgrSelects = updateMgrSelects;
+updateMgrSelects = function(){
+  _origUpdateMgrSelects();
+  const coOpts=`<option value="all">Todas as empresas</option>`+STATE.companies.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  ['planoCoFilter','pa_empresa','pulsoCoSel'].forEach(id=>{const el=$(id);if(el)el.innerHTML=coOpts;});
+};
+
+// ═══════════════════════════════════════
+// #11 — MIN_ANON checks in renderCQ / renderBE
+// ═══════════════════════════════════════
+const _origRenderCQ = renderCQ;
+renderCQ = function(){
+  const cf=$('cqCoFilter').value, sf=$('cqSecFilter').value;
+  let resps=STATE.responses.filter(r=>r.questionario==='copsoq');
+  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
+  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
+  const cont=$('cqRepContent');
+  if(sf!=='all' && resps.length < MIN_ANON){
+    cont.innerHTML=`<div class="empty-st"><p>Dados insuficientes para exibir resultados por setor.<br><span style="font-size:12px;color:var(--muted)">São necessárias pelo menos ${MIN_ANON} respostas para garantir o anonimato (LGPD). Este grupo possui ${resps.length} resposta(s).</span></p></div>`;
+    return;
+  }
+  _origRenderCQ();
+};
+
+const _origRenderBE = renderBE;
+renderBE = function(){
+  const cf=$('beCoFilter').value, sf=$('beSecFilter').value;
+  let resps=STATE.responses.filter(r=>r.questionario==='bemestar');
+  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
+  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
+  const cont=$('beRepContent');
+  if(sf!=='all' && resps.length < MIN_ANON){
+    cont.innerHTML=`<div class="empty-st"><p>Dados insuficientes para exibir resultados por setor.<br><span style="font-size:12px;color:var(--muted)">São necessárias pelo menos ${MIN_ANON} respostas para garantir o anonimato (LGPD). Este grupo possui ${resps.length} resposta(s).</span></p></div>`;
+    return;
+  }
+  _origRenderBE();
+};
+
+// ═══════════════════════════════════════
+// Patch buildRepHTML to show MIN_ANON warning
+// ═══════════════════════════════════════
+const _origBuildRepHTML = buildRepHTML;
+buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co){
+  const warning = resps.length < MIN_ANON
+    ? `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#92400e">
+        ⚠️ <strong>Aviso de anonimato:</strong> Este relatório contém apenas ${resps.length} resposta(s). Para garantir o anonimato exigido pela LGPD, recomenda-se um mínimo de ${MIN_ANON} respostas por grupo analisado.
+       </div>`
+    : '';
+  return warning + _origBuildRepHTML(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+};
 
 </script>
 </body>
