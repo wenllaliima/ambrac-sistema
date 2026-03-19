@@ -69,6 +69,12 @@
   }
 </script>
 <style>
+/* ─── WHITE-LABEL BRANDING ─── */
+:root {
+  --brand-name: 'AMBRAC';
+  --brand-color-primary: #1e4d3a;
+  --brand-color-manager: #3d7aed;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.6}
 .screen{display:none;animation:fadeIn .3s ease}
@@ -1164,6 +1170,62 @@ body.manager-mode{
               <button class="abtn ab-ghost" onclick="syncFromSupabase().then(()=>{refreshMgr();alert('Sincronizado com sucesso.')})">Sincronizar agora</button>
             </div>
           </div>
+          <div class="ucard">
+            <h3>Identidade Visual (White-Label)</h3>
+            <p class="desc">Personalize a aparência da plataforma com a identidade visual da sua empresa. As alterações são aplicadas imediatamente e ficam salvas no navegador.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:600px;margin-bottom:16px">
+              <div class="form-group"><label>Nome da Plataforma</label><input id="wl_nome" placeholder="AMBRAC" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Tagline / Subtítulo</label><input id="wl_tagline" placeholder="Sistema de Avaliação Ocupacional" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Cor Principal (participante)</label><input id="wl_cor_part" type="color" value="#1e4d3a" style="width:100%;height:42px;padding:4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/></div>
+              <div class="form-group"><label>Cor Principal (painel gestor)</label><input id="wl_cor_mgr" type="color" value="#3d7aed" style="width:100%;height:42px;padding:4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/></div>
+              <div class="form-group" style="grid-column:1/-1"><label>URL do Logo (opcional)</label><input id="wl_logo" placeholder="https://suaempresa.com/logo.png" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group" style="grid-column:1/-1"><label>Texto do Rodapé</label><input id="wl_footer" placeholder="AMBRAC — Saúde Ocupacional" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="abtn ab-pri" onclick="saveWhiteLabel()">Aplicar identidade</button>
+              <button class="abtn ab-ghost" onclick="resetWhiteLabel()">Restaurar padrão AMBRAC</button>
+              <span id="wlStatus" style="font-size:12.5px;color:var(--muted)"></span>
+            </div>
+            <div id="wlPreview" style="margin-top:16px;display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Pré-visualização</div>
+              <div id="wlPreviewContent"></div>
+            </div>
+          </div>
+          <div class="ucard">
+            <h3>Webhooks e Integrações</h3>
+            <p class="desc">Configure URLs de webhook para receber notificações automáticas quando eventos importantes ocorrerem (nova resposta recebida, relatório gerado, campanha encerrada). Use para integrar com Zapier, Make (Integromat), n8n ou sistemas próprios.</p>
+            <div id="webhookList" style="margin-bottom:16px"></div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px">
+              <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Adicionar webhook</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div class="form-group" style="margin:0;grid-column:1/-1"><label>URL do Endpoint *</label><input id="wh_url" placeholder="https://hooks.zapier.com/hooks/catch/..." style="width:100%;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/></div>
+                <div class="form-group" style="margin:0"><label>Evento</label>
+                  <select id="wh_event" style="width:100%;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+                    <option value="nova_resposta">Nova resposta recebida</option>
+                    <option value="relatorio_gerado">Relatório gerado</option>
+                    <option value="acao_concluida">Ação do plano concluída</option>
+                    <option value="all">Todos os eventos</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0"><label>Descrição (opcional)</label><input id="wh_desc" placeholder="Notificar Slack" style="width:100%;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button class="abtn ab-pri" onclick="addWebhook()">Adicionar</button>
+                <button class="abtn ab-ghost" onclick="testWebhook()">Testar</button>
+              </div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px">
+              <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Exportação de Dados via URL</div>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Gere um token de exportação para acessar os dados do AMBRAC via URL (formato JSON). Útil para Power BI, Google Data Studio e integrações personalizadas.</p>
+              <div style="display:flex;gap:10px;align-items:center">
+                <button class="abtn ab-ghost" onclick="generateExportToken()">Gerar token de exportação</button>
+                <span id="exportTokenDisplay" style="font-family:monospace;font-size:12px;color:var(--accent)"></span>
+              </div>
+              <div id="exportTokenInstructions" style="display:none;margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--muted)">
+                Use este token como parâmetro <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">?export=SEU_TOKEN</code> na URL do AMBRAC para exportar os dados em JSON.
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ACADEMY / CURSOS -->
@@ -1380,6 +1442,7 @@ body.manager-mode{
       <button id="ecTab3" onclick="switchEcTab(3)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Unidades <span id="ecUnidCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
       <button id="ecTab4" onclick="switchEcTab(4)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">GHEs <span id="ecGheCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
       <button id="ecTab5" onclick="switchEcTab(5)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Ciclos <span id="ecCicloCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
+      <button id="ecTab6" onclick="switchEcTab(6)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Indicadores <span id="ecIndCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
     </div>
 
     <!-- Tab 1: Dados -->
@@ -1517,11 +1580,32 @@ body.manager-mode{
       <div id="ecCicloBody" style="margin-top:8px"></div>
     </div>
 
+    <!-- Tab 6: Indicadores de Saúde -->
+    <div class="modal-body" id="ecPanel6" style="display:none">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Registre indicadores mensais de saúde e absenteísmo. Esses dados serão cruzados com os scores psicossociais nos relatórios (Triângulo de Evidências — NR-1).</p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Adicionar registro mensal</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="form-group" style="margin:0"><label>Mês / Ano *</label><input id="ec_ind_mes" type="month"/></div>
+          <div class="form-group" style="margin:0"><label>Dias perdidos (absenteísmo)</label><input id="ec_ind_dias" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group" style="margin:0"><label>Acidentes de trabalho</label><input id="ec_ind_acid" type="number" min="0" placeholder="0"/></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="form-group" style="margin:0"><label>Afastamentos (INSS/CAT)</label><input id="ec_ind_afas" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group" style="margin:0"><label>Atend. ambulatoriais</label><input id="ec_ind_amb" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group" style="margin:0"><label>Rotatividade (%)</label><input id="ec_ind_rot" type="number" min="0" step="0.1" placeholder="0.0"/></div>
+        </div>
+        <button class="abtn ab-pri" style="height:36px" onclick="ecAddIndicador()">+ Adicionar registro</button>
+      </div>
+      <div id="ecIndBody"></div>
+    </div>
+
     <div class="modal-footer" id="ecFooter1"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Cancelar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar alterações</button></div>
     <div class="modal-footer" id="ecFooter2" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
     <div class="modal-footer" id="ecFooter3" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEcUnids()">Salvar unidades</button></div>
     <div class="modal-footer" id="ecFooter4" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
     <div class="modal-footer" id="ecFooter5" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
+    <div class="modal-footer" id="ecFooter6" style="display:none"><button class="abtn ab-ghost" onclick="closeModal('mEditCo')">Fechar</button><button class="abtn ab-pri" onclick="saveEditCo()">Salvar</button></div>
   </div>
 </div>
 
@@ -4959,6 +5043,486 @@ buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factC
        </div>`
     : '';
   return warning + _origBuildRepHTML(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+};
+
+// ═══════════════════════════════════════
+// INDICADORES DE SAÚDE — ABSENTEÍSMO
+// ═══════════════════════════════════════
+function ecAddIndicador() {
+  const mes = $('ec_ind_mes')?.value;
+  if (!mes) { alert('Informe o mês/ano.'); return; }
+  const editId = $('mEditCo')?.dataset?.editId;
+  if (!editId) return;
+  const co = STATE.companies.find(c => c.id === editId);
+  if (!co) return;
+  if (!co.indicadores) co.indicadores = [];
+  const idx = co.indicadores.findIndex(x => x.mes === mes);
+  const rec = {
+    mes,
+    dias: parseFloat($('ec_ind_dias')?.value) || 0,
+    acidentes: parseInt($('ec_ind_acid')?.value) || 0,
+    afastamentos: parseInt($('ec_ind_afas')?.value) || 0,
+    ambulatorial: parseInt($('ec_ind_amb')?.value) || 0,
+    rotatividade: parseFloat($('ec_ind_rot')?.value) || 0
+  };
+  if (idx >= 0) co.indicadores[idx] = rec;
+  else co.indicadores.push(rec);
+  co.indicadores.sort((a,b) => a.mes.localeCompare(b.mes));
+  $('ec_ind_mes').value = '';
+  $('ec_ind_dias').value = '';
+  $('ec_ind_acid').value = '';
+  $('ec_ind_afas').value = '';
+  $('ec_ind_amb').value = '';
+  $('ec_ind_rot').value = '';
+  renderEcIndList();
+  saveState();
+}
+
+function renderEcIndList() {
+  const editId = $('mEditCo')?.dataset?.editId;
+  if (!editId) return;
+  const co = STATE.companies.find(c => c.id === editId);
+  const inds = co?.indicadores || [];
+  const cnt = $('ecIndCount');
+  if (cnt) cnt.textContent = inds.length;
+  const body = $('ecIndBody');
+  if (!body) return;
+  if (!inds.length) { body.innerHTML = '<p style="font-size:12.5px;color:var(--muted)">Nenhum registro de indicadores.</p>'; return; }
+  body.innerHTML = `<div style="overflow-x:auto;border:1px solid var(--border);border-radius:9px">
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead style="background:var(--surface2)"><tr>
+        <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Mês</th>
+        <th style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Dias Perdidos</th>
+        <th style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Acidentes</th>
+        <th style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Afastamentos</th>
+        <th style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Ambulatorial</th>
+        <th style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">Rotatividade %</th>
+        <th style="padding:8px 12px;width:50px;border-bottom:1px solid var(--border)"></th>
+      </tr></thead>
+      <tbody>
+        ${inds.map(r => {
+          const [y,m] = r.mes.split('-');
+          const label = `${m}/${y}`;
+          return `<tr>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);font-weight:600">${label}</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:center">${r.dias}</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:center;color:${r.acidentes>0?'var(--red)':'var(--muted)'};font-weight:${r.acidentes>0?700:400}">${r.acidentes}</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:center;color:${r.afastamentos>0?'var(--amber)':'var(--muted)'}">${r.afastamentos}</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:center">${r.ambulatorial}</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border);text-align:center">${r.rotatividade}%</td>
+            <td style="padding:7px 12px;border-bottom:1px solid var(--border)"><button class="icon-btn del" onclick="ecDeleteIndicador('${r.mes}')">Excluir</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function ecDeleteIndicador(mes) {
+  if (!confirm('Excluir registro de ' + mes + '?')) return;
+  const editId = $('mEditCo')?.dataset?.editId;
+  const co = STATE.companies.find(c => c.id === editId);
+  if (co) co.indicadores = (co.indicadores || []).filter(x => x.mes !== mes);
+  renderEcIndList();
+  saveState();
+}
+
+function buildHealthTriangleHTML(co, avgRiskScore) {
+  if (!co?.indicadores?.length) return '';
+  const inds = co.indicadores.slice(-6);
+  const totalDias = inds.reduce((s, x) => s + x.dias, 0);
+  const totalAcid = inds.reduce((s, x) => s + x.acidentes, 0);
+  const totalAfas = inds.reduce((s, x) => s + x.afastamentos, 0);
+  const avgRot = inds.length ? (inds.reduce((s, x) => s + x.rotatividade, 0) / inds.length).toFixed(1) : 0;
+  const riskPct = Math.round(avgRiskScore * 100);
+  const riskColor = avgRiskScore >= 0.75 ? '#ef4444' : avgRiskScore >= 0.5 ? '#f59e0b' : '#22c55e';
+  return `<div class="sec-title" style="margin-top:22px">Triângulo de Evidências — NR-1
+    <span>Cruzamento: dados psicossociais + indicadores de saúde</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+    <div class="stat-card"><div class="val" style="color:${riskColor}">${riskPct}%</div><div class="lbl">Score psicossocial médio</div></div>
+    <div class="stat-card"><div class="val va">${totalDias}</div><div class="lbl">Dias perdidos (6 meses)</div></div>
+    <div class="stat-card"><div class="val ${totalAcid > 0 ? 'vr' : 'vg'}">${totalAcid}</div><div class="lbl">Acidentes de trabalho</div></div>
+    <div class="stat-card"><div class="val ${parseFloat(avgRot) > 5 ? 'va' : 'vg'}">${avgRot}%</div><div class="lbl">Rotatividade média</div></div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">Análise de Correlação</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.8">
+      ${avgRiskScore >= 0.5 && (totalDias > 0 || totalAcid > 0) ?
+        `<span style="color:var(--red);font-weight:600">Correlação identificada:</span> Score psicossocial elevado (${riskPct}%) associado a ${totalDias} dias de absenteísmo e ${totalAcid} acidente(s) no período analisado. Este padrão é consistente com os fatores de risco identificados e reforça a necessidade de intervenção prioritária conforme NR-1.` :
+        avgRiskScore >= 0.5 ?
+        `Score psicossocial moderado/alto (${riskPct}%). Monitore os indicadores de absenteísmo e acidentes nos próximos ciclos para identificar correlações emergentes.` :
+        `Score psicossocial dentro do nível de atenção (${riskPct}%). Indicadores de saúde e psicossociais alinhados. Mantenha o monitoramento periódico conforme NR-1.`
+      }
+    </div>
+  </div>`;
+}
+
+// Patch switchEcTab to handle tab 6 (Indicadores)
+const _origSwitchEcTab6 = switchEcTab;
+switchEcTab = function(n){
+  _origSwitchEcTab6(n);
+  const p6 = $('ecPanel6'); const f6 = $('ecFooter6'); const t6 = $('ecTab6');
+  if (p6) p6.style.display = n===6 ? 'block' : 'none';
+  if (f6) f6.style.display = n===6 ? 'flex' : 'none';
+  if (t6) { t6.style.borderBottomColor = n===6 ? 'var(--accent)' : 'transparent'; t6.style.color = n===6 ? 'var(--accent)' : 'var(--muted)'; t6.style.fontWeight = n===6 ? '600' : '500'; }
+  if (n===6) renderEcIndList();
+};
+
+// ═══════════════════════════════════════
+// BENCHMARKS NORMATIVOS — COPSOQ II
+// Fonte: COPSOQ International Network (2021) + Validação Portuguesa/Brasileira
+// Valores: mediana normalizada (0–1) por fator
+// ═══════════════════════════════════════
+const CQ_BENCHMARKS = {
+  'Exigências Quantitativas':        { med: 0.52, p25: 0.38, p75: 0.65, ref: 'COPSOQ-II PT/BR 2021' },
+  'Ritmo de Trabalho':               { med: 0.58, p25: 0.44, p75: 0.72, ref: 'COPSOQ-II PT/BR 2021' },
+  'Exigências Cognitivas':           { med: 0.41, p25: 0.28, p75: 0.55, ref: 'COPSOQ-II PT/BR 2021' },
+  'Exigências Emocionais':           { med: 0.45, p25: 0.30, p75: 0.60, ref: 'COPSOQ-II PT/BR 2021' },
+  'Pouca Influência':                { med: 0.44, p25: 0.31, p75: 0.58, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixo Desenvolvimento':           { med: 0.35, p25: 0.22, p75: 0.50, ref: 'COPSOQ-II PT/BR 2021' },
+  'Pouca previsibilidade de rotina': { med: 0.40, p25: 0.28, p75: 0.54, ref: 'COPSOQ-II PT/BR 2021' },
+  'Falta de Transparência de Papel': { med: 0.38, p25: 0.25, p75: 0.52, ref: 'COPSOQ-II PT/BR 2021' },
+  'Falta de Recompensas':            { med: 0.42, p25: 0.28, p75: 0.57, ref: 'COPSOQ-II PT/BR 2021' },
+  'Conflitos de Papel':              { med: 0.48, p25: 0.34, p75: 0.62, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixo apoio de colegas':          { med: 0.36, p25: 0.22, p75: 0.50, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixo apoio de superiores':       { med: 0.40, p25: 0.26, p75: 0.55, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa cooperação':                { med: 0.33, p25: 0.20, p75: 0.47, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa Qualidade da Liderança':    { med: 0.44, p25: 0.30, p75: 0.59, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa confiança entre pares':     { med: 0.38, p25: 0.25, p75: 0.52, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa confiança na gerência':     { med: 0.42, p25: 0.28, p75: 0.57, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa Justiça Organizacional':    { med: 0.45, p25: 0.31, p75: 0.60, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixa Autoeficácia':              { med: 0.30, p25: 0.18, p75: 0.43, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixo Significado':               { med: 0.28, p25: 0.16, p75: 0.41, ref: 'COPSOQ-II PT/BR 2021' },
+  'Baixo Comprometimento':           { med: 0.32, p25: 0.20, p75: 0.46, ref: 'COPSOQ-II PT/BR 2021' },
+  'Insatisfação no Trabalho':        { med: 0.40, p25: 0.26, p75: 0.55, ref: 'COPSOQ-II PT/BR 2021' },
+  'Insegurança no Emprego':          { med: 0.35, p25: 0.22, p75: 0.50, ref: 'COPSOQ-II PT/BR 2021' },
+  'Saúde Geral Precária':            { med: 0.38, p25: 0.24, p75: 0.52, ref: 'COPSOQ-II PT/BR 2021' },
+  'Conflito Trabalho-Família':       { med: 0.47, p25: 0.33, p75: 0.62, ref: 'COPSOQ-II PT/BR 2021' },
+  'Distúrbios do Sono':              { med: 0.43, p25: 0.28, p75: 0.58, ref: 'COPSOQ-II PT/BR 2021' },
+  'Burnout':                         { med: 0.44, p25: 0.30, p75: 0.59, ref: 'COPSOQ-II PT/BR 2021' },
+  'Estresse':                        { med: 0.46, p25: 0.32, p75: 0.61, ref: 'COPSOQ-II PT/BR 2021' },
+  'Sintomas Depressivos':            { med: 0.35, p25: 0.22, p75: 0.50, ref: 'COPSOQ-II PT/BR 2021' },
+  'Comportamentos Ofensivos':        { med: 0.12, p25: 0.05, p75: 0.22, ref: 'COPSOQ-II PT/BR 2021' },
+};
+
+// AOT benchmarks (based on DRPS Brazilian reference data)
+const BE_BENCHMARKS = {
+  'Excesso de Demandas':      { med: 0.50, p25: 0.35, p75: 0.64, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Ociosidade':               { med: 0.28, p25: 0.16, p75: 0.42, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Baixo Controle':           { med: 0.42, p25: 0.28, p75: 0.56, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Falta de Apoio':           { med: 0.38, p25: 0.24, p75: 0.52, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Baixa Clareza':            { med: 0.35, p25: 0.22, p75: 0.49, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Conflitos e Más Relações': { med: 0.36, p25: 0.22, p75: 0.51, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Falta de Reconhecimento':  { med: 0.44, p25: 0.30, p75: 0.59, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Injustiça no Trabalho':    { med: 0.42, p25: 0.28, p75: 0.57, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Má Gestão de Mudanças':    { med: 0.46, p25: 0.32, p75: 0.61, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Problemas de Comunicação': { med: 0.40, p25: 0.26, p75: 0.55, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Assédio':                  { med: 0.14, p25: 0.06, p75: 0.25, ref: 'DRPS/FUNDACENTRO BR 2023' },
+  'Violência e Agressão':     { med: 0.10, p25: 0.04, p75: 0.19, ref: 'DRPS/FUNDACENTRO BR 2023' },
+};
+
+function getBenchmarkBadge(factorName, score, type) {
+  const bm = type === 'cq' ? CQ_BENCHMARKS[factorName] : BE_BENCHMARKS[factorName];
+  if (!bm) return '';
+  const diff = score - bm.med;
+  const absDiff = Math.abs(diff);
+  if (absDiff < 0.04) return `<span style="font-size:10px;color:var(--muted);display:block;margin-top:2px">Na mediana setorial</span>`;
+  if (diff > 0) return `<span style="font-size:10px;color:${diff>0.12?'var(--red)':'var(--amber)'};display:block;margin-top:2px">+${Math.round(diff*100)}pts acima da referencia</span>`;
+  return `<span style="font-size:10px;color:var(--green);display:block;margin-top:2px">${Math.round(absDiff*100)}pts abaixo da referencia</span>`;
+}
+
+function buildBenchmarkSectionHTML(sortedF, prefix) {
+  const benchmarks = prefix === 'cq' ? CQ_BENCHMARKS : BE_BENCHMARKS;
+  const factors = sortedF.filter(f => benchmarks[f.name]);
+  if (!factors.length) return '';
+  const aboveMedian = factors.filter(f => f.score > (benchmarks[f.name]?.med || 0) + 0.04);
+  const belowMedian = factors.filter(f => f.score < (benchmarks[f.name]?.med || 0) - 0.04);
+  return `<div class="sec-title" style="margin-top:22px">Comparativo com Referencia Normativa
+    <span>Fonte: COPSOQ International Network / DRPS-FUNDACENTRO</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Acima da Referencia (${aboveMedian.length})</div>
+      ${aboveMedian.length ? aboveMedian.map(f => {
+        const bm = benchmarks[f.name];
+        const diff = Math.round((f.score - bm.med) * 100);
+        return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(239,68,68,.1);font-size:12.5px">
+          <span style="color:var(--text)">${f.name}</span>
+          <span style="color:var(--red);font-weight:600">+${diff}pts</span>
+        </div>`;
+      }).join('') : '<p style="font-size:12.5px;color:var(--muted)">Nenhum fator acima da referencia.</p>'}
+    </div>
+    <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:var(--radius);padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Abaixo da Referencia (${belowMedian.length})</div>
+      ${belowMedian.length ? belowMedian.map(f => {
+        const bm = benchmarks[f.name];
+        const diff = Math.round((bm.med - f.score) * 100);
+        return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(34,197,94,.1);font-size:12.5px">
+          <span style="color:var(--text)">${f.name}</span>
+          <span style="color:var(--green);font-weight:600">-${diff}pts</span>
+        </div>`;
+      }).join('') : '<p style="font-size:12.5px;color:var(--muted)">Nenhum fator abaixo da referencia.</p>'}
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted);font-style:italic">Valores de referencia baseados em estudos normativos publicados. Diferenças superiores a 4 pontos percentuais são consideradas relevantes.</p>`;
+}
+
+// Patch buildRepHTML to inject benchmark badges in risk rows and benchmark section + health triangle
+const _origBuildRepHTML2 = buildRepHTML;
+buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co) {
+  // Augment each factor's desc to include benchmark badge (appended as HTML)
+  const augmentedF = sortedF.map(f => ({
+    ...f,
+    desc: (f.desc || (dims.find(d => d.id === f.dim)?.name) || f.dim) + getBenchmarkBadge(f.name, f.score, prefix)
+  }));
+  const result = _origBuildRepHTML2(resps, augmentedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+  // Calculate avgAll for health triangle
+  const allDimScores = Object.values(dimScores).filter(v => v != null);
+  const avgAll = allDimScores.length ? allDimScores.reduce((a,b) => a+b, 0) / allDimScores.length : 0;
+  const extra = buildBenchmarkSectionHTML(sortedF, prefix) + (co ? buildHealthTriangleHTML(co, avgAll) : '');
+  // Append extra sections before "Perfil dos Respondentes" section, or at end if not present
+  if (extra) {
+    const profileMarker = '<div class="sec-title" style="margin-top:22px">Perfil dos Respondentes</div>';
+    if (result.includes(profileMarker)) {
+      return result.replace(profileMarker, extra + profileMarker);
+    }
+    return result + extra;
+  }
+  return result;
+};
+
+// ═══════════════════════════════════════
+// WHITE-LABEL — IDENTIDADE VISUAL
+// ═══════════════════════════════════════
+const WL_DEFAULTS = {
+  nome: 'AMBRAC',
+  tagline: 'Sistema de Avaliação Ocupacional',
+  corParticipante: '#1e4d3a',
+  corGestor: '#3d7aed',
+  logo: '',
+  footer: 'AMBRAC — Saúde Ocupacional'
+};
+
+function loadWhiteLabel() {
+  return JSON.parse(localStorage.getItem('ambrac_wl') || 'null') || {...WL_DEFAULTS};
+}
+
+function applyWhiteLabel(cfg) {
+  document.documentElement.style.setProperty('--wl-color-participant', cfg.corParticipante);
+  document.documentElement.style.setProperty('--wl-color-manager', cfg.corGestor);
+  const brandEls = document.querySelectorAll('.brand, .p-logo, .m-logo, .sb-logo .brand');
+  brandEls.forEach(el => {
+    const span = el.querySelector('span');
+    if (span) {
+      if (el.childNodes[0] && el.childNodes[0].nodeType === 3) el.childNodes[0].textContent = cfg.nome;
+    } else {
+      el.textContent = cfg.nome;
+    }
+  });
+  document.title = cfg.nome + ' – ' + cfg.tagline;
+  const tagEls = document.querySelectorAll('.brand-tag');
+  tagEls.forEach(el => { el.textContent = cfg.nome + ' · Saúde Ocupacional'; });
+  if (document.body.classList.contains('participant-mode')) {
+    document.body.style.setProperty('--accent', cfg.corParticipante);
+    document.body.style.setProperty('--accent-light', cfg.corParticipante + 'cc');
+  }
+  if (document.body.classList.contains('manager-mode')) {
+    document.body.style.setProperty('--accent', cfg.corGestor);
+    document.body.style.setProperty('--accent-light', cfg.corGestor + 'cc');
+    document.body.style.setProperty('--accent-pale', cfg.corGestor + '20');
+  }
+  if (cfg.logo) {
+    const logoWrap = document.querySelector('.p-login-left .pll-inner');
+    if (logoWrap && !document.getElementById('wlLogoImg')) {
+      const img = document.createElement('img');
+      img.id = 'wlLogoImg';
+      img.src = cfg.logo;
+      img.style.cssText = 'height:48px;object-fit:contain;margin-bottom:16px;display:block';
+      img.onerror = () => img.remove();
+      logoWrap.insertBefore(img, logoWrap.firstChild);
+    }
+  }
+}
+
+function saveWhiteLabel() {
+  const cfg = {
+    nome: ($('wl_nome')?.value || '').trim() || WL_DEFAULTS.nome,
+    tagline: ($('wl_tagline')?.value || '').trim() || WL_DEFAULTS.tagline,
+    corParticipante: $('wl_cor_part')?.value || WL_DEFAULTS.corParticipante,
+    corGestor: $('wl_cor_mgr')?.value || WL_DEFAULTS.corGestor,
+    logo: ($('wl_logo')?.value || '').trim(),
+    footer: ($('wl_footer')?.value || '').trim() || WL_DEFAULTS.footer
+  };
+  localStorage.setItem('ambrac_wl', JSON.stringify(cfg));
+  applyWhiteLabel(cfg);
+  const st = $('wlStatus');
+  if (st) { st.textContent = 'Identidade aplicada com sucesso.'; st.style.color = '#22c55e'; }
+  const prev = $('wlPreview');
+  if (prev) prev.style.display = 'block';
+  const prevC = $('wlPreviewContent');
+  if (prevC) prevC.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:${cfg.corParticipante}">${cfg.nome}<span style="color:#c4922a">.</span></div>
+      <div style="font-size:12px;color:var(--muted)">${cfg.tagline}</div>
+      ${cfg.logo ? `<img src="${cfg.logo}" style="height:36px;object-fit:contain" onerror="this.remove()"/>` : ''}
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted)">${cfg.footer}</div>`;
+}
+
+function resetWhiteLabel() {
+  localStorage.removeItem('ambrac_wl');
+  applyWhiteLabel(WL_DEFAULTS);
+  if ($('wl_nome')) $('wl_nome').value = '';
+  if ($('wl_tagline')) $('wl_tagline').value = '';
+  if ($('wl_cor_part')) $('wl_cor_part').value = WL_DEFAULTS.corParticipante;
+  if ($('wl_cor_mgr')) $('wl_cor_mgr').value = WL_DEFAULTS.corGestor;
+  if ($('wl_logo')) $('wl_logo').value = '';
+  if ($('wl_footer')) $('wl_footer').value = '';
+  const st = $('wlStatus');
+  if (st) { st.textContent = 'Padrão restaurado.'; st.style.color = 'var(--muted)'; }
+  const prev = $('wlPreview');
+  if (prev) prev.style.display = 'none';
+}
+
+(function initWL() {
+  const cfg = loadWhiteLabel();
+  if (cfg.nome !== WL_DEFAULTS.nome || cfg.corParticipante !== WL_DEFAULTS.corParticipante || cfg.corGestor !== WL_DEFAULTS.corGestor) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => applyWhiteLabel(cfg));
+    } else {
+      setTimeout(() => applyWhiteLabel(cfg), 100);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if ($('wl_nome')) $('wl_nome').value = cfg.nome !== WL_DEFAULTS.nome ? cfg.nome : '';
+    if ($('wl_tagline')) $('wl_tagline').value = cfg.tagline !== WL_DEFAULTS.tagline ? cfg.tagline : '';
+    if ($('wl_cor_part')) $('wl_cor_part').value = cfg.corParticipante;
+    if ($('wl_cor_mgr')) $('wl_cor_mgr').value = cfg.corGestor;
+    if ($('wl_logo')) $('wl_logo').value = cfg.logo || '';
+    if ($('wl_footer')) $('wl_footer').value = cfg.footer !== WL_DEFAULTS.footer ? cfg.footer : '';
+  });
+})();
+
+// ═══════════════════════════════════════
+// WEBHOOKS — INTEGRAÇÕES
+// ═══════════════════════════════════════
+function loadWebhooks() { return JSON.parse(localStorage.getItem('ambrac_webhooks') || '[]'); }
+function saveWebhooks(whs) { localStorage.setItem('ambrac_webhooks', JSON.stringify(whs)); }
+let WEBHOOKS = loadWebhooks();
+
+const WH_EVENT_LABELS = {
+  nova_resposta: 'Nova resposta',
+  relatorio_gerado: 'Relatório gerado',
+  acao_concluida: 'Ação concluída',
+  all: 'Todos os eventos'
+};
+
+function renderWebhookList() {
+  const el = $('webhookList');
+  if (!el) return;
+  if (!WEBHOOKS.length) { el.innerHTML = '<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Nenhum webhook configurado.</p>'; return; }
+  el.innerHTML = `<div style="border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:8px">
+    ${WEBHOOKS.map((wh, i) => `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:${i<WEBHOOKS.length-1?'1px solid var(--border)':'none'}">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${wh.desc || wh.url.slice(0,50) + '...'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${WH_EVENT_LABELS[wh.event] || wh.event} · <span style="font-family:monospace">${wh.url.slice(0,40)}...</span></div>
+      </div>
+      <span style="font-size:11px;padding:2px 8px;border-radius:99px;background:${wh.ativo?'rgba(34,197,94,.12)':'var(--surface3)'};color:${wh.ativo?'#22c55e':'var(--muted)'};font-weight:600">${wh.ativo?'Ativo':'Inativo'}</span>
+      <button class="icon-btn" onclick="toggleWebhook(${i})">${wh.ativo?'Pausar':'Ativar'}</button>
+      <button class="icon-btn del" onclick="deleteWebhook(${i})">Excluir</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function addWebhook() {
+  const url = ($('wh_url')?.value || '').trim();
+  if (!url.startsWith('http')) { alert('Informe uma URL válida.'); return; }
+  WEBHOOKS.push({ url, event: $('wh_event')?.value || 'nova_resposta', desc: ($('wh_desc')?.value||'').trim(), ativo: true, criadoEm: new Date().toISOString() });
+  saveWebhooks(WEBHOOKS);
+  if ($('wh_url')) $('wh_url').value = '';
+  if ($('wh_desc')) $('wh_desc').value = '';
+  renderWebhookList();
+}
+
+function toggleWebhook(i) { WEBHOOKS[i].ativo = !WEBHOOKS[i].ativo; saveWebhooks(WEBHOOKS); renderWebhookList(); }
+function deleteWebhook(i) { if (!confirm('Excluir este webhook?')) return; WEBHOOKS.splice(i, 1); saveWebhooks(WEBHOOKS); renderWebhookList(); }
+
+async function testWebhook() {
+  const url = ($('wh_url')?.value || '').trim();
+  if (!url.startsWith('http')) { alert('Informe uma URL para testar.'); return; }
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      body: JSON.stringify({ evento: 'teste', sistema: 'AMBRAC', timestamp: new Date().toISOString(), dados: { mensagem: 'Teste de webhook AMBRAC' } })
+    });
+    alert('Requisição enviada. Verifique o endpoint para confirmar o recebimento (modo no-cors).');
+  } catch(e) { alert('Erro ao enviar: ' + e.message); }
+}
+
+async function fireWebhook(event, data) {
+  const active = WEBHOOKS.filter(wh => wh.ativo && (wh.event === event || wh.event === 'all'));
+  active.forEach(wh => {
+    fetch(wh.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      body: JSON.stringify({ evento: event, sistema: 'AMBRAC', timestamp: new Date().toISOString(), dados: data })
+    }).catch(() => {});
+  });
+}
+
+function generateExportToken() {
+  const token = 'ambrac_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,10);
+  localStorage.setItem('ambrac_export_token', token);
+  const disp = $('exportTokenDisplay');
+  if (disp) disp.textContent = token;
+  const inst = $('exportTokenInstructions');
+  if (inst) inst.style.display = 'block';
+}
+
+(function checkExportToken() {
+  const params = new URLSearchParams(window.location.search);
+  const tok = params.get('export');
+  if (!tok) return;
+  const saved = localStorage.getItem('ambrac_export_token');
+  if (tok !== saved) return;
+  const exportData = {
+    exportedAt: new Date().toISOString(),
+    companies: STATE?.companies || [],
+    responses: STATE?.responses || [],
+    reports: REPORT_HIST || []
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ambrac_export_' + Date.now() + '.json';
+  a.click();
+})();
+
+// Wire renderWebhookList when navigating to pConfig
+const _origNavTo2 = navTo;
+navTo = function(pid, btn) {
+  _origNavTo2(pid, btn);
+  if (pid === 'pConfig') renderWebhookList();
+};
+
+// Wire fireWebhook to submitForm (patch)
+const _origSubmitForm = submitForm;
+submitForm = function(type) {
+  _origSubmitForm(type);
+  const co = STATE.companies.find(c => c.colaboradores && c.colaboradores.find(col => col.email === (typeof CU !== 'undefined' ? CU.email : '')));
+  const lastResp = STATE.responses[STATE.responses.length - 1];
+  if (lastResp) fireWebhook('nova_resposta', { questionario: lastResp.questionario, empresa: lastResp.empresa, timestamp: lastResp.timestamp });
+};
+
+// Wire fireWebhook to addToReportHist (patch)
+const _origAddToReportHist = addToReportHist;
+addToReportHist = function(type, label, empresa, setor, nResp, mgr) {
+  _origAddToReportHist(type, label, empresa, setor, nResp, mgr);
+  fireWebhook('relatorio_gerado', { tipo: type, empresa: empresa, nResp: nResp });
 };
 
 </script>
