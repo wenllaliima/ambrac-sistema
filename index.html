@@ -165,7 +165,6 @@ body.manager-mode{
 .qcard.gld:hover{border-color:var(--gold);box-shadow:0 12px 40px rgba(196,146,42,.15)}
 .qcard.done-card{opacity:.5;cursor:not-allowed;pointer-events:none}
 .qcard.done-card::after{content:'✓ Já respondido';position:absolute;top:14px;right:14px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px}
-.qci{font-size:32px;margin-bottom:12px}
 .qtag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px}
 .qtag.green{background:var(--accent-pale);color:var(--accent)}
 .qtag.amber{background:var(--gold-pale);color:var(--gold)}
@@ -258,9 +257,6 @@ body.manager-mode{
 .m-fg input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(61,122,237,.15)}
 .m-btn{width:100%;padding:12px;border-radius:9px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;transition:all .18s;margin-top:4px}
 .m-btn:hover{background:var(--accent-light);transform:translateY(-1px)}
-.demo-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:13px 14px;font-size:12px;color:var(--muted);margin-top:14px}
-.demo-box strong{color:var(--text);display:block;margin-bottom:5px}
-.demo-box code{background:var(--surface3);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11px;color:var(--accent)}
 .back-to-part{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s;width:100%}
 .back-to-part:hover{color:var(--text)}
 
@@ -276,7 +272,6 @@ body.manager-mode{
 .nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--muted);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
 .nav-item:hover{background:var(--surface2);color:var(--text)}
 .nav-item.active{background:var(--accent-pale);color:var(--accent);font-weight:600}
-.nav-item .icon{font-size:15px;flex-shrink:0}
 .sb-footer{padding:14px 12px;border-top:1px solid var(--border)}
 .sb-user{display:flex;align-items:center;gap:9px}
 .sb-av{width:32px;height:32px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
@@ -338,11 +333,7 @@ body.manager-mode{
 .bb{background:var(--accent-pale);color:var(--accent)}
 .bgr{background:var(--surface3);color:var(--muted)}
 .bte{background:rgba(13,148,136,.15);color:#2dd4bf;border:1px solid rgba(13,148,136,.3)}
-.qcard.teal{border-color:rgba(13,148,136,.4)}
-.qcard.teal:hover{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.15)}
-.qcard.teal .qtag.teal{background:rgba(13,148,136,.15);color:#2dd4bf}
-.e3-inv{color:#0d9488;font-weight:700;margin-right:4px}
-.e3-risk-tag{font-size:9.5px;background:var(--surface3);color:var(--muted);padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.sc-icon{display:none}
 .row-acts{display:flex;gap:6px}
 .icon-btn{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:6px;font-size:14px;transition:background .15s;color:var(--muted)}
 .icon-btn:hover{background:var(--surface3);color:var(--text)}
@@ -621,10 +612,10 @@ body.manager-mode{
         <h1 class="p-headline">Avaliação de <em>Bem-Estar</em><br/>e Riscos Psicossociais</h1>
         <p class="p-desc">Instrumento desenvolvido no âmbito do PGR, em atendimento à Norma Regulamentadora nº 1.</p>
         <div class="p-badges">
-          <div class="p-badge"><div class="p-badge-icon">🔒</div><span>Respostas totalmente anônimas e sigilosas</span></div>
-          <div class="p-badge"><div class="p-badge-icon">📊</div><span>Dados tratados exclusivamente de forma coletiva</span></div>
-          <div class="p-badge"><div class="p-badge-icon">🛡️</div><span>Avalia condições de trabalho, não o colaborador</span></div>
-          <div class="p-badge"><div class="p-badge-icon">✉️</div><span>Acesso protegido por código único de verificação</span></div>
+          <div class="p-badge"><div class="p-badge-icon" style="font-size:12px;font-weight:700">01</div><span>Respostas totalmente anônimas e sigilosas</span></div>
+          <div class="p-badge"><div class="p-badge-icon" style="font-size:12px;font-weight:700">02</div><span>Dados tratados exclusivamente de forma coletiva</span></div>
+          <div class="p-badge"><div class="p-badge-icon" style="font-size:12px;font-weight:700">03</div><span>Avalia condições de trabalho, não o colaborador</span></div>
+          <div class="p-badge"><div class="p-badge-icon" style="font-size:12px;font-weight:700">04</div><span>Acesso protegido por código único de verificação</span></div>
         </div>
       </div>
     </div>
@@ -668,7 +659,7 @@ body.manager-mode{
           <button id="resendBtn"></button>
         </div>
 
-        <button class="mgr-link" onclick="goToManagerLogin()">🔑 Acesso ao Painel Gerencial</button>
+        <button class="mgr-link" onclick="goToManagerLogin()">Acesso ao Painel Gerencial</button>
       </div>
     </div>
   </div>
@@ -684,33 +675,24 @@ body.manager-mode{
     </div>
     <div class="qcards">
       <div class="qcard" id="cCopsoq" onclick="startQ('copsoq')">
-        <div class="qci">🧠</div><div class="qtag green">Internacional · COPSOQ II</div>
+        <div class="qtag green">Internacional · COPSOQ II</div>
         <h3>COPSOQ II</h3>
         <p>Copenhagen Psychosocial Questionnaire — avaliação abrangente dos riscos psicossociais, validada internacionalmente.</p>
-        <div class="qmeta"><div class="qchip">⏱ ~20 min</div><div class="qchip">📋 76 questões</div><div class="qchip">🌍 Validado internacionalmente</div></div>
+        <div class="qmeta"><div class="qchip">~20 min</div><div class="qchip">76 questões</div><div class="qchip">Validado internacionalmente</div></div>
         <div class="qcstart"><span id="cqLabel">Iniciar questionário →</span></div>
       </div>
       <div class="qcard gld" id="cBe" onclick="startQ('bemestar')">
-        <div class="qci">🏢</div><div class="qtag amber">AMBRAC · PGR / NR-1</div>
+        <div class="qtag amber">AMBRAC · PGR / NR-1</div>
         <h3>Avaliação de Organização do Trabalho (AOT)</h3>
         <p>Instrumento AMBRAC para identificar fatores psicossociais que impactam o bem-estar, em conformidade com a NR-1.</p>
-        <div class="qmeta"><div class="qchip">⏱ ~10 min</div><div class="qchip">📋 24 questões</div><div class="qchip">🇧🇷 PGR / NR-1</div></div>
+        <div class="qmeta"><div class="qchip">~10 min</div><div class="qchip">24 questões</div><div class="qchip">PGR / NR-1</div></div>
         <div class="qcstart"><span id="beLabel">Iniciar questionário →</span></div>
       </div>
     </div>
-      <div class="qcard teal" id="cE3" onclick="startQ('eixo3')">
-        <div class="qci">🎯</div><div class="qtag teal">AMBRAC · Eixo III · GHE</div>
-        <h3>Validação Qualitativa Participativa</h3>
-        <p>Instrumento de validação qualitativa participativa dos fatores de risco psicossocial, respondido pelo representante do GHE.</p>
-        <div class="qmeta"><div class="qchip">⏱ ~5 min</div><div class="qchip">📋 12 questões</div></div>
-        <div class="qcstart"><span id="e3Label">Iniciar questionário →</span></div>
-      </div>
-    </div>
     <div id="assignedNotice" style="display:none;background:var(--accent-pale);border:1px solid rgba(30,77,58,.25);border-radius:12px;padding:13px 18px;font-size:13px;color:var(--accent);margin-bottom:16px;align-items:center;gap:10px">
-      <span style="font-size:18px;flex-shrink:0">📋</span>
       <p id="assignedNoticeText"></p>
     </div>
-    <div class="info-bar"><div style="font-size:18px;flex-shrink:0">ℹ️</div><p><strong>Sobre a confidencialidade:</strong> suas respostas são anônimas e analisadas exclusivamente de forma coletiva. Cada colaborador pode responder cada questionário apenas <strong>uma única vez</strong>.</p></div>
+    <div class="info-bar"><p><strong>Sobre a confidencialidade:</strong> suas respostas são anônimas e analisadas exclusivamente de forma coletiva. Cada colaborador pode responder cada questionário apenas <strong>uma única vez</strong>.</p></div>
     <button class="logout-lnk" onclick="doLogout()">Sair ↗</button>
   </div>
 </div>
@@ -723,7 +705,7 @@ body.manager-mode{
   </div>
   <div class="qwrap">
     <div class="qsec">
-      <div class="sechead" style="background:var(--gold)"><h3>🏢 Avaliação de Organização do Trabalho (AOT)</h3><p>AMBRAC · PGR / NR-1 &nbsp;|&nbsp; Escala: 1-Nunca · 2-Raramente · 3-Às vezes · 4-Frequentemente · 5-Sempre</p></div>
+      <div class="sechead" style="background:var(--gold)"><h3>Avaliação de Organização do Trabalho (AOT)</h3><p>AMBRAC · PGR / NR-1 &nbsp;|&nbsp; Escala: 1-Nunca · 2-Raramente · 3-Às vezes · 4-Frequentemente · 5-Sempre</p></div>
       <div class="secbody">
         <div style="padding:16px 18px;font-size:13.5px;color:var(--muted);line-height:1.8;border-bottom:1px solid var(--border)"><strong style="color:var(--text)">Objetivo:</strong> Identificar fatores na organização do trabalho que possam impactar o bem-estar dos colaboradores.</div>
         <div class="openq" style="border-bottom:1px solid var(--border)"><label>Setor / Departamento <span style="color:var(--muted);font-weight:300">(opcional)</span></label><input type="text" id="be_setor" placeholder="Ex.: Produção, Administrativo, RH…" class="tinput" style="resize:none;min-height:unset"/></div>
@@ -763,57 +745,7 @@ body.manager-mode{
       <h3>Pronto para enviar?</h3>
       <p>Após o envio, não será possível editar e o questionário ficará bloqueado.</p>
       <button class="subbtn gb" onclick="submitForm('bemestar')">Enviar respostas ✓</button>
-      <p class="warnnote">⚠️ Cada colaborador pode responder este questionário apenas uma vez.</p>
-    </div>
-  </div>
-</div>
-
-<!-- PARTICIPANT: EIXO III — Validação Qualitativa Participativa -->
-<div id="sE3" class="screen">
-  <div class="q-topbar">
-    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">Eixo III — Validação Qualitativa Participativa · AMBRAC</span></div>
-    <div class="pbwrap"><span class="plabel" id="e3Pct">0%</span><div class="ptrack"><div class="pfill" id="e3Fill" style="width:0%"></div></div></div>
-  </div>
-  <div class="qwrap">
-    <div class="qsec">
-      <div class="sechead" style="background:#0d9488"><h3>🎯 Instrumento de Validação Qualitativa Participativa — Eixo III</h3><p>AMBRAC · Representante do GHE &nbsp;|&nbsp; Escala: 1-Nunca/Raro · 2-Ocasional · 3-Frequente · 4-Sempre/Constante</p></div>
-      <div class="secbody">
-        <div style="padding:16px 18px;font-size:13.5px;color:var(--muted);line-height:1.8;border-bottom:1px solid var(--border)">
-          <strong style="color:var(--text)">Instruções:</strong> Responda com base na sua rotina de trabalho. Não há respostas certas ou erradas. Seja o mais sincero(a) possível — suas respostas são anônimas e analisadas apenas de forma coletiva.
-        </div>
-        <div class="openq" style="border-bottom:1px solid var(--border)"><label>Setor / GHE <span style="color:#ef4444;font-weight:600">*</span></label><input type="text" id="e3_setor" placeholder="Ex.: Operadores de máquina, GHE-02, Administrativo…" class="tinput" style="resize:none;min-height:unset"/></div>
-        <div class="openq" style="border-bottom:1px solid var(--border)"><label>Função / Cargo <span style="color:#ef4444;font-weight:600">*</span></label><input type="text" id="e3_funcao" placeholder="Ex.: Operador de máquina, Analista, Técnico de segurança…" class="tinput" style="resize:none;min-height:unset"/></div>
-      </div>
-    </div>
-    <div class="qsec">
-      <div class="sechead" style="background:var(--accent)"><h3>Dados Básicos</h3><p>Para análise estatística — totalmente anônimos.</p></div>
-      <div class="secbody">
-        <div class="drow"><div class="dlabel">Faixa etária</div><div class="dopts" id="e3_idade"><div class="opill gsel" onclick="sp(this,'e3_idade')">Menor de 18 anos</div><div class="opill gsel" onclick="sp(this,'e3_idade')">Até 27 anos</div><div class="opill gsel" onclick="sp(this,'e3_idade')">De 28 a 43 anos</div><div class="opill gsel" onclick="sp(this,'e3_idade')">De 44 a 59 anos</div><div class="opill gsel" onclick="sp(this,'e3_idade')">+ 60 anos</div></div></div>
-        <div class="drow"><div class="dlabel">Sexo</div><div class="dopts" id="e3_sexo"><div class="opill gsel" onclick="sp(this,'e3_sexo')">Feminino</div><div class="opill gsel" onclick="sp(this,'e3_sexo')">Masculino</div><div class="opill gsel" onclick="sp(this,'e3_sexo')">Intersex</div><div class="opill gsel" onclick="sp(this,'e3_sexo')">Não binário</div><div class="opill gsel" onclick="sp(this,'e3_sexo')">Outro</div></div></div>
-        <div class="drow"><div class="dlabel">Tempo na empresa</div><div class="dopts" id="e3_tempo"><div class="opill gsel" onclick="sp(this,'e3_tempo')">Até 6 meses</div><div class="opill gsel" onclick="sp(this,'e3_tempo')">De 7 meses a 1 ano</div><div class="opill gsel" onclick="sp(this,'e3_tempo')">Entre 1 e 3 anos</div><div class="opill gsel" onclick="sp(this,'e3_tempo')">Entre 3 e 5 anos</div><div class="opill gsel" onclick="sp(this,'e3_tempo')">Mais que 5 anos</div></div></div>
-        <div class="drow" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px"><div class="dlabel" style="color:var(--muted);font-size:11px">Turno de trabalho</div><div class="dopts" id="e3_turno"><div class="opill gsel" onclick="sp(this,'e3_turno')">Diurno</div><div class="opill gsel" onclick="sp(this,'e3_turno')">Vespertino</div><div class="opill gsel" onclick="sp(this,'e3_turno')">Noturno</div><div class="opill gsel" onclick="sp(this,'e3_turno')">Revezamento</div></div></div>
-      </div>
-    </div>
-    <div class="qsec">
-      <div class="sechead" style="background:#0d9488"><h3>Percepção dos Riscos Psicossociais</h3><p>Indique a frequência com que cada situação ocorre na sua rotina de trabalho.</p></div>
-      <div class="secbody" style="overflow-x:auto">
-        <table class="ltable">
-          <thead><tr>
-            <th style="text-align:left;padding-left:18px">Afirmação</th>
-            <th class="colw"><div class="lhlabel">1<br/>Nunca/<br/>Raro</div></th>
-            <th class="colw"><div class="lhlabel">2<br/>Ocasio-nal</div></th>
-            <th class="colw"><div class="lhlabel">3<br/>Frequente</div></th>
-            <th class="colw"><div class="lhlabel">4<br/>Sempre/<br/>Constante</div></th>
-          </tr></thead>
-          <tbody id="e3Likert"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="qsubmit">
-      <h3>Pronto para enviar?</h3>
-      <p>Após o envio, não será possível editar e o questionário ficará bloqueado.</p>
-      <button class="subbtn" style="background:#0d9488" onclick="submitForm('eixo3')">Enviar respostas ✓</button>
-      <p class="warnnote">⚠️ Cada representante pode responder este questionário apenas uma vez.</p>
+      <p class="warnnote">Atenção: Cada colaborador pode responder este questionário apenas uma vez.</p>
     </div>
   </div>
 </div>
@@ -826,7 +758,7 @@ body.manager-mode{
   </div>
   <div class="qwrap">
     <div class="qsec">
-      <div class="sechead" style="background:var(--accent)"><h3>🧠 COPSOQ II — Avaliação Psicossocial</h3><p>Instrumento validado internacionalmente · Versão AMBRAC · NR-1 / PGR</p></div>
+      <div class="sechead" style="background:var(--accent)"><h3>COPSOQ II — Avaliação Psicossocial</h3><p>Instrumento validado internacionalmente · Versão AMBRAC · NR-1 / PGR</p></div>
       <div class="secbody"><div style="padding:15px 18px;font-size:13.5px;color:var(--muted);line-height:1.8"><strong style="color:var(--text)">Instruções:</strong> Responda com base na sua rotina de trabalho atual. Não há respostas certas ou erradas.</div></div>
     </div>
     <div class="qsec">
@@ -859,7 +791,7 @@ body.manager-mode{
       <h3>Pronto para enviar?</h3>
       <p>Após o envio, não será possível editar e o questionário ficará bloqueado.</p>
       <button class="subbtn" onclick="submitForm('copsoq')">Enviar respostas ✓</button>
-      <p class="warnnote">⚠️ Cada colaborador pode responder este questionário apenas uma vez.</p>
+      <p class="warnnote">Atenção: Cada colaborador pode responder este questionário apenas uma vez.</p>
     </div>
   </div>
 </div>
@@ -868,7 +800,7 @@ body.manager-mode{
 <div id="sSucc" class="screen">
   <div class="succ-wrap">
     <div class="succ-card">
-      <div style="font-size:50px;margin-bottom:16px">🎉</div>
+      <div style="font-size:50px;margin-bottom:16px;color:var(--accent)">✓</div>
       <h2>Obrigado pela sua participação!</h2>
       <p>Suas respostas foram registradas com sucesso e serão analisadas de forma coletiva e anônima pela equipe da <strong>AMBRAC</strong>.<br/><br/>Sua contribuição é fundamental para melhorar o bem-estar no trabalho.</p>
       <button class="subbtn" onclick="doLogout()">Encerrar sessão</button>
@@ -881,7 +813,7 @@ body.manager-mode{
   <div class="m-login-wrap">
     <div class="m-login-card">
       <div class="m-logo">AMBRAC<span>.</span></div>
-      <div class="mgr-badge">🔑 Acesso Gerencial</div>
+      <div class="mgr-badge">Acesso Gerencial</div>
       <h2>Painel de Gerenciamento</h2>
       <p class="sub">Área restrita para gestores e administradores da AMBRAC</p>
       <div id="mgrAlert" class="alert alert-e"></div>
@@ -901,18 +833,19 @@ body.manager-mode{
       <div class="sb-logo"><div class="brand">AMBRAC<span>.</span></div><div class="role">Painel de Gerenciamento</div></div>
       <nav class="sb-nav">
         <div class="nav-sec">Visão Geral</div>
-        <button class="nav-item active" onclick="navTo('pOv',this)"><span class="icon">📊</span>Dashboard</button>
+        <button class="nav-item active" onclick="navTo('pOv',this)">Dashboard</button>
         <div class="nav-sec">Empresas</div>
-        <button class="nav-item" onclick="navTo('pCo',this)"><span class="icon">🏢</span>Empresas</button>
-        <button class="nav-item" onclick="navTo('pUp',this)"><span class="icon">📤</span>Importar Colaboradores</button>
+        <button class="nav-item" onclick="navTo('pCo',this)">Empresas</button>
+        <button class="nav-item" onclick="navTo('pUp',this)">Importar Colaboradores</button>
         <div class="nav-sec">Relatórios</div>
-        <button class="nav-item" onclick="navTo('pRCq',this)"><span class="icon">🧠</span>Relatório COPSOQ II</button>
-        <button class="nav-item" onclick="navTo('pRBe',this)"><span class="icon">🏢</span>Relatório AOT</button>
-        <button class="nav-item" onclick="navTo('pRE3',this)"><span class="icon">🎯</span>Relatório Eixo III</button>
-        <button class="nav-item" onclick="navTo('pResp',this)"><span class="icon">📋</span>Respostas Individuais</button>
+        <button class="nav-item" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
+        <button class="nav-item" onclick="navTo('pRBe',this)">Relatório AOT</button>
+        <button class="nav-item" onclick="navTo('pResp',this)">Respostas Individuais</button>
+        <div class="nav-sec">Academy</div>
+        <button class="nav-item" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
         <div class="nav-sec">Administração</div>
-        <button class="nav-item" onclick="navTo('pHist',this)"><span class="icon">📜</span>Histórico de Relatórios</button>
-        <button class="nav-item" onclick="navTo('pContas',this)"><span class="icon">👥</span>Contas Gerenciais</button>
+        <button class="nav-item" onclick="navTo('pHist',this)">Histórico de Relatórios</button>
+        <button class="nav-item" onclick="navTo('pContas',this)">Contas Gerenciais</button>
       </nav>
       <div class="sb-footer">
         <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role" id="sbRole">Gerenciador</div></div></div>
@@ -932,9 +865,9 @@ body.manager-mode{
         <!-- DASHBOARD -->
         <div class="panel active" id="pOv">
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <span style="font-size:13px;color:var(--muted);white-space:nowrap">🔍 Filtrar por empresa:</span>
+            <span style="font-size:13px;color:var(--muted);white-space:nowrap">Filtrar por empresa:</span>
             <input id="ovSearch" placeholder="Nome, CNPJ ou ID da empresa…" oninput="renderOv()" style="flex:1;min-width:220px;padding:8px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
-            <button onclick="$('ovSearch').value='';renderOv();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;padding:4px 8px;border-radius:6px">✕ Limpar</button>
+            <button onclick="$('ovSearch').value='';renderOv();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;padding:4px 8px;border-radius:6px">Limpar</button>
             <span id="ovFilterBadge" style="display:none;background:var(--accent-pale);color:var(--accent);border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600"></span>
           </div>
 
@@ -954,7 +887,7 @@ body.manager-mode{
                 <div class="sc-num" id="ov-st-ativo">0</div>
                 <div class="sc-sub">Coleta em andamento</div>
               </div>
-              <div class="sc-icon">🔵</div>
+              <div class="sc-icon"></div>
             </div>
             <div class="status-card sc-inc">
               <div>
@@ -962,7 +895,7 @@ body.manager-mode{
                 <div class="sc-num" id="ov-st-inc">0</div>
                 <div class="sc-sub">Aguardando finalização</div>
               </div>
-              <div class="sc-icon">🟡</div>
+              <div class="sc-icon"></div>
             </div>
             <div class="status-card sc-conc">
               <div>
@@ -970,7 +903,7 @@ body.manager-mode{
                 <div class="sc-num" id="ov-st-conc">0</div>
                 <div class="sc-sub">Diagnóstico finalizado</div>
               </div>
-              <div class="sc-icon">🟢</div>
+              <div class="sc-icon"></div>
             </div>
           </div>
 
@@ -984,9 +917,9 @@ body.manager-mode{
         <!-- COMPANIES -->
         <div class="panel" id="pCo">
           <div class="toolbar">
-            <div class="toolbar-l"><input class="srch" id="srchCo" placeholder="🔍 Buscar por nome, CNPJ ou ID…" oninput="filterCo()"/></div>
+            <div class="toolbar-l"><input class="srch" id="srchCo" placeholder="Buscar por nome, CNPJ ou ID…" oninput="filterCo()"/></div>
             <div style="display:flex;gap:8px">
-              <button class="abtn ab-ghost" onclick="openModal('mImpCo')">📂 Importar planilha</button>
+              <button class="abtn ab-ghost" onclick="openModal('mImpCo')">Importar planilha</button>
               <button class="abtn ab-pri" onclick="openModal('mNewCo')">+ Nova Empresa</button>
             </div>
           </div>
@@ -1004,7 +937,7 @@ body.manager-mode{
             <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:6px">Empresa destino</label><select class="sel-s" id="upTarget" style="width:100%"></select></div>
             <div class="dropzone" id="dropzone" ondragover="dzOn(event)" ondragleave="dzOff(event)" ondrop="dzDrop(event)">
               <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(event)"/>
-              <div class="dz-icon">📂</div><div class="dz-text"><strong>Clique ou arraste o arquivo aqui</strong></div><div class="dz-hint">Formatos: .xlsx, .xls, .csv</div>
+              <div class="dz-icon">+</div><div class="dz-text"><strong>Clique ou arraste o arquivo aqui</strong></div><div class="dz-hint">Formatos: .xlsx, .xls, .csv</div>
             </div>
             <div id="upPrev" style="display:none">
               <p style="font-size:12.5px;color:var(--muted);margin-top:12px" id="upPrevTitle"></p>
@@ -1015,11 +948,11 @@ body.manager-mode{
               </div>
             </div>
           </div>
-          <div class="ucard"><h3>Modelo de planilha</h3><p class="desc">Baixe o modelo para garantir o formato correto.</p><button class="abtn ab-ghost" onclick="dlTemplate()">⬇ Baixar modelo (.xlsx)</button></div>
+          <div class="ucard"><h3>Modelo de planilha</h3><p class="desc">Baixe o modelo para garantir o formato correto.</p><button class="abtn ab-ghost" onclick="dlTemplate()">Baixar modelo (.xlsx)</button></div>
 
           <!-- IMPORTAR RESPOSTAS POR PLANILHA -->
           <div class="ucard" style="border-top:2px solid var(--accent);margin-top:4px">
-            <h3>📊 Importar Respostas por Planilha</h3>
+            <h3>Importar Respostas por Planilha</h3>
             <p class="desc">Upload de planilha com respostas coletadas externamente. O relatório é gerado automaticamente após a importação. Use os modelos abaixo para o formato correto.</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
               <div>
@@ -1037,7 +970,7 @@ body.manager-mode{
             </div>
             <div class="dropzone" id="respDropzone" ondragover="dzOn(event)" ondragleave="dzOff(event)" ondrop="respDzDrop(event)" style="margin-bottom:10px">
               <input type="file" accept=".xlsx,.xls,.csv" onchange="handleRespFile(event)"/>
-              <div class="dz-icon">📊</div>
+              <div class="dz-icon">+</div>
               <div class="dz-text"><strong>Clique ou arraste a planilha de respostas aqui</strong></div>
               <div class="dz-hint">Formatos: .xlsx, .xls, .csv — colunas: Setor, q0, q1, … qN</div>
             </div>
@@ -1050,8 +983,8 @@ body.manager-mode{
               </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="abtn ab-ghost" onclick="dlRespTemplate('copsoq')" style="font-size:12px">⬇ Modelo COPSOQ II</button>
-              <button class="abtn ab-ghost" onclick="dlRespTemplate('bemestar')" style="font-size:12px">⬇ Modelo AOT</button>
+              <button class="abtn ab-ghost" onclick="dlRespTemplate('copsoq')" style="font-size:12px">Modelo COPSOQ II</button>
+              <button class="abtn ab-ghost" onclick="dlRespTemplate('bemestar')" style="font-size:12px">Modelo AOT</button>
             </div>
           </div>
         </div>
@@ -1062,9 +995,9 @@ body.manager-mode{
             <select class="sel-s" id="cqCoFilter" onchange="renderCQ()"><option value="all">Todas as empresas</option></select>
             <select class="sel-s" id="cqSecFilter" onchange="renderCQ()"><option value="all">Todos os setores</option></select>
             <button class="abtn ab-ghost" onclick="renderCQ()">↻ Atualizar</button>
-            <button class="abtn ab-pdf" id="cqPdfBtn" onclick="printReport('cq')" title="Imprimir / Salvar como PDF">🖨 Imprimir / PDF</button>
+            <button class="abtn ab-pdf" id="cqPdfBtn" onclick="printReport('cq')" title="Imprimir / Salvar como PDF">PDF</button>
           </div>
-          <div id="cqRepContent"><div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta COPSOQ II recebida ainda.</p></div></div>
+          <div id="cqRepContent"><div class="empty-st"><p>Nenhuma resposta COPSOQ II recebida ainda.</p></div></div>
         </div>
 
         <!-- REPORT BEM-ESTAR -->
@@ -1073,31 +1006,20 @@ body.manager-mode{
             <select class="sel-s" id="beCoFilter" onchange="renderBE()"><option value="all">Todas as empresas</option></select>
             <select class="sel-s" id="beSecFilter" onchange="renderBE()"><option value="all">Todos os setores</option></select>
             <button class="abtn ab-ghost" onclick="renderBE()">↻ Atualizar</button>
-            <button class="abtn ab-pdf" id="bePdfBtn" onclick="printReport('be')" title="Imprimir / Salvar como PDF">🖨 Imprimir / PDF</button>
+            <button class="abtn ab-pdf" id="bePdfBtn" onclick="printReport('be')" title="Imprimir / Salvar como PDF">PDF</button>
           </div>
-          <div id="beRepContent"><div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta AOT recebida ainda.</p></div></div>
-        </div>
-
-        <!-- RELATÓRIO EIXO III -->
-        <div class="panel" id="pRE3">
-          <div class="rep-toolbar">
-            <select class="sel-s" id="e3CoFilter" onchange="renderE3()"><option value="all">Todas as empresas</option></select>
-            <select class="sel-s" id="e3SecFilter" onchange="renderE3()"><option value="all">Todos os setores/GHEs</option></select>
-            <button class="abtn ab-ghost" onclick="renderE3()">↻ Atualizar</button>
-            <button class="abtn ab-pdf" id="e3PdfBtn" onclick="printReport('e3')" title="Imprimir / Salvar como PDF">🖨 Imprimir / PDF</button>
-          </div>
-          <div id="e3RepContent"><div class="empty-st"><div class="big">🎯</div><p>Nenhuma resposta do Eixo III recebida ainda.</p></div></div>
+          <div id="beRepContent"><div class="empty-st"><p>Nenhuma resposta AOT recebida ainda.</p></div></div>
         </div>
 
         <!-- RESPOSTAS -->
         <div class="panel" id="pResp">
           <div class="toolbar">
             <div class="toolbar-l">
-              <input class="srch" id="srchResp" placeholder="🔍 Buscar por empresa, CNPJ ou ID…" oninput="renderResp()" style="width:260px"/>
-              <select class="sel-s" id="respType" onchange="renderResp()"><option value="all">Todos os questionários</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option><option value="eixo3">Eixo III — Validação GHE</option></select>
+              <input class="srch" id="srchResp" placeholder="Buscar por empresa, CNPJ ou ID…" oninput="renderResp()" style="width:260px"/>
+              <select class="sel-s" id="respType" onchange="renderResp()"><option value="all">Todos os questionários</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option></select>
               <select class="sel-s" id="respCo" onchange="renderResp()"><option value="all">Todas as empresas</option></select>
             </div>
-            <button class="abtn ab-ghost" onclick="exportCSV()">⬇ Exportar CSV</button>
+            <button class="abtn ab-ghost" onclick="exportCSV()">Exportar CSV</button>
           </div>
           <div class="dtable-wrap"><table class="dtable">
             <thead><tr><th>#</th><th>Data/Hora</th><th>Empresa</th><th>Questionário</th><th>Setor</th><th>Ações</th></tr></thead>
@@ -1110,8 +1032,8 @@ body.manager-mode{
           <div class="toolbar">
             <div class="toolbar-l"><span style="font-size:13px;color:var(--muted)">Relatórios gerados — sincronizados via Supabase em todos os dispositivos.</span></div>
             <div style="display:flex;gap:8px">
-              <button class="abtn ab-ghost" onclick="syncReportHist()">⟳ Sincronizar</button>
-              <button class="abtn ab-ghost" style="color:var(--danger)" onclick="clearReportHist()">🗑 Limpar histórico</button>
+              <button class="abtn ab-ghost" onclick="syncReportHist()">Sincronizar</button>
+              <button class="abtn ab-ghost" style="color:var(--danger)" onclick="clearReportHist()">Limpar histórico</button>
             </div>
           </div>
           <div id="histList" style="padding:8px 0"></div>
@@ -1122,7 +1044,7 @@ body.manager-mode{
           <div class="toolbar">
             <div class="toolbar-l"><span style="font-size:13px;color:var(--muted)">Gerencie os acessos ao painel gerencial. Contas sincronizadas em todos os dispositivos via Supabase.</span></div>
             <div style="display:flex;gap:8px">
-              <button class="abtn ab-ghost" onclick="forceSyncManagers()" title="Sincronizar com Supabase">☁ Sincronizar</button>
+              <button class="abtn ab-ghost" onclick="forceSyncManagers()" title="Sincronizar com Supabase">Sincronizar</button>
               <button class="abtn ab-pri" onclick="openNewMgr()">+ Nova Conta</button>
             </div>
           </div>
@@ -1132,7 +1054,85 @@ body.manager-mode{
           </table></div>
         </div>
 
+        <!-- ACADEMY / CURSOS -->
+        <div class="panel" id="pAcademy">
+          <div class="toolbar">
+            <div class="toolbar-l">
+              <span style="font-size:13px;color:var(--muted)">Biblioteca de cursos e treinamentos para gestores e colaboradores.</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="abtn ab-pri" onclick="openModal('mNewCourse')">+ Novo Curso</button>
+            </div>
+          </div>
+
+          <!-- Course category filter -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+            <button class="da-pill active" onclick="filterCourses('all',this)" data-cat="all" id="courseFilterAll">Todos</button>
+            <button class="da-pill" onclick="filterCourses('lideranca',this)" data-cat="lideranca">Lideranca e Gestao</button>
+            <button class="da-pill" onclick="filterCourses('saude',this)" data-cat="saude">Saude Mental</button>
+            <button class="da-pill" onclick="filterCourses('seguranca',this)" data-cat="seguranca">Seguranca do Trabalho</button>
+            <button class="da-pill" onclick="filterCourses('compliance',this)" data-cat="compliance">Compliance e Etica</button>
+            <button class="da-pill" onclick="filterCourses('comunicacao',this)" data-cat="comunicacao">Comunicacao</button>
+          </div>
+
+          <div id="courseGrid" class="da-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
+        </div>
+
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO CURSO -->
+<div class="modal-ov" id="mNewCourse">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-hdr">
+      <h3>Novo Curso</h3>
+      <button class="modal-close" onclick="closeModal('mNewCourse')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Titulo do Curso *</label><input id="cs_titulo" placeholder="Ex.: Gestao de Conflitos"/></div>
+        <div class="form-group"><label>Categoria</label>
+          <select id="cs_cat">
+            <option value="lideranca">Lideranca e Gestao</option>
+            <option value="saude">Saude Mental</option>
+            <option value="seguranca">Seguranca do Trabalho</option>
+            <option value="compliance">Compliance e Etica</option>
+            <option value="comunicacao">Comunicacao</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Carga Horaria (horas)</label><input id="cs_horas" type="number" min="1" placeholder="4"/></div>
+        <div class="form-group"><label>Formato</label>
+          <select id="cs_formato">
+            <option value="online">Online (Video)</option>
+            <option value="presencial">Presencial</option>
+            <option value="hibrido">Hibrido</option>
+            <option value="leitura">Material de Leitura</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:13px"><label>Descricao</label>
+        <textarea id="cs_desc" style="width:100%;min-height:80px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical" placeholder="Descreva os objetivos e conteudo do curso..."></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Link / URL do Conteudo</label><input id="cs_link" placeholder="https://..."/></div>
+        <div class="form-group"><label>Publico-Alvo</label>
+          <select id="cs_publico">
+            <option value="todos">Todos</option>
+            <option value="lideranca">Lideranca</option>
+            <option value="operacional">Operacional</option>
+            <option value="rh">RH / Gestao de Pessoas</option>
+          </select>
+        </div>
+      </div>
+      <div id="courseAlert" class="alert alert-e"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="abtn ab-ghost" onclick="closeModal('mNewCourse')">Cancelar</button>
+      <button class="abtn ab-pri" onclick="saveCourse()">Salvar curso</button>
     </div>
   </div>
 </div>
@@ -1140,7 +1140,7 @@ body.manager-mode{
 <!-- MODAL: NOVA CONTA GERENCIAL -->
 <div class="modal-ov" id="mNewMgr">
   <div class="modal" style="max-width:520px">
-    <div class="modal-hdr"><h3 id="mNewMgrTitle">Nova Conta Gerencial</h3><button class="modal-close" onclick="closeModal('mNewMgr')">✕</button></div>
+    <div class="modal-hdr"><h3 id="mNewMgrTitle">Nova Conta Gerencial</h3><button class="modal-close" onclick="closeModal('mNewMgr')">×</button></div>
     <div class="modal-body">
       <input type="hidden" id="mgrEditId"/>
       <div class="m-fg" style="margin-bottom:13px"><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Nome completo</label>
@@ -1173,7 +1173,7 @@ body.manager-mode{
 <!-- MODAL: NOVA EMPRESA -->
 <div class="modal-ov" id="mNewCo">
   <div class="modal" style="max-width:680px">
-    <div class="modal-hdr"><h3>Nova Empresa</h3><button class="modal-close" onclick="closeModal('mNewCo')">✕</button></div>
+    <div class="modal-hdr"><h3>Nova Empresa</h3><button class="modal-close" onclick="closeModal('mNewCo')">×</button></div>
     <div style="display:flex;border-bottom:1px solid var(--border);padding:0 24px">
       <button id="ncTab1" onclick="switchNcTab(1)" style="padding:10px 18px;background:none;border:none;border-bottom:2px solid var(--accent);font-family:inherit;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;margin-bottom:-1px">Dados</button>
       <button id="ncTab2" onclick="switchNcTab(2)" style="padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px">Colaboradores <span id="ncColabCount" style="background:var(--surface3);border-radius:99px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
@@ -1182,7 +1182,7 @@ body.manager-mode{
       <div class="form-grid"><div class="form-group"><label>Nome *</label><input id="nc_nome" placeholder="Indústria XYZ Ltda"/></div><div class="form-group"><label>CNPJ</label><input id="nc_cnpj" placeholder="00.000.000/0000-00" oninput="maskCNPJ(this)"/></div></div>
       <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="nc_setor" placeholder="Indústria, Saúde, Varejo…"/></div><div class="form-group"><label>Contato RH</label><input id="nc_rh" placeholder="Nome do responsável"/></div></div>
       <div class="form-grid"><div class="form-group"><label>E-mail RH</label><input id="nc_email" type="email" placeholder="rh@empresa.com.br"/></div><div class="form-group"><label>Questionário atribuído *</label>
-        <select id="nc_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option><option value="eixo3">Eixo III — Validação GHE</option><option value="ambos">Todos</option></select>
+        <select id="nc_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option><option value="ambos">Todos</option></select>
       </div></div>
       <div class="form-group"><label>Informações adicionais</label><textarea id="nc_info" placeholder="Observações, contexto, histórico da empresa…" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
     </div>
@@ -1191,7 +1191,7 @@ body.manager-mode{
         <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Importar planilha (.xlsx / .csv)</div>
         <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Colunas aceitas: <strong style="color:var(--text)">Nome, E-mail, Função, Setor</strong>.</p>
         <label style="display:inline-flex;align-items:center;gap:8px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--text);cursor:pointer">
-          📂 Selecionar arquivo<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ncImportFile(event)"/>
+          Selecionar arquivo<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ncImportFile(event)"/>
         </label>
         <span id="ncImportStatus" style="font-size:12px;color:var(--muted);margin-left:10px"></span>
       </div>
@@ -1224,12 +1224,12 @@ body.manager-mode{
 <!-- MODAL: IMPORT COMPANY -->
 <div class="modal-ov" id="mImpCo">
   <div class="modal" style="max-width:600px">
-    <div class="modal-hdr"><h3>Importar Empresa por Planilha</h3><button class="modal-close" onclick="closeModal('mImpCo')">✕</button></div>
+    <div class="modal-hdr"><h3>Importar Empresa por Planilha</h3><button class="modal-close" onclick="closeModal('mImpCo')">×</button></div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--muted);margin-bottom:16px">A planilha deve ter duas abas: <strong style="color:var(--text)">Empresa</strong> e <strong style="color:var(--text)">Colaboradores</strong>.</p>
       <div class="dropzone" id="impCoDz" ondragover="dzOn(event)" ondragleave="dzOff(event)" ondrop="impCoDrop(event)">
         <input type="file" accept=".xlsx,.xls,.csv" onchange="impCoFile(event)"/>
-        <div class="dz-icon">📂</div><div class="dz-text"><strong>Clique ou arraste a planilha</strong></div><div class="dz-hint">.xlsx, .xls ou .csv</div>
+        <div class="dz-icon">+</div><div class="dz-text"><strong>Clique ou arraste a planilha</strong></div><div class="dz-hint">.xlsx, .xls ou .csv</div>
       </div>
       <div id="impCoStatus" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
       <div id="impCoPrev" style="display:none;margin-top:12px"></div>
@@ -1246,7 +1246,7 @@ body.manager-mode{
   <div class="modal" style="max-width:720px">
     <div class="modal-hdr">
       <h3 id="mEditCoTitle">Editar Empresa</h3>
-      <button class="modal-close" onclick="closeModal('mEditCo')">✕</button>
+      <button class="modal-close" onclick="closeModal('mEditCo')">×</button>
     </div>
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto">
       <button id="ecTab1" onclick="switchEcTab(1)" style="padding:10px 16px;background:none;border:none;border-bottom:2px solid var(--accent);font-family:inherit;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;margin-bottom:-1px;white-space:nowrap">Dados</button>
@@ -1285,13 +1285,13 @@ body.manager-mode{
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:14px">
         <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Importar planilha</div>
         <label style="display:inline-flex;align-items:center;gap:8px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--text);cursor:pointer">
-          📂 Selecionar arquivo<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ecImportFile(event)"/>
+          Selecionar arquivo<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ecImportFile(event)"/>
         </label>
         <span id="ecImportStatus" style="font-size:12px;color:var(--muted);margin-left:10px"></span>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Lista de colaboradores</span>
-        <input id="ecSearch" placeholder="🔍 Nome, e-mail, setor…" oninput="renderEcColabList()" style="padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--text);outline:none;width:180px"/>
+        <input id="ecSearch" placeholder="Nome, e-mail, setor…" oninput="renderEcColabList()" style="padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px;color:var(--text);outline:none;width:180px"/>
       </div>
       <div style="max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;background:var(--surface)">
         <table style="width:100%;border-collapse:collapse">
@@ -1378,7 +1378,7 @@ body.manager-mode{
 <!-- MODAL: DETALHES RESPOSTA -->
 <div class="modal-ov" id="mRespDet">
   <div class="modal">
-    <div class="modal-hdr"><h3>Detalhes da Resposta</h3><button class="modal-close" onclick="closeModal('mRespDet')">✕</button></div>
+    <div class="modal-hdr"><h3>Detalhes da Resposta</h3><button class="modal-close" onclick="closeModal('mRespDet')">×</button></div>
     <div class="modal-body" id="mRespDetBody"></div>
     <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mRespDet')">Fechar</button></div>
   </div>
@@ -1393,84 +1393,6 @@ const COLABORADORES=[
   {nome:"Carlos Mendes",       email:"carlos.mendes"+"@"+"empresa.com.br"},
   {nome:"Maria Fernanda Lima", email:"mfernanda"+"@"+"empresa.com.br"},
 ];
-
-// ═══════════════════════════════════════
-// EIXO III — VALIDAÇÃO QUALITATIVA PARTICIPATIVA
-// Perguntas invertidas (inv=true): score alto = risco BAIXO → inverter para relatório
-// Perguntas diretas  (inv=false): score alto = risco ALTO
-// ═══════════════════════════════════════
-const E3_Q=[
-  {t:'Sinto que tenho liberdade para decidir a ordem das minhas tarefas e o ritmo do meu trabalho.',        inv:true,  dim:'CT', risk:'Baixo Controle/Falta de Autonomia'},
-  {t:'O meu volume de trabalho é tão alto que preciso ignorar pausas ou fazer horas extras constantes.',     inv:false, dim:'DE', risk:'Excesso de Demandas (Sobrecarga)'},
-  {t:'Sei exatamente o que a empresa espera de mim e quais são as minhas responsabilidades.',                inv:true,  dim:'CL', risk:'Baixa Clareza de Papel/Função'},
-  {t:'Quando tenho uma dificuldade técnica, recebo apoio rápido e eficiente da minha liderança.',           inv:true,  dim:'SU', risk:'Falta de Suporte/Apoio no Trabalho'},
-  {t:'As decisões sobre benefícios, folgas e promoções no meu setor são transparentes e justas.',           inv:true,  dim:'JU', risk:'Baixa Justiça Organizacional'},
-  {t:'Observo ou sofro situações de humilhação, gritos ou perseguições no ambiente de trabalho.',           inv:false, dim:'AS', risk:'Assédio de Qualquer Natureza'},
-  {t:'Geralmente, sou surpreendido por mudanças no trabalho sem que ninguém me avise ou treine antes.',     inv:false, dim:'MU', risk:'Má Gestão de Mudanças Organizacionais'},
-  {t:'Existe um clima de respeito, ajuda mútua e cooperação entre os meus colegas.',                        inv:true,  dim:'RE', risk:'Más Relações no Local de Trabalho'},
-  {t:'A minha função expõe-me a situações violentas, acidentes graves ou risco de vida.',                   inv:false, dim:'TR', risk:'Eventos Violentos ou Traumáticos'},
-  {t:'Sinto que o meu esforço e dedicação são reconhecidos e valorizados pela organização.',                inv:true,  dim:'RC', risk:'Baixas Recompensas e Reconhecimento'},
-  {t:'As informações para realizar o meu trabalho chegam de forma clara e sem atrasos.',                    inv:true,  dim:'CO', risk:'Trabalho em Condições de Difícil Comunicação'},
-  {t:'Sinto que passo muito tempo sem ter tarefas produtivas para fazer (ócio forçado).',                   inv:false, dim:'DB', risk:'Baixa Demanda (Subcarga)'},
-];
-const E3_DIMS=[
-  {id:'DE', name:'Demanda (Sobrecarga)',                  factors:['Demanda Alta']},
-  {id:'DB', name:'Demanda Baixa (Subcarga)',              factors:['Demanda Baixa']},
-  {id:'CT', name:'Controle / Autonomia',                  factors:['Controle']},
-  {id:'CL', name:'Clareza de Papel',                      factors:['Clareza']},
-  {id:'SU', name:'Suporte / Apoio',                       factors:['Suporte']},
-  {id:'JU', name:'Justiça Organizacional',                factors:['Justiça']},
-  {id:'AS', name:'Assédio',                               factors:['Assédio']},
-  {id:'MU', name:'Gestão de Mudanças',                    factors:['Mudança']},
-  {id:'RE', name:'Relações no Trabalho',                  factors:['Relacionamento']},
-  {id:'TR', name:'Violência / Trauma',                    factors:['Trauma']},
-  {id:'RC', name:'Recompensas / Reconhecimento',          factors:['Recompensa']},
-  {id:'CO', name:'Comunicação',                           factors:['Comunicação']},
-];
-
-function buildE3Likert(){
-  const tb=$('e3Likert');tb.innerHTML='';
-  E3_Q.forEach((q,i)=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i+1}. ${q.t}</td>`+
-      [1,2,3,4].map(v=>`<td><div class="lradio" id="e3_q${i}_${v}" onclick="selL('e3',${i},${v},4)"></div></td>`).join('');
-    tb.appendChild(tr);
-  });
-}
-
-function calcE3(resps){
-  // For each question: if inv=true, invert score (5-score)/4; else (score-1)/3
-  const dimScores={};
-  E3_DIMS.forEach(d=>dimScores[d.id]=null);
-  const dimMap={DE:1, DB:11, CT:0, CL:2, SU:3, JU:4, AS:5, MU:6, RE:7, TR:8, RC:9, CO:10};
-  const scores={};
-  E3_Q.forEach((q,i)=>{
-    const vals=resps.map(r=>r.respostas['q'+i]).filter(v=>v!=null);
-    if(!vals.length){scores[q.dim]=null;return;}
-    const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
-    // Normalize 1-4 to 0-1, then invert if needed
-    const norm=(avg-1)/3;
-    scores[q.dim]=q.inv ? 1-norm : norm;
-  });
-  // Build sorted factors
-  const factors=E3_Q.map((q,i)=>({
-    name:q.risk,
-    dim:q.dim,
-    desc:E3_DIMS.find(d=>d.id===q.dim)?.name||q.dim,
-    score:scores[q.dim]??0,
-    inv:q.inv,
-    qIdx:i
-  })).filter(f=>f.score!==null&&scores[f.dim]!==null);
-  // Deduplicate by dim (take max risk score per dim)
-  const seen={};
-  const uniqueFactors=[];
-  factors.forEach(f=>{
-    if(!(f.dim in seen)||f.score>seen[f.dim]){seen[f.dim]=f.score;uniqueFactors[uniqueFactors.findIndex(x=>x.dim===f.dim)||uniqueFactors.length]=f;}
-  });
-  const dimS={};
-  E3_DIMS.forEach(d=>{dimS[d.id]=scores[d.id]??null;});
-  return{fs:scores,ds:dimS,factors:factors.sort((a,b)=>b.score-a.score)};
-}
 
 const BE_Q=[
   "O volume de trabalho é tão alto que é preciso estender o horário ou pular pausas",
@@ -1602,7 +1524,7 @@ function addToReportHist(type,label,empresa,setor,nResp,mgr){
 function renderHist(){
   const el=$('histList');if(!el)return;
   if(!REPORT_HIST.length){
-    el.innerHTML=`<div class="empty-st"><div class="big">📜</div><p>Nenhum relatório gerado ainda.<br><small>Os relatórios aparecerão aqui cada vez que forem impressos.</small></p></div>`;
+    el.innerHTML=`<div class="empty-st"><p>Nenhum relatório gerado ainda.<br><small>Os relatórios aparecerão aqui cada vez que forem impressos.</small></p></div>`;
     return;
   }
   el.innerHTML=`<table style="width:100%;border-collapse:collapse">
@@ -1690,7 +1612,7 @@ function handleGoogleLogin(response) {
     if (!found) {
       const err = $('errGoogle');
       err.className = 'alert alert-e show';
-      err.innerHTML = `⚠️ O e-mail <strong>${email}</strong> não está cadastrado em nenhuma empresa. Entre em contato com o gestor.`;
+      err.innerHTML = `Atenção: O e-mail <strong>${email}</strong> não está cadastrado em nenhuma empresa. Entre em contato com o gestor.`;
       return;
     }
     // Login bem-sucedido
@@ -1709,7 +1631,7 @@ function handleGoogleLogin(response) {
     console.error('Google login error:', e);
     const err = $('errGoogle');
     err.className = 'alert alert-e show';
-    err.textContent = '❌ Erro ao processar login. Tente novamente.';
+    err.textContent = 'Erro ao processar login. Tente novamente.';
   }
 }
 
@@ -1720,7 +1642,7 @@ function loginWithCpf() {
   err.className = 'alert alert-e';
   if (!nome || !cpf) {
     err.className = 'alert alert-e show';
-    err.textContent = '⚠️ Preencha o nome e o CPF/Matrícula.';
+    err.textContent = 'Preencha o nome e o CPF/Matrícula.';
     return;
   }
   let found = null, foundCo = null;
@@ -1734,7 +1656,7 @@ function loginWithCpf() {
   }
   if (!found) {
     err.className = 'alert alert-e show';
-    err.innerHTML = '⚠️ Nome ou CPF/Matrícula não encontrado. Verifique os dados ou entre em contato com o gestor.';
+    err.innerHTML = 'Nome ou CPF/Matrícula não encontrado. Verifique os dados ou entre em contato com o gestor.';
     return;
   }
   CU = { nome: found.nome, email: found.email || found.cpf || '', empresa: foundCo.id, questionario: foundCo.questionario };
@@ -1799,7 +1721,7 @@ if (EMAILJS_CFG.publicKey) {
 }
 
 let CU=null,OTP=null,OTPexp=null,otpInt=null;
-let beAns={},cqAns={},e3Ans={};
+let beAns={},cqAns={};
 const done={};
 const $=id=>document.getElementById(id);
 
@@ -1814,7 +1736,7 @@ function setTheme(mode){document.body.className=mode+'-mode';}
 // ═══════════════════════════════════════
 function goBack(){showSc('sSel');}
 function doLogout(){
-  CU=null;OTP=null;clearInterval(otpInt);beAns={};cqAns={};e3Ans={};
+  CU=null;OTP=null;clearInterval(otpInt);beAns={};cqAns={};
   $('iNome').value='';$('iEmail').value='';
   backTo1();
   // Revoga sessão Google e re-renderiza o botão de login
@@ -1830,10 +1752,10 @@ function backTo1(){setStep(1);$('errLogin').classList.remove('show');['iNome','i
 function sendOtp(){
   const nome=$('iNome').value.trim(),email=$('iEmail').value.trim().toLowerCase();
   $('errLogin').classList.remove('show');
-  if(!nome||!email){showA('errLogin','e','⚠️ Preencha o nome e o e-mail.');if(!nome)$('iNome').classList.add('err');if(!email)$('iEmail').classList.add('err');return;}
+  if(!nome||!email){showA('errLogin','e','Preencha o nome e o e-mail.');if(!nome)$('iNome').classList.add('err');if(!email)$('iEmail').classList.add('err');return;}
   let found=COLABORADORES.find(c=>c.nome.trim().toLowerCase()===nome.toLowerCase()&&c.email.trim().toLowerCase()===email);
   if(!found){for(const co of STATE.companies){const col=co.colaboradores.find(c=>c.nome.trim().toLowerCase()===nome.toLowerCase()&&c.email.trim().toLowerCase()===email);if(col){found={nome:col.nome,email:col.email};break;}}}
-  if(!found){showA('errLogin','e','⚠️ Colaborador não encontrado. Verifique o nome e e-mail cadastrados.');$('iNome').classList.add('err');$('iEmail').classList.add('err');return;}
+  if(!found){showA('errLogin','e','Colaborador não encontrado. Verifique o nome e e-mail cadastrados.');$('iNome').classList.add('err');$('iEmail').classList.add('err');return;}
   CU=found;genOtp(email);
 }
 function genOtp(email){
@@ -1847,7 +1769,7 @@ function genOtp(email){
   if(EMAILJS_CFG.publicKey&&EMAILJS_CFG.serviceId&&EMAILJS_CFG.templateId){
     $('otpShow').textContent='···';
     otpBlock.style.display='none';
-    showA('infoOtp','i',`✉️ Enviando código para <strong>${email}</strong>…`);
+    showA('infoOtp','i',`Enviando código para <strong>${email}</strong>…`);
     emailjs.send(EMAILJS_CFG.serviceId,EMAILJS_CFG.templateId,{
       to_email:email,
       otp_code:OTP,
@@ -1858,20 +1780,20 @@ function genOtp(email){
       console.error('EmailJS error:',err);
       $('otpShow').textContent=OTP;
       otpBlock.style.display='';
-      showA('infoOtp','i',`⚠️ Falha no envio por e-mail. Usando código exibido abaixo para teste.`);
+      showA('infoOtp','i',`Falha no envio por e-mail. Usando código exibido abaixo para teste.`);
     });
   }else{
     $('otpShow').textContent=OTP;
     otpBlock.style.display='';
-    showA('infoOtp','i',`✉️ Código gerado para <strong>${email}</strong>.`);
+    showA('infoOtp','i',`Código gerado para <strong>${email}</strong>.`);
   }
 }
 function startCDown(){clearInterval(otpInt);$('resendBtn').disabled=true;otpInt=setInterval(()=>{const r=Math.max(0,Math.ceil((OTPexp-Date.now())/1000));const m=Math.floor(r/60),s=r%60;$('otpTimer').textContent=r>0?`Código válido por ${m}:${String(s).padStart(2,'0')}`:'Código expirado.';if(r===0){clearInterval(otpInt);$('resendBtn').disabled=false;}},1000);}
 function verifyOtp(){
   const v=$('iOtp').value.trim();
-  if(!v){showA('errOtp','e','⚠️ Digite o código.');return;}
-  if(Date.now()>OTPexp){showA('errOtp','e','⏱ Código expirado. Reenvie um novo.');return;}
-  if(v!==OTP){showA('errOtp','e','❌ Código incorreto. Tente novamente.');return;}
+  if(!v){showA('errOtp','e','Digite o código.');return;}
+  if(Date.now()>OTPexp){showA('errOtp','e','Código expirado. Reenvie um novo.');return;}
+  if(v!==OTP){showA('errOtp','e','Código incorreto. Tente novamente.');return;}
   clearInterval(otpInt);$('errOtp').classList.remove('show');
   const first=CU.nome.split(' ')[0];
   $('gName').textContent=`Olá, ${first}!`;$('avLetter').textContent=first.charAt(0).toUpperCase();
@@ -1885,43 +1807,33 @@ function resendOtp(){genOtp(CU.email);}
 function updateCards(){
   const e=CU?CU.email:'';const q=CU?.questionario||'ambos';
   const lock=(card,labelId,locked)=>{if(locked){card.classList.add('done-card');$(labelId).textContent='✓ Já respondido';}else{card.classList.remove('done-card');$(labelId).textContent='Iniciar questionário →';}};
-  lock($('cCopsoq'),'cqLabel',done[e+'_copsoq']);lock($('cBe'),'beLabel',done[e+'_bemestar']);lock($('cE3'),'e3Label',done[e+'_eixo3']);
-  const cqCard=$('cCopsoq');const beCard=$('cBe');const e3Card=$('cE3');
-  if(q==='copsoq'){cqCard.style.display='';beCard.style.display='none';e3Card.style.display='none';}
-  else if(q==='bemestar'){beCard.style.display='';cqCard.style.display='none';e3Card.style.display='none';}
-  else if(q==='eixo3'){e3Card.style.display='';cqCard.style.display='none';beCard.style.display='none';}
-  else{cqCard.style.display='';beCard.style.display='';e3Card.style.display='';}
+  lock($('cCopsoq'),'cqLabel',done[e+'_copsoq']);lock($('cBe'),'beLabel',done[e+'_bemestar']);
+  const cqCard=$('cCopsoq');const beCard=$('cBe');
+  if(q==='copsoq'){cqCard.style.display='';beCard.style.display='none';}
+  else if(q==='bemestar'){beCard.style.display='';cqCard.style.display='none';}
+  else{cqCard.style.display='';beCard.style.display='';}
   const notice=$('assignedNotice');const noticeText=$('assignedNoticeText');
-  if(q&&q!=='ambos'&&notice&&noticeText){const label=q==='copsoq'?'COPSOQ II':q==='bemestar'?'Bem-Estar':'Eixo III — Validação GHE';noticeText.innerHTML=`Sua empresa atribuiu o questionário <strong>${label}</strong> para esta avaliação.`;notice.style.display='flex';}
+  if(q&&q!=='ambos'&&notice&&noticeText){const label=q==='copsoq'?'COPSOQ II':'Bem-Estar';noticeText.innerHTML=`Sua empresa atribuiu o questionário <strong>${label}</strong> para esta avaliação.`;notice.style.display='flex';}
   else if(notice){notice.style.display='none';}
 }
 function startQ(type){
   if(done[CU.email+'_'+type])return;
   if(type==='bemestar'){buildBeLikert();buildNps('be_nps','be');showSc('sBe');updP('be');}
-  else if(type==='eixo3'){buildE3Likert();showSc('sE3');updP('e3');}
   else{buildCopsoq();buildNps('cq_nps','cq');showSc('sCq');updP('cq');}
 }
 function buildNps(cid,prefix){const w=$(cid);if(!w)return;w.innerHTML='';for(let i=0;i<=10;i++){const d=document.createElement('div');d.className='npsbtn';d.textContent=i;d.onclick=()=>{w.querySelectorAll('.npsbtn').forEach(b=>b.classList.remove('sel'));d.classList.add('sel');(prefix==='be'?beAns:cqAns)['nps']=i;};w.appendChild(d);}}
 function buildBeLikert(){const tb=$('beLikert');tb.innerHTML='';BE_Q.forEach((q,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}. ${q}</td>`+[1,2,3,4,5].map(v=>`<td><div class="lradio" id="be_q${i}_${v}" onclick="selL('be',${i},${v})"></div></td>`).join('');tb.appendChild(tr);});}
 function buildCopsoq(){const cont=$('cqSections');cont.innerHTML='';let gi=0;CQ_SECS.forEach(sec=>{const div=document.createElement('div');div.className='qsec';let rows='';sec.qs.forEach(q=>{const idx=gi;rows+=`<tr><td>${q.n}. ${q.t}</td>${[1,2,3,4,5].map(v=>`<td><div class="lradio" id="cq_q${idx}_${v}" onclick="selL('cq',${idx},${v})"></div></td>`).join('')}</tr>`;gi++;});div.innerHTML=`<div class="sechead" style="background:var(--accent)"><h3>${sec.title}</h3><p>${sec.sub}</p><div class="factnote">${sec.facts}</div></div><div class="secbody" style="overflow-x:auto"><table class="ltable"><thead><tr><th style="text-align:left;padding-left:18px">Questão</th>${sec.scale.map((s,i)=>`<th class="colw"><div class="lhlabel">${i+1}<br/>${s}</div></th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;cont.appendChild(div);});}
-function selL(prefix,qi,val,maxV=5){Array.from({length:maxV},(_,i)=>i+1).forEach(v=>{const el=$(prefix+`_q${qi}_${v}`);if(el)el.classList.remove('sel');});const el=$(prefix+`_q${qi}_${val}`);if(el)el.classList.add('sel');(prefix==='be'?beAns:prefix==='e3'?e3Ans:cqAns)[`q${qi}`]=val;updP(prefix==='be'?'be':prefix==='e3'?'e3':'cq');}
-function updP(t){if(t==='be'){const p=Math.round(Object.keys(beAns).filter(k=>k.startsWith('q')).length/BE_Q.length*100);$('bePct').textContent=p+'%';$('beFill').style.width=p+'%';}else if(t==='e3'){const p=Math.round(Object.keys(e3Ans).filter(k=>k.startsWith('q')).length/E3_Q.length*100);$('e3Pct').textContent=p+'%';$('e3Fill').style.width=p+'%';}else{const total=CQ_SECS.reduce((a,s)=>a+s.qs.length,0);const p=Math.round(Object.keys(cqAns).filter(k=>k.startsWith('q')).length/total*100);$('cqPct').textContent=p+'%';$('cqFill').style.width=p+'%';}}
+function selL(prefix,qi,val,maxV=5){Array.from({length:maxV},(_,i)=>i+1).forEach(v=>{const el=$(prefix+`_q${qi}_${v}`);if(el)el.classList.remove('sel');});const el=$(prefix+`_q${qi}_${val}`);if(el)el.classList.add('sel');(prefix==='be'?beAns:cqAns)[`q${qi}`]=val;updP(prefix==='be'?'be':'cq');}
+function updP(t){if(t==='be'){const p=Math.round(Object.keys(beAns).filter(k=>k.startsWith('q')).length/BE_Q.length*100);$('bePct').textContent=p+'%';$('beFill').style.width=p+'%';}else{const total=CQ_SECS.reduce((a,s)=>a+s.qs.length,0);const p=Math.round(Object.keys(cqAns).filter(k=>k.startsWith('q')).length/total*100);$('cqPct').textContent=p+'%';$('cqFill').style.width=p+'%';}}
 function sp(el,gid){document.querySelectorAll(`#${gid} .opill`).forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
 function submitForm(type){
   done[CU.email+'_'+type]=true;
   const gp=gid=>{const el=document.querySelector(`#${gid} .opill.sel`);return el?el.textContent.trim():null;};
   const perfil={};
   if(type==='bemestar'){perfil.idade=gp('be_idade');perfil.sexo=gp('be_sexo');perfil.civil=gp('be_civil');perfil.escola=gp('be_escola');perfil.tempo=gp('be_tempo');beAns.setor=$('be_setor')?.value||'';}
-  else if(type==='eixo3'){
-    const setorVal=$('e3_setor')?.value.trim()||'';
-    const funcaoVal=$('e3_funcao')?.value.trim()||'';
-    if(!setorVal){alert('⚠️ Por favor, informe o Setor / GHE antes de enviar.');return;}
-    if(!funcaoVal){alert('⚠️ Por favor, informe a Função / Cargo antes de enviar.');return;}
-    perfil.idade=gp('e3_idade');perfil.sexo=gp('e3_sexo');perfil.tempo=gp('e3_tempo');perfil.turno=gp('e3_turno');
-    e3Ans.setor=setorVal;e3Ans.funcao=funcaoVal;
-  }
   else{perfil.idade=gp('cq_idade');perfil.sexo=gp('cq_sexo');perfil.civil=gp('cq_civil');perfil.escola=gp('cq_escola');perfil.tempo=gp('cq_tempo');cqAns.setor=$('cq_setor')?.value||'';}
-  const payload={id:'resp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),colaborador:CU.nome,email:CU.email,empresa:null,questionario:type,timestamp:new Date().toISOString(),respostas:type==='bemestar'?{...beAns}:type==='eixo3'?{...e3Ans}:{...cqAns},perfil};
+  const payload={id:'resp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),colaborador:CU.nome,email:CU.email,empresa:null,questionario:type,timestamp:new Date().toISOString(),respostas:type==='bemestar'?{...beAns}:{...cqAns},perfil};
   const co=STATE.companies.find(c=>c.colaboradores.find(col=>col.email===CU.email));if(co)payload.empresa=co.id;
   try{const ex=JSON.parse(localStorage.getItem('ambrac_responses')||'[]');ex.push(payload);localStorage.setItem('ambrac_responses',JSON.stringify(ex));}catch(e){}
   STATE.responses.push(payload);saveState();updateCards();showSc('sSucc');
@@ -1937,7 +1849,7 @@ let currentMgr=null;
 function doMgrLogin(){
   const u=$('mUser').value.trim().toLowerCase(),p=$('mPass').value;
   const f=MANAGERS.find(m=>m.user.toLowerCase()===u&&m.pass===p);
-  if(!f){showA('mgrAlert','e','❌ Usuário ou senha incorretos.');return;}
+  if(!f){showA('mgrAlert','e','Usuário ou senha incorretos.');return;}
   currentMgr=f;
   $('sbName').textContent=f.name;$('sbAv').textContent=f.name.charAt(0);
   $('sbRole').textContent=f.setor||'Gerenciador';
@@ -1966,8 +1878,8 @@ function renderMgrTable(){
       <td style="color:var(--muted);font-size:12px">${m.user}</td>
       <td><span class="badge bb">${m.setor||'—'}</span></td>
       <td><div class="row-acts">
-        <button class="icon-btn" onclick="editMgr('${m.id}')" title="Editar">✏️</button>
-        ${isSelf?'':'<button class="icon-btn del" onclick="deleteMgr(\''+m.id+'\')" title="Remover">🗑</button>'}
+        <button class="icon-btn" onclick="editMgr('${m.id}')" title="Editar">Editar</button>
+        ${isSelf?'':'<button class="icon-btn del" onclick="deleteMgr(\''+m.id+'\')" title="Remover">Excluir</button>'}
       </div></td>
     </tr>`;
   }).join('');
@@ -1998,10 +1910,10 @@ function saveMgrAccount(){
   const pass=$('mgrPass').value;
   const setor=$('mgrSetor').value;
 
-  if(!name||!user){showA('mgrAlert2','e','⚠️ Preencha nome e usuário.');return;}
-  if(!id&&!pass){showA('mgrAlert2','e','⚠️ Informe uma senha para a nova conta.');return;}
-  if(pass&&pass.length<6){showA('mgrAlert2','e','⚠️ Senha deve ter pelo menos 6 caracteres.');return;}
-  if(MANAGERS.find(m=>m.user===user&&m.id!==id)){showA('mgrAlert2','e','⚠️ Este usuário já existe.');return;}
+  if(!name||!user){showA('mgrAlert2','e','Preencha nome e usuário.');return;}
+  if(!id&&!pass){showA('mgrAlert2','e','Informe uma senha para a nova conta.');return;}
+  if(pass&&pass.length<6){showA('mgrAlert2','e','Senha deve ter pelo menos 6 caracteres.');return;}
+  if(MANAGERS.find(m=>m.user===user&&m.id!==id)){showA('mgrAlert2','e','Este usuário já existe.');return;}
 
   if(id){
     const m=MANAGERS.find(x=>x.id===id);if(!m)return;
@@ -2029,7 +1941,7 @@ document.addEventListener('keydown',e=>{
   else if($('sMgrLogin').classList.contains('active'))doMgrLogin();
 });
 
-const PANEL_MAP={pOv:['Dashboard','Visão geral'],pCo:['Empresas','Gerencie empresas cadastradas'],pUp:['Importar Colaboradores','Upload de planilhas'],pRCq:['Relatório COPSOQ II','Diagnóstico de riscos psicossociais'],pRBe:['Relatório AOT','Avaliação de Organização do Trabalho — NR-1'],pRE3:['Relatório Eixo III','Validação Qualitativa Participativa — GHE'],pResp:['Respostas Individuais','Todas as respostas recebidas'],pHist:['Histórico de Relatórios','Todos os relatórios gerados'],pContas:['Contas Gerenciais','Gerencie acessos ao painel']};
+const PANEL_MAP={pOv:['Dashboard','Visão geral'],pCo:['Empresas','Gerencie empresas cadastradas'],pUp:['Importar Colaboradores','Upload de planilhas'],pRCq:['Relatório COPSOQ II','Diagnóstico de riscos psicossociais'],pRBe:['Relatório AOT','Avaliação de Organização do Trabalho — NR-1'],pResp:['Respostas Individuais','Todas as respostas recebidas'],pAcademy:['Academy — Cursos e Treinamentos','Biblioteca de cursos e treinamentos'],pHist:['Histórico de Relatórios','Todos os relatórios gerados'],pContas:['Contas Gerenciais','Gerencie acessos ao painel']};
 function navTo(pid,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
@@ -2040,8 +1952,8 @@ function navTo(pid,btn){
   if(pid==='pUp')renderUpSelects();
   if(pid==='pRCq')renderCQ();
   if(pid==='pRBe')renderBE();
-  if(pid==='pRE3')renderE3();
   if(pid==='pResp')renderResp();
+  if(pid==='pAcademy')renderCourses();
   if(pid==='pHist')renderHist();
   if(pid==='pContas')renderMgrTable();
 }
@@ -2073,7 +1985,7 @@ function renderCo(f){
   tb.innerHTML=list.map(co=>{
     const resp=STATE.responses.filter(r=>r.empresa===co.id);
     const taxa=co.colaboradores.length?Math.round(resp.length/co.colaboradores.length*100):0;
-    const qBadge=co.questionario==='copsoq'?'<span class="badge bb">COPSOQ II</span>':co.questionario==='bemestar'?'<span class="badge ba">Bem-Estar</span>':co.questionario==='eixo3'?'<span class="badge bte">Eixo III</span>':co.questionario==='ambos'?'<span class="badge bgr">Todos</span>':'<span class="badge br">—</span>';
+    const qBadge=co.questionario==='copsoq'?'<span class="badge bb">COPSOQ II</span>':co.questionario==='bemestar'?'<span class="badge ba">Bem-Estar</span>':co.questionario==='ambos'?'<span class="badge bgr">Todos</span>':'<span class="badge br">—</span>';
     const shortId=(co.id||'').slice(-6).toUpperCase();
     const unids=(co.unidades||[]).length;const ghes=(co.ghes||[]).length;
     return `<tr>
@@ -2086,7 +1998,7 @@ function renderCo(f){
       <td><span style="color:${ghes?'var(--text)':'var(--muted)'}">${ghes}</span></td>
       <td>${resp.length} <span style="font-size:11px;color:var(--muted)">(${taxa}%)</span></td>
       <td>${statusBadge(co.status||'ativo')}</td>
-      <td><div class="row-acts"><button class="icon-btn" onclick="editCo('${co.id}')" title="Editar">✏️</button></div></td>
+      <td><div class="row-acts"><button class="icon-btn" onclick="editCo('${co.id}')" title="Editar">Editar</button></div></td>
     </tr>`;
   }).join('');
 }
@@ -2140,8 +2052,8 @@ function renderEcColabList(){
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.funcao||'—'}</td>
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.setor||'—'}</td>
     <td style="padding:8px 12px;text-align:center"><div style="display:flex;gap:4px;justify-content:center">
-      <button class="icon-btn" onclick="ecEditColab('${col.id}')" title="Editar">✏️</button>
-      <button class="icon-btn del" onclick="ecDelColab('${col.id}')" title="Remover">🗑</button>
+      <button class="icon-btn" onclick="ecEditColab('${col.id}')" title="Editar">Editar</button>
+      <button class="icon-btn del" onclick="ecDelColab('${col.id}')" title="Remover">Excluir</button>
     </div></td>
   </tr>`).join('');
 }
@@ -2215,7 +2127,7 @@ function renderEcUnidList(){
     <td style="padding:9px 14px;font-size:13px;font-weight:500">${u.nome}</td>
     <td style="padding:9px 14px;font-size:12.5px;color:var(--muted)">${u.cidade||'—'}</td>
     <td style="padding:9px 14px;font-size:12.5px;color:var(--muted)">${u.cnpj||'—'}</td>
-    <td style="padding:9px 14px;text-align:center"><button class="icon-btn del" onclick="ecDelUnid('${u.id}')" title="Remover">🗑</button></td>
+    <td style="padding:9px 14px;text-align:center"><button class="icon-btn del" onclick="ecDelUnid('${u.id}')" title="Remover">Excluir</button></td>
   </tr>`).join('');
   // Sync GHE unidade select
   const gueEl=$('ec_ghe_unid');
@@ -2253,7 +2165,7 @@ function renderEcGheList(){
       <td style="padding:9px 12px;font-size:12px;color:var(--muted)">${unidNome}</td>
       <td style="padding:9px 12px;text-align:center;font-size:13px;font-weight:600">${g.trab||'—'}</td>
       <td style="padding:9px 12px;text-align:center"><span class="badge ${rc.cls}">${((g.risco||'—').charAt(0).toUpperCase()+(g.risco||'').slice(1))}</span></td>
-      <td style="padding:9px 12px;text-align:center"><button class="icon-btn del" onclick="ecDelGhe('${g.id}')" title="Remover">🗑</button></td>
+      <td style="padding:9px 12px;text-align:center"><button class="icon-btn del" onclick="ecDelGhe('${g.id}')" title="Remover">Excluir</button></td>
     </tr>`;
   }).join('');
 }
@@ -2289,7 +2201,7 @@ function renderNcColabList(){
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.email}</td>
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.funcao||'—'}</td>
     <td style="padding:8px 12px;font-size:12px;color:var(--muted)">${col.setor||'—'}</td>
-    <td style="padding:8px 12px;text-align:center"><button class="icon-btn del" onclick="ncDelColab(${i})">🗑</button></td>
+    <td style="padding:8px 12px;text-align:center"><button class="icon-btn del" onclick="ncDelColab(${i})">Excluir</button></td>
   </tr>`).join('');
 }
 function ncAddColab(){
@@ -2345,7 +2257,7 @@ function impCoProcess(file){
       }
       if(!compData||!compData.nome){st.textContent='Não foi possível identificar dados da empresa.';st.style.color='var(--red)';return;}
       _impCoData={compData,colabData};prev.style.display='block';
-      prev.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:10px"><div style="font-size:14px;font-weight:600">${compData.nome}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${compData.cnpj||'CNPJ não informado'}</div></div><div style="font-size:13px;color:var(--muted)">📋 <strong style="color:var(--text)">${colabData.length}</strong> colaborador(es) identificado(s).</div>`;
+      prev.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:10px"><div style="font-size:14px;font-weight:600">${compData.nome}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${compData.cnpj||'CNPJ não informado'}</div></div><div style="font-size:13px;color:var(--muted)"><strong style="color:var(--text)">${colabData.length}</strong> colaborador(es) identificado(s).</div>`;
       st.textContent='✓ Planilha lida.';st.style.color='var(--green)';btn.style.display='inline-flex';
     }catch(err){st.textContent='Erro: '+err.message;st.style.color='var(--red)';}
   };
@@ -2533,9 +2445,9 @@ function renderOvCharts(companies,responses){
   const c1=document.getElementById('chEmp')?.getContext('2d');
   if(c1)CHARTS.chEmp=new Chart(c1,{type:'bar',data:{labels:companies.map(co=>co.nome.length>18?co.nome.slice(0,18)+'…':co.nome),datasets:[{label:'Respostas',data:companies.map(co=>responses.filter(r=>r.empresa===co.id).length),backgroundColor:companies.map(co=>co.status==='concluido'?'rgba(34,197,94,.7)':co.status==='inconclusivo'?'rgba(245,158,11,.7)':'rgba(61,122,237,.7)'),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#6b728f',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#6b728f'}}}}});
   destroyChart('chDist');
-  const cq=responses.filter(r=>r.questionario==='copsoq').length,be=responses.filter(r=>r.questionario==='bemestar').length,e3=responses.filter(r=>r.questionario==='eixo3').length;
+  const cq=responses.filter(r=>r.questionario==='copsoq').length,be=responses.filter(r=>r.questionario==='bemestar').length;
   const c2=document.getElementById('chDist')?.getContext('2d');
-  if(c2)CHARTS.chDist=new Chart(c2,{type:'doughnut',data:{labels:['COPSOQ II','Bem-Estar','Eixo III'],datasets:[{data:[cq,be,e3],backgroundColor:['rgba(61,122,237,.8)','rgba(212,160,48,.8)','rgba(13,148,136,.8)'],borderColor:['#3d7aed','#d4a030','#0d9488'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e8eaf0',font:{size:12}}}}}});
+  if(c2)CHARTS.chDist=new Chart(c2,{type:'doughnut',data:{labels:['COPSOQ II','Bem-Estar'],datasets:[{data:[cq,be],backgroundColor:['rgba(61,122,237,.8)','rgba(212,160,48,.8)'],borderColor:['#3d7aed','#d4a030'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e8eaf0',font:{size:12}}}}}});
   destroyChart('chTime');
   const days={};const now=new Date();for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days[d.toLocaleDateString('pt-BR')]=0;}
   responses.forEach(r=>{const d=new Date(r.timestamp).toLocaleDateString('pt-BR');if(d in days)days[d]++;});
@@ -2594,7 +2506,7 @@ function buildCoInfoBlock(co){
 
   return`<div class="co-info-block">
     <div class="co-info-hdr">
-      <h3>🏢 ${co.nome}</h3>
+      <h3>${co.nome}</h3>
       <span class="badge" style="background:${statusColor}22;color:${statusColor}">● ${statusLabel}</span>
     </div>
     <div class="co-info-body">
@@ -2603,7 +2515,7 @@ function buildCoInfoBlock(co){
         <div class="co-meta-item"><span class="co-meta-lbl">Ramo</span><span class="co-meta-val">${co.setor||'—'}</span></div>
         <div class="co-meta-item"><span class="co-meta-lbl">Contato RH</span><span class="co-meta-val">${co.rh||'—'}</span></div>
         <div class="co-meta-item"><span class="co-meta-lbl">E-mail RH</span><span class="co-meta-val">${co.email||'—'}</span></div>
-        <div class="co-meta-item"><span class="co-meta-lbl">Questionário</span><span class="co-meta-val">${co.questionario==='copsoq'?'COPSOQ II':co.questionario==='bemestar'?'Bem-Estar':co.questionario==='eixo3'?'Eixo III — GHE':co.questionario==='ambos'?'Todos':'—'}</span></div>
+        <div class="co-meta-item"><span class="co-meta-lbl">Questionário</span><span class="co-meta-val">${co.questionario==='copsoq'?'COPSOQ II':co.questionario==='bemestar'?'Bem-Estar':co.questionario==='ambos'?'Todos':'—'}</span></div>
         <div class="co-meta-item"><span class="co-meta-lbl">Colaboradores</span><span class="co-meta-val">${co.colaboradores.length}</span></div>
         <div class="co-meta-item"><span class="co-meta-lbl">Unidades</span><span class="co-meta-val">${unids.length}</span></div>
         <div class="co-meta-item"><span class="co-meta-lbl">GHEs</span><span class="co-meta-val">${ghes.length}</span></div>
@@ -3203,96 +3115,6 @@ DETAILED_ACTIONS['Altas exigências emocionais'] = {risco:'Excesso de Demandas (
 ]};
 DETAILED_ACTIONS['Pouca previsibilidade de rotina'] = DETAILED_ACTIONS['Baixa confiança na gerência'];
 
-// ═══════════════════════════════════════
-// RELATÓRIO EIXO III
-// ═══════════════════════════════════════
-const E3_ACTIONS={
-  'Excesso de Demandas (Sobrecarga)':'Revisar tabelas e itinerários; garantir pausas; avaliar aumento de quadro.',
-  'Baixa Demanda (Subcarga)':'Enriquecer funções; criar banco de tarefas; programas de mentoria.',
-  'Baixo Controle/Falta de Autonomia':'Ampliar participação nas decisões; flexibilizar pausas e ordem de tarefas.',
-  'Baixa Clareza de Papel/Função':'Documentar responsabilidades; criar reuniões semanais de alinhamento; matriz RACI.',
-  'Falta de Suporte/Apoio no Trabalho':'Criar canais de escuta; protocolo de apoio pós-incidente; mentoria formal.',
-  'Baixa Justiça Organizacional':'Critérios objetivos para distribuição de tarefas; ombudsman; auditoria de processos.',
-  'Assédio de Qualquer Natureza':'Política de tolerância zero; canal de denúncia anônimo; comitê de ética.',
-  'Má Gestão de Mudanças Organizacionais':'Calendário de comunicação com antecedência; treinamento pré-mudança; embaixadores.',
-  'Más Relações no Trabalho':'Normas de convivência; CNV; eventos de integração; pesquisa de clima.',
-  'Eventos Violentos ou Traumáticos':'Revisão do layout; sistema de emergência; apoio psicológico pós-evento.',
-  'Baixas Recompensas e Reconhecimento':'Reconhecimento imediato; programa formal anual; fast-track por mérito.',
-  'Trabalho em Condições de Difícil Comunicação':'Checklist de informação; atualização de rádios/sistemas; glossário técnico.',
-};
-
-function renderE3(){
-  const cf=$('e3CoFilter').value, sf=$('e3SecFilter').value;
-  let resps=STATE.responses.filter(r=>r.questionario==='eixo3');
-  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
-  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
-  const cont=$('e3RepContent');
-  if(!resps.length){cont.innerHTML=`<div class="empty-st"><div class="big">🎯</div><p>Nenhuma resposta do Eixo III recebida ainda.</p></div>`;return;}
-  const sc=calcE3(resps);
-  const sortedF=sc.factors;
-  const e3Co=STATE.companies.find(x=>x.id===(cf==='all'?null:cf));
-  cont.innerHTML=buildE3RepHTML(resps,sortedF,sc.ds,e3Co);
-  setTimeout(()=>renderRepCharts('e3DimCh','e3FactCh',E3_DIMS,sc.ds,sortedF),80);
-}
-
-function buildE3RepHTML(resps,sortedF,dimScores,co){
-  const allDimScores=Object.values(dimScores).filter(v=>v!=null);
-  const avgAll=allDimScores.length?allDimScores.reduce((a,b)=>a+b,0)/allDimScores.length:0;
-  const coInfoBlock=co?buildCoInfoBlock(co):'';
-
-  // Build dimension cards
-  const dimCards=E3_DIMS.map(d=>{
-    const s=dimScores[d.id];
-    const pct=s!=null?Math.round(s*100):0;
-    const rc=riskClass(s||0);
-    const q=E3_Q.find(q=>q.dim===d.id);
-    const invNote=q?.inv?'<span style="font-size:10px;color:#0d9488">↩ invertida</span>':'';
-    return`<div class="dim-card"><div class="dim-name">${d.id}</div><div style="font-size:11px;color:var(--text);margin-bottom:4px;line-height:1.3">${d.name}</div>${invNote}<div class="dim-score" style="color:${rc.color}">${pct}%</div><span class="badge ${rc.cls}">${rc.label}</span><div style="font-size:10px;color:var(--muted);margin-top:3px">${riskAction(rc.label)}</div><div class="dim-bar"><div class="dim-bar-fill" style="width:${pct}%;background:${rc.color}"></div></div></div>`;
-  }).join('');
-
-  // Build risk ranking rows
-  const riskRows=sortedF.map(f=>{
-    const pct=Math.round(f.score*100);
-    const rc=riskClass(f.score);
-    const invBadge=f.inv?`<span style="font-size:9px;color:#0d9488;margin-left:4px">↩</span>`:'';
-    return`<div class="risk-row"><div><div class="factor-name">${f.name}${invBadge}</div><div class="factor-dim">${f.desc||f.dim}</div></div><div><div class="risk-bar-wrap"><div class="risk-bar" style="width:${pct}%;background:${rc.color}"></div></div></div><div class="risk-pct" style="color:${rc.color}">${pct}%</div><div style="text-align:right"><span class="badge ${rc.cls}">${rc.label}</span></div></div>`;
-  }).join('');
-
-  // Build actions table
-  const riskFactors=sortedF.filter(f=>f.score>=0.5);
-  const actionsBlock=riskFactors.length?`
-    <div class="sec-title" style="margin-top:22px">Ações Sugeridas — Moderado e Alto</div>
-    ${buildDetailedActionsBlock(riskFactors,E3_DIMS,'e3')}
-  `:`<div class="sec-title" style="margin-top:22px">Ações Sugeridas</div><div style="text-align:center;color:#22c55e;padding:20px">✓ Nenhum fator moderado ou alto identificado</div>`;
-
-  // Interpretation note about inverted questions
-  const invNote=`<div style="background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:var(--text);line-height:1.6">
-    <strong style="color:#2dd4bf">ℹ️ Sobre as perguntas invertidas (↩):</strong> Questões de Controle, Clareza, Suporte, Justiça, Relacionamento, Recompensa e Comunicação foram redigidas de forma <em>positiva</em>. Scores <strong>baixos</strong> nessas questões indicam <strong>alto risco</strong> — o sistema já aplica a inversão automaticamente nos resultados exibidos.
-  </div>`;
-
-  return`${coInfoBlock}${invNote}
-    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat-card"><div class="val vc">${resps.length}</div><div class="lbl">Respostas recebidas</div></div>
-      <div class="stat-card"><div class="val ${riskClass(sortedF[0]?.score||0).cls==='br'?'vr':sortedF[0]?.score>=.5?'va':'vg'}">${sortedF[0]?.name?.split(' ').slice(0,3).join(' ')||'—'}</div><div class="lbl">Principal risco identificado</div></div>
-      <div class="stat-card"><div class="val ${riskClass(avgAll).cls==='br'?'vr':avgAll>=.5?'va':'vg'}">${Math.round(avgAll*100)}%</div><div class="lbl">Score médio de risco</div></div>
-    </div>
-    <div class="legend"><div class="leg-item"><div class="leg-dot" style="background:#22c55e"></div>Baixo (0–49%)</div><div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div>Moderado (50–74%)</div><div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Alto (75–100%)</div></div>
-    <div class="sec-title">Resultados por Dimensão <span>${new Date().toLocaleDateString('pt-BR')}</span></div>
-    <div class="dim-grid" style="grid-template-columns:repeat(4,1fr)">${dimCards}</div>
-    <div class="charts-grid">
-      <div class="chart-card"><h4>Dimensões — Score de Risco (%)</h4><div style="height:280px"><canvas id="e3DimCh"></canvas></div></div>
-      <div class="chart-card"><h4>Fatores de Maior Risco</h4><div style="height:280px"><canvas id="e3FactCh"></canvas></div></div>
-    </div>
-    <div class="sec-title">Fatores de Risco — Detalhamento</div>
-    <div class="risk-wrap">
-      <div class="risk-title">Ranking <span style="font-size:12px;color:var(--muted)">${sortedF.length} dimensões avaliadas</span></div>
-      ${riskRows}
-    </div>
-    ${actionsBlock}
-    ${renderProfileHTML(resps)}`;
-}
-
-
 function calcCQ(resps){
   const fs={};CQ_FACTORS.forEach(f=>{const inv=new Set(f.invertedQs||[]);const v=[];resps.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);});});fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
   const ds={};CQ_DIMS.forEach(d=>{const v=d.factors.map(fn=>fs[fn]).filter(x=>x!=null);ds[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});
@@ -3304,7 +3126,7 @@ function renderCQ(){
   if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
   if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
   const cont=$('cqRepContent');
-  if(!resps.length){cont.innerHTML=`<div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta COPSOQ II recebida ainda.</p></div>`;return;}
+  if(!resps.length){cont.innerHTML=`<div class="empty-st"><p>Nenhuma resposta COPSOQ II recebida ainda.</p></div>`;return;}
   const sc=calcCQ(resps);
   const sf2=CQ_FACTORS.map(f=>({...f,score:sc.fs[f.name]})).filter(f=>f.score!=null).sort((a,b)=>b.score-a.score);
   const cqCo=STATE.companies.find(x=>x.id===(cf==='all'?null:cf));
@@ -3370,7 +3192,7 @@ function renderBE(){
   if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
   if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
   const cont=$('beRepContent');
-  if(!resps.length){cont.innerHTML=`<div class="empty-st"><div class="big">📊</div><p>Nenhuma resposta de Bem-Estar recebida ainda.</p></div>`;return;}
+  if(!resps.length){cont.innerHTML=`<div class="empty-st"><p>Nenhuma resposta de Bem-Estar recebida ainda.</p></div>`;return;}
   const sc=calcBE(resps);
   const sf2=BE_FACTORS.map(f=>({...f,score:sc.fs[f.name]})).filter(f=>f.score!=null).sort((a,b)=>b.score-a.score);
   const avgNps=resps.filter(r=>r.respostas?.nps!=null).map(r=>r.respostas.nps).reduce((a,b,_,arr)=>a+b/arr.length,0)||0;
@@ -3431,17 +3253,16 @@ function buildDetailedActionsBlock(sortedF, dims, prefix) {
     const cc = compColors[a.complexidade]||'#94a3b8';
     const cl = compLabels[a.complexidade]||a.complexidade;
     const pl = pubLabels[a.publico]||a.publico;
-    const tipoIcon = a.tipo === 'treinamento' ? '🎓' : '🔧';
     const tipoLabel = a.tipo === 'treinamento' ? 'Treinamento' : 'Ação Prática';
     return `<div class="da-card" data-comp="${a.complexidade}" data-pub="${a.publico}" data-tipo="${a.tipo}" data-fator="${a.fator}">
       <div class="da-card-header">
-        <span class="da-tipo-badge">${tipoIcon} ${tipoLabel}</span>
+        <span class="da-tipo-badge">${tipoLabel}</span>
         <span class="da-comp-badge" style="background:${cc}20;color:${cc};border:1px solid ${cc}40">${cl}</span>
       </div>
       <div class="da-card-title">${a.titulo}</div>
       <div class="da-card-desc">${a.desc}</div>
       <div class="da-card-footer">
-        <span class="da-pub">👥 ${pl}</span>
+        <span class="da-pub">${pl}</span>
         <span class="da-fator" style="color:var(--muted);font-size:11px">${a.fator}</span>
       </div>
     </div>`;
@@ -3574,7 +3395,7 @@ function renderResp(){
   if(q){resps=resps.filter(r=>{const co=STATE.companies.find(x=>x.id===r.empresa);return(co?.nome||'').toLowerCase().includes(q)||(co?.cnpj||'').replace(/\D/g,'').includes(q.replace(/\D/g,''))||(r.empresa||'').toLowerCase().includes(q)||(r.colaborador||'').toLowerCase().includes(q);});}
   const tb=$('respTable');
   if(!resps.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Nenhuma resposta</td></tr>`;return;}
-  tb.innerHTML=resps.map((r,i)=>{const co=STATE.companies.find(c=>c.id===r.empresa);const qBadgeCls=r.questionario==='copsoq'?'bb':r.questionario==='bemestar'?'ba':'bte';const qBadgeTxt=r.questionario==='copsoq'?'COPSOQ II':r.questionario==='bemestar'?'Bem-Estar':'Eixo III';return`<tr><td style="color:var(--muted)">${i+1}</td><td>${new Date(r.timestamp).toLocaleString('pt-BR')}</td><td>${co?.nome||'—'}</td><td><span class="badge ${qBadgeCls}">${qBadgeTxt}</span></td><td style="color:var(--muted)">${r.respostas?.setor||'—'}</td><td><button class="icon-btn" onclick='showRespDet(${JSON.stringify(r).replace(/'/g,"&#39;")})'>🔍</button></td></tr>`;}).join('');
+  tb.innerHTML=resps.map((r,i)=>{const co=STATE.companies.find(c=>c.id===r.empresa);const qBadgeCls=r.questionario==='copsoq'?'bb':'ba';const qBadgeTxt=r.questionario==='copsoq'?'COPSOQ II':'Bem-Estar';return`<tr><td style="color:var(--muted)">${i+1}</td><td>${new Date(r.timestamp).toLocaleString('pt-BR')}</td><td>${co?.nome||'—'}</td><td><span class="badge ${qBadgeCls}">${qBadgeTxt}</span></td><td style="color:var(--muted)">${r.respostas?.setor||'—'}</td><td><button class="icon-btn" onclick='showRespDet(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Ver</button></td></tr>`;}).join('');
 }
 function showRespDet(r){
   const co=STATE.companies.find(c=>c.id===r.empresa);
@@ -3596,10 +3417,10 @@ function exportCSV(){
 // ═══════════════════════════════════════
 function updateMgrSelects(){
   const co=`<option value="all">Todas as empresas</option>`+STATE.companies.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  ['cqCoFilter','beCoFilter','e3CoFilter','respCo'].forEach(id=>{const el=$(id);if(el)el.innerHTML=co;});
+  ['cqCoFilter','beCoFilter','respCo'].forEach(id=>{const el=$(id);if(el)el.innerHTML=co;});
   const secs=[...new Set(STATE.responses.map(r=>r.respostas?.setor||'').filter(Boolean))];
   const se=`<option value="all">Todos os setores</option>`+secs.map(s=>`<option value="${s}">${s}</option>`).join('');
-  ['cqSecFilter','beSecFilter','e3SecFilter'].forEach(id=>{const el=$(id);if(el)el.innerHTML=se;});
+  ['cqSecFilter','beSecFilter'].forEach(id=>{const el=$(id);if(el)el.innerHTML=se;});
 }
 
 // ═══════════════════════════════════════
@@ -3630,17 +3451,10 @@ function seedDemo(){
   saveState();
 }
 
-function populateDemoLabels(){
-  const d=['demo1','demo2','demo3'];const e=['ana.paula','carlos.mendes','mfernanda'];
-  d.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=e[i]+'@'+'empresa.com.br';});
-  const mu=document.getElementById('mgr-demo-user');if(mu)mu.textContent='admin'+'@'+'ambrac.com.br';
-}
-
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
 seedDemo();
-populateDemoLabels();
 setInterval(()=>{if(currentMgr){syncExternalResponses();$('lastUpd').textContent='Atualizado: '+new Date().toLocaleTimeString('pt-BR');}},60000);
 
 // ═══════════════════════════════════════
@@ -3666,12 +3480,12 @@ function openHtmlTab(htmlStr) {
   bar.innerHTML = '<span style="font-size:13px;font-weight:600">Relatório AMBRAC — pronto para impressão</span>';
 
   const btnPrint = document.createElement('button');
-  btnPrint.textContent = '🖨 Imprimir / Salvar PDF';
+  btnPrint.textContent = 'Imprimir / Salvar PDF';
   btnPrint.style.cssText = 'padding:7px 18px;background:#c4922a;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit';
   btnPrint.onclick = () => iframe.contentWindow.print();
 
   const btnClose = document.createElement('button');
-  btnClose.textContent = '✕ Fechar';
+  btnClose.textContent = 'Fechar';
   btnClose.style.cssText = 'padding:7px 14px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:7px;cursor:pointer;font-size:13px;font-family:inherit';
   btnClose.onclick = () => wrap.remove();
 
@@ -3796,8 +3610,6 @@ function svgBarChart(dims, dimScores, accentColor) {
 // IMPRIMIR COPSOQ II / BEM-ESTAR
 // ═══════════════════════════════════════
 function printReport(type) {
-  if (type === 'e3') { printE3Report(); return; }
-
   const isCQ = type === 'cq';
   const filterCo  = document.getElementById(isCQ ? 'cqCoFilter' : 'beCoFilter');
   const filterSec = document.getElementById(isCQ ? 'cqSecFilter' : 'beSecFilter');
@@ -4128,61 +3940,99 @@ function printReport(type) {
   openHtmlTab(html);
 }
 
+
 // ═══════════════════════════════════════
-// PDF ESPECÍFICO DO EIXO III — por GHE
+// ACADEMY — PLATAFORMA DE CURSOS
 // ═══════════════════════════════════════
-function printE3Report() {
-  const cf=document.getElementById('e3CoFilter').value, sf=document.getElementById('e3SecFilter').value;
-  let resps=STATE.responses.filter(r=>r.questionario==='eixo3');
-  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
-  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
-  if(!resps.length){alert('Nenhuma resposta do Eixo III para gerar o relatório.');return;}
-  const co=cf!=='all'?STATE.companies.find(c=>c.id===cf):null;
-  const dateStr=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  const accent='#0d9488';
-  const RC=s=>{const p=s*100;if(p<50)return{cls:'badge-baixo',label:'BAIXO',color:'#16a34a',rec:'Monitorar'};if(p<75)return{cls:'badge-mod',label:'MODERADO',color:'#d97706',rec:'Planejar correção'};return{cls:'badge-alto',label:'ALTO',color:'#ef4444',rec:'Intervenção imediata'};};
-  const BAR=(pct,color)=>`<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
-  const calcScores=arr=>{const sc={};E3_Q.forEach((q,i)=>{const vals=arr.map(r=>r.respostas['q'+i]).filter(v=>v!=null);if(!vals.length){sc[q.dim]=null;return;}const avg=vals.reduce((a,b)=>a+b,0)/vals.length;sc[q.dim]=q.inv?1-(avg-1)/3:(avg-1)/3;});return sc;};
-  const buildDimRows=scores=>E3_DIMS.map(d=>{const s=scores[d.id];if(s==null)return'';const pct=Math.round(s*100),rc=RC(s);return`<tr><td style="font-weight:800;color:${accent}">${d.id}</td><td style="font-weight:600">${d.name}</td><td style="text-align:center;font-weight:800;color:${rc.color}">${pct}%</td><td class="bar-cell">${BAR(pct,rc.color)}</td><td style="text-align:center"><span class="${rc.cls}">${rc.label}</span></td><td style="font-size:9px;color:#6b7280">${rc.rec}</td></tr>`;}).join('');
-  const globalScores=calcScores(resps);
-  const allP=Object.values(globalScores).filter(v=>v!=null);
-  const avgG=allP.length?allP.reduce((a,b)=>a+b,0)/allP.length:0;
-  const globalRC=RC(avgG);
-  const ghesMap={};resps.forEach(r=>{const k=(r.respostas?.setor||'Não informado').trim()||'Não informado';if(!ghesMap[k])ghesMap[k]=[];ghesMap[k].push(r);});
-  const gheKeys=Object.keys(ghesMap).sort();
-  const gheSumRows=gheKeys.map(k=>{const arr=ghesMap[k],sc=calcScores(arr);const pcts=Object.values(sc).filter(v=>v!=null);const avg=pcts.length?pcts.reduce((a,b)=>a+b,0)/pcts.length:0;const rc=RC(avg),avgPct=Math.round(avg*100);let wDim='—',wVal=0;E3_DIMS.forEach(d=>{const p=sc[d.id]??0;if(p>wVal){wVal=p;wDim=d.name;}});return`<tr><td style="font-weight:700">${k}</td><td style="text-align:center;color:${accent};font-weight:700">${arr.length}</td><td style="text-align:center;font-weight:800;color:${rc.color}">${avgPct}%</td><td class="bar-cell">${BAR(avgPct,rc.color)}</td><td style="text-align:center"><span class="${rc.cls}">${rc.label}</span></td><td style="font-size:9px;color:#6b7280">${wDim}</td></tr>`;}).join('');
-  const gheDetails=gheKeys.map(k=>{const arr=ghesMap[k],sc=calcScores(arr);const pcts=Object.values(sc).filter(v=>v!=null);const avg=pcts.length?pcts.reduce((a,b)=>a+b,0)/pcts.length:0;const rc=RC(avg),avgPct=Math.round(avg*100);const funcoes=[...new Set(arr.map(r=>r.respostas?.funcao).filter(Boolean))];return`<div class="no-break" style="margin-bottom:20px"><div style="background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:8px;padding:8px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;font-weight:800;color:#1e2235">🏷 ${k}</div><div style="font-size:8.5px;color:#6b7280;margin-top:2px">${arr.length} respondente(s)${funcoes.length?' · Funções: '+funcoes.join(', '):''}</div></div><div style="text-align:right"><span style="font-size:20px;font-weight:900;color:${rc.color}">${avgPct}%</span> &nbsp;<span class="${rc.cls}">${rc.label}</span></div></div><table class="factor-table" style="font-size:9.5px"><thead><tr><th style="width:40px">Sigla</th><th>Dimensão</th><th style="width:50px;text-align:center">Score</th><th class="bar-cell">Nível</th><th style="width:80px;text-align:center">Classif.</th><th>Recomendação</th></tr></thead><tbody>${buildDimRows(sc)}</tbody></table></div>`;}).join('');
-  const coBlock=co?`<table class="id-table"><tr><td>EMPRESA</td><td>${co.nome}${co.cnpj?' &nbsp;·&nbsp; CNPJ: '+co.cnpj:''}</td></tr><tr><td>RAMO</td><td>${co.setor||'—'}</td></tr><tr><td>CONTATO RH</td><td>${co.rh||'—'}</td></tr><tr><td>GHEs CADASTRADOS</td><td>${(co.ghes||[]).length}</td></tr></table>`:'';
-  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório Eixo III — GHE — AMBRAC</title><style>${printCSS(accent)}</style></head><body>
-  <div class="no-print">✅ <strong>Para salvar como PDF:</strong> pressione <strong>Ctrl+P</strong> (ou ⌘P no Mac) → Destino: "Salvar como PDF" → clique Imprimir</div>
-  <div class="rp-topbar">Diagnóstico da Percepção do Colaborador sobre os Fatores de Risco Psicossociais</div>
-  <div style="padding:12px 0 0">
-    <div class="rp-header"><div><div class="rp-brand">AMBRAC</div><div class="rp-brand-sub">Instrumento de Validação Qualitativa Participativa — Eixo III</div></div><div class="rp-header-right"><div class="rp-title">Relatório Eixo III — Riscos Psicossociais por GHE</div><div class="rp-meta">Emitido em: ${dateStr}</div></div></div>
-    ${coBlock}
-    <div class="rp-sec"><div class="rp-sec-title">Resumo Executivo</div>
-      <table class="met-table"><tr><td>TOTAL DE RESPONDENTES</td><td><strong>${resps.length}</strong></td><td style="font-weight:700;background:#f8faff;color:${accent};width:160px">GHEs / SETORES</td><td><strong>${gheKeys.length}</strong></td></tr><tr><td>SCORE MÉDIO GERAL</td><td><strong style="color:${globalRC.color}">${Math.round(avgG*100)}%</strong></td><td style="font-weight:700;background:#f8faff;color:${accent}">CLASSIFICAÇÃO</td><td><span class="${globalRC.cls}">${globalRC.label}</span></td></tr></table>
-    </div>
-    <div class="rp-sec"><div class="rp-sec-title">Resultados por Dimensão — Consolidado</div>
-      <div class="chart-wrap">${svgBarChart(E3_DIMS,globalScores,accent)}</div>
-    </div>
-    <div class="rp-sec"><div class="rp-sec-title">Tabela de Resultados — Todos os Respondentes</div>
-      <table class="factor-table"><thead><tr><th style="width:40px">Sigla</th><th>Dimensão</th><th style="width:50px;text-align:center">Score</th><th class="bar-cell">Nível</th><th style="width:80px;text-align:center">Classif.</th><th>Recomendação</th></tr></thead><tbody>${buildDimRows(globalScores)}</tbody></table>
-    </div>
-    <div class="rp-sec no-break"><div class="rp-sec-title">Interpretação dos Resultados</div>
-      <table class="interp-table"><thead><tr><th>Faixa (%)</th><th>Risco</th><th>Descrição</th><th>Recomendações</th></tr></thead><tbody><tr><td class="fav">0 a 49%</td><td><span class="badge-baixo">BAIXO</span></td><td>Situação favorável</td><td>Monitorar</td></tr><tr><td class="mod">50 a 74%</td><td><span class="badge-mod">MODERADO</span></td><td>Situação intermediária</td><td>Planejar correção</td></tr><tr><td class="crit">75 a 100%</td><td><span class="badge-alto">ALTO</span></td><td>Situação crítica</td><td>Intervenção imediata</td></tr></tbody></table>
-    </div>
-    <div class="rp-sec page-break"><div class="rp-sec-title">Visão Geral por GHE / Setor</div>
-      <table class="factor-table"><thead><tr><th>GHE / Setor</th><th style="width:80px;text-align:center">Respondentes</th><th style="width:60px;text-align:center">Score</th><th class="bar-cell">Nível</th><th style="width:80px;text-align:center">Classif.</th><th>Dimensão de maior risco</th></tr></thead><tbody>${gheSumRows}</tbody></table>
-    </div>
-    <div class="rp-sec"><div class="rp-sec-title">Resultados Detalhados por GHE / Setor</div>${gheDetails}</div>
-    <div class="sign-block">
-      <p style="font-size:9.5px;color:#6b7280;margin-bottom:20px">${dateStr}</p>
-      <div class="sign-line"></div><div class="sign-name">&nbsp;</div><div class="sign-crp">CRP: &nbsp;</div>
-    </div>
-    <div class="rp-footer"><span>AMBRAC — Avaliação Ergonômica Preliminar de Riscos Psicossociais · Eixo III</span><span>Documento gerado automaticamente. Análise técnica sob responsabilidade de profissional habilitado.</span></div>
-  </div></body></html>`;
-  openHtmlTab(html);
+function loadCourses(){
+  const defaults=[
+    {id:'c001',titulo:'Lideranca Humanizada e Gestao de Pessoas',categoria:'lideranca',horas:8,formato:'online',desc:'Desenvolva habilidades essenciais de liderança centrada nas pessoas, com foco em comunicação não-violenta, escuta ativa e gestão de equipes de alta performance.',link:'',publico:'lideranca',ativo:true,criadoEm:new Date().toISOString()},
+    {id:'c002',titulo:'Saude Mental no Trabalho — Fundamentos',categoria:'saude',horas:4,formato:'online',desc:'Compreenda os principais fatores de risco psicossocial no trabalho, sinais de alerta para burnout, ansiedade e depressão, e estratégias de autocuidado.',link:'',publico:'todos',ativo:true,criadoEm:new Date().toISOString()},
+    {id:'c003',titulo:'Prevencao e Combate ao Assedio',categoria:'compliance',horas:6,formato:'online',desc:'Identifique situações de assédio moral e sexual no ambiente de trabalho. Conheça as responsabilidades legais, os canais de denúncia e as medidas de proteção.',link:'',publico:'todos',ativo:true,criadoEm:new Date().toISOString()},
+    {id:'c004',titulo:'Comunicacao Nao-Violenta (CNV)',categoria:'comunicacao',horas:6,formato:'hibrido',desc:'Aprenda a comunicar necessidades e sentimentos de forma assertiva e empática, reduzindo conflitos e melhorando o clima organizacional.',link:'',publico:'todos',ativo:true,criadoEm:new Date().toISOString()},
+    {id:'c005',titulo:'NR-1 e PGR — Gestao de Riscos Psicossociais',categoria:'seguranca',horas:4,formato:'online',desc:'Entenda as exigências da NR-1 para o Programa de Gerenciamento de Riscos (PGR), com foco em riscos psicossociais, documentação e responsabilidades.',link:'',publico:'rh',ativo:true,criadoEm:new Date().toISOString()},
+    {id:'c006',titulo:'Primeiros Socorros Psicologicos',categoria:'saude',horas:3,formato:'presencial',desc:'Capacite colaboradores e líderes para oferecer suporte imediato em situações de crise emocional, dentro dos limites éticos e técnicos da intervenção leiga.',link:'',publico:'lideranca',ativo:true,criadoEm:new Date().toISOString()},
+  ];
+  const saved=JSON.parse(localStorage.getItem('ambrac_courses')||'null');
+  if(saved&&saved.length)return saved;
+  localStorage.setItem('ambrac_courses',JSON.stringify(defaults));
+  return defaults;
 }
+function saveCourses(list){
+  localStorage.setItem('ambrac_courses',JSON.stringify(list));
+}
+let COURSES=loadCourses();
+
+const CAT_LABELS={lideranca:'Lideranca e Gestao',saude:'Saude Mental',seguranca:'Seguranca do Trabalho',compliance:'Compliance e Etica',comunicacao:'Comunicacao'};
+const FORMAT_LABELS={online:'Online',presencial:'Presencial',hibrido:'Hibrido',leitura:'Leitura'};
+const PUB_LABELS={todos:'Todos',lideranca:'Lideranca',operacional:'Operacional',rh:'RH'};
+
+function renderCourses(){
+  const activeFilter=document.querySelector('#pAcademy .da-pill.active');
+  const cat=activeFilter?.dataset?.cat||'all';
+  const list=cat==='all'?COURSES:COURSES.filter(c=>c.categoria===cat);
+  const grid=$('courseGrid');
+  if(!grid)return;
+  if(!list.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">Nenhum curso encontrado para esta categoria.</div>`;return;}
+  grid.innerHTML=list.map(c=>{
+    const catLabel=CAT_LABELS[c.categoria]||c.categoria;
+    const fmtLabel=FORMAT_LABELS[c.formato]||c.formato;
+    const pubLabel=PUB_LABELS[c.publico]||c.publico;
+    const catColor={lideranca:'#3d7aed',saude:'#22c55e',seguranca:'#f59e0b',compliance:'#ef4444',comunicacao:'#7c3aed'}[c.categoria]||'#6b728f';
+    return`<div class="da-card" style="cursor:default">
+      <div class="da-card-header">
+        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${catColor}20;color:${catColor}">${catLabel}</span>
+        <span style="font-size:11px;color:var(--muted)">${c.horas}h — ${fmtLabel}</span>
+      </div>
+      <div class="da-card-title" style="margin-top:6px">${c.titulo}</div>
+      <div class="da-card-desc">${c.desc}</div>
+      <div class="da-card-footer" style="margin-top:8px">
+        <span style="font-size:11px;color:var(--accent)">${pubLabel}</span>
+        <div style="display:flex;gap:6px">
+          ${c.link?`<a href="${c.link}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:6px;padding:3px 10px">Acessar</a>`:''}
+          <button class="icon-btn del" onclick="deleteCourse('${c.id}')" title="Excluir">Excluir</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterCourses(cat,btn){
+  document.querySelectorAll('#pAcademy .da-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.dataset.cat=cat;
+  renderCourses();
+}
+
+function saveCourse(){
+  const titulo=($('cs_titulo')?.value||'').trim();
+  if(!titulo){showAlert('courseAlert','Informe o título do curso.');return;}
+  const curso={
+    id:'c'+Date.now(),
+    titulo,
+    categoria:$('cs_cat')?.value||'lideranca',
+    horas:parseInt($('cs_horas')?.value)||1,
+    formato:$('cs_formato')?.value||'online',
+    desc:($('cs_desc')?.value||'').trim(),
+    link:($('cs_link')?.value||'').trim(),
+    publico:$('cs_publico')?.value||'todos',
+    ativo:true,
+    criadoEm:new Date().toISOString()
+  };
+  COURSES.unshift(curso);
+  saveCourses(COURSES);
+  closeModal('mNewCourse');
+  renderCourses();
+}
+
+function deleteCourse(id){
+  if(!confirm('Excluir este curso?'))return;
+  COURSES=COURSES.filter(c=>c.id!==id);
+  saveCourses(COURSES);
+  renderCourses();
+}
+
+function showAlert(id,msg){const el=$(id);if(!el)return;el.className='alert alert-e show';el.textContent=msg;setTimeout(()=>{el.className='alert alert-e';},3000);}
 
 </script>
 </body>
