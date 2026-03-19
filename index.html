@@ -3977,6 +3977,9 @@ function printReport(type) {
   const sn=(base)=>base+(hasNps&&base>=3?0:hasNps?0:base>=3?-1:-0);
   // secção numbering: 1=Obj 2=Met 3=NPS(if) 4=Dim 5=Fat 6=Setor(if) 7=Plano 8=Conclusão
   const snDim=hasNps?4:3, snFat=hasNps?5:4, snSetor=hasNps?6:5, snPlano=hasSectors?(hasNps?7:6):(hasNps?6:5), snConc=hasSectors?(hasNps?8:7):(hasNps?7:6);
+  const capName = s => s ? s.replace(/\b\w/g, c=>c.toUpperCase()) : s;
+  const mgrNameDisplay = currentMgr?.name ? capName(currentMgr.name) : 'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho';
+  const mgrSigName = currentMgr?.name ? capName(currentMgr.name) : 'Respons\u00e1vel T\u00e9cnico';
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} \u2014 AMBRAC</title>
   <style>${printCSS(accent)}</style></head><body>
   <div class="no-print">\u2705 <strong>Para salvar como PDF:</strong> pressione <strong>Ctrl+P</strong> \u2192 Destino: "Salvar como PDF" \u2192 Imprimir</div>
@@ -3994,7 +3997,7 @@ function printReport(type) {
           ${co?.setor?'<tr><td style="padding:5px 10px 5px 0;font-weight:700;color:'+accent+'">Ramo de Atividade</td><td style="padding:5px 0">'+co.setor+'</td></tr>':''}
           <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Per\u00edodo</td><td style="padding:5px 0">${periodStart}${periodStart!==periodEnd?' a '+periodEnd:''}</td></tr>
           <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Instrumento</td><td style="padding:5px 0">${instrName}</td></tr>
-          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Elaborado por</td><td style="padding:5px 0">${currentMgr?.name||'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho'}</td></tr>
+          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Elaborado por</td><td style="padding:5px 0">${mgrNameDisplay}</td></tr>
         </table>
       </div>
     </div>
@@ -4028,7 +4031,7 @@ function printReport(type) {
         <tr><td>Respondentes / Ades\u00e3o</td><td><strong>${resps.length}</strong> respondentes &nbsp;\u00b7&nbsp; <strong style="color:${adhPct>=70?'#16a34a':adhPct>=50?'#d97706':'#ef4444'}">${adhPct}% de ades\u00e3o</strong></td></tr>
         <tr><td>Instrumento Utilizado</td><td>${instrName}</td></tr>
         <tr><td>Forma de Aplica\u00e7\u00e3o</td><td>Aplica\u00e7\u00e3o digital \u2014 autopreenchimento via plataforma AMBRAC</td></tr>
-        <tr><td>Respons\u00e1vel T\u00e9cnico</td><td>${currentMgr?.name||'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho'}</td></tr>
+        <tr><td>Respons\u00e1vel T\u00e9cnico</td><td>${mgrNameDisplay}</td></tr>
         <tr><td>Setores Avaliados</td><td>${sectors.length?sectors.length+' setor(es): '+sectorsStr:'N\u00e3o especificado'}</td></tr>
       </table>
       ${sectors.length>1?'<table class="factor-table" style="margin-bottom:8px"><thead><tr><th>Setor</th><th style="text-align:center;width:120px">Respondentes (N)</th><th style="text-align:center;width:100px">% do Total</th></tr></thead><tbody>'+sectorTableRows+'</tbody></table>':''}
@@ -4052,7 +4055,7 @@ function printReport(type) {
     ${hasSectors?'<div class="rp-sec page-break"><div class="rp-sec-title">'+snSetor+'. An\u00e1lise por Setor</div>'+crossTabHTML+'</div>':''}
     <div class="rp-sec ${hasSectors?'page-break':'no-break'}">
       <div class="rp-sec-title">${snPlano}. Plano de A\u00e7\u00e3o Sugerido</div>
-      ${riskFactors.length?'<table class="actions-table"><thead><tr><th>Fator de Risco</th><th style="text-align:center;width:110px">Classif. / Score</th><th>A\u00e7\u00e3o Sugerida</th><th style="text-align:center;width:110px">Dimens\u00e3o</th><th style="text-align:center;width:80px">Complexidade</th></tr></thead><tbody>'+actionRowsDRPS+'</tbody></table><div style="margin-top:10px;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px"><div style="font-size:10px;font-weight:700;color:#1e4d3a;margin-bottom:8px">Protocolo AMBRAC de Acompanhamento</div><table class="met-table" style="font-size:9.5px"><tr><td>Acompanhamento psicol\u00f3gico</td><td>Rodas de conversa, escuta ativa e atendimentos breves no ambiente de trabalho.</td></tr><tr><td>Revis\u00e3o peri\u00f3dica</td><td>Reaaplica\u00e7\u00e3o do instrumento em 6 meses para verifica\u00e7\u00e3o da efetividade das a\u00e7\u00f5es.</td></tr><tr><td>Monitoramento cont\u00ednuo</td><td>Valida\u00e7\u00e3o das medidas aplicadas com escuta ativa dos colaboradores.</td></tr></table></div>':'<p class="rp-body-text">Nenhum fator com risco moderado ou alto identificado. Mantenha o monitoramento peri\u00f3dico.</p>'}
+      ${riskFactors.length?'<table class="actions-table"><thead><tr><th>Fator de Risco</th><th style="text-align:center;width:110px">Classif. / Score</th><th>A\u00e7\u00e3o Sugerida</th><th style="text-align:center;width:110px">Dimens\u00e3o</th><th style="text-align:center;width:80px">Complexidade</th></tr></thead><tbody>'+actionRowsDRPS+'</tbody></table><div style="margin-top:10px;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px"><div style="font-size:10px;font-weight:700;color:#1e4d3a;margin-bottom:8px">Protocolo AMBRAC de Acompanhamento</div><table class="met-table" style="font-size:9.5px"><tr><td>Acompanhamento psicol\u00f3gico</td><td>Rodas de conversa, escuta ativa e atendimentos breves no ambiente de trabalho.</td></tr><tr><td>Revis\u00e3o peri\u00f3dica</td><td>Reaplicação do instrumento em 6 meses para verifica\u00e7\u00e3o da efetividade das a\u00e7\u00f5es.</td></tr><tr><td>Monitoramento cont\u00ednuo</td><td>Valida\u00e7\u00e3o das medidas aplicadas com escuta ativa dos colaboradores.</td></tr></table></div>':'<p class="rp-body-text">Nenhum fator com risco moderado ou alto identificado. Mantenha o monitoramento peri\u00f3dico.</p>'}
     </div>
     <div class="rp-sec no-break">
       <div class="rp-sec-title">${snConc}. Conclus\u00e3o</div>
@@ -4104,15 +4107,9 @@ function printReport(type) {
       <div style="display:flex;gap:30px;margin-top:20px;align-items:flex-end">
         <div style="flex:1">
           <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
-          <div style="font-size:10.5px;font-weight:700;color:#1e2235">${currentMgr?.name||'Respons\u00e1vel T\u00e9cnico'}</div>
+          <div style="font-size:10.5px;font-weight:700;color:#1e2235">${mgrSigName}</div>
           <div style="font-size:9px;color:#6b7280">Respons\u00e1vel T\u00e9cnico \u2014 AMBRAC</div>
           <div style="font-size:9px;color:#6b7280;margin-top:2px">CRP / CRM: ______________________</div>
-        </div>
-        <div style="flex:1">
-          <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
-          <div style="font-size:10.5px;font-weight:700;color:#1e2235">Representante da Empresa</div>
-          <div style="font-size:9px;color:#6b7280">${coName}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cargo / Fun\u00e7\u00e3o: _____________________</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
