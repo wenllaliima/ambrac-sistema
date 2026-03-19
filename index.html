@@ -3946,11 +3946,66 @@ function printReport(type) {
     : avgAll < 0.75
     ? 'A avaliação aponta risco moderado em algumas dimensões de ' + coName + '. É necessário planejar intervenções específicas nas áreas destacadas, priorizando ações preventivas antes que os riscos se intensifiquem.'
     : 'A avaliação revela risco elevado no ambiente de trabalho de ' + coName + '. Recomenda-se intervenção imediata com apoio técnico especializado, envolvimento da liderança e implementação urgente do plano de ação sugerido.';
-  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} — AMBRAC</title>
+  // ── Cálculos extras para relatório DRPS ──
+  const SEV = s => s>=0.75?'Grave':s>=0.5?'Alta':s>=0.25?'Moderada':'Baixa';
+  const fQuestNums = f => f.qs.map(q=>'Q'+(q+1)).join(', ');
+  const sectorCounts = sectors.map(sec => {
+    const n=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sec.toLowerCase()).length;
+    const pct=resps.length?Math.round(n/resps.length*100):0;
+    return {sec,n,pct};
+  });
+  const sectorTableRows = sectorCounts.map(({sec,n,pct})=>'<tr><td>'+sec+'</td><td style="text-align:center">'+n+'</td><td style="text-align:center">'+pct+'%</td></tr>').join('');
+  const sectorFactorScores = {};
+  if(sectors.length>0){sectorCounts.forEach(({sec})=>{const sR=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sec.toLowerCase());sectorFactorScores[sec]={};factors.forEach(f=>{const inv=new Set(f.invertedQs||[]);const v=[];sR.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);});});sectorFactorScores[sec][f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});});}
+  const ctChunkSize=8;
+  const ctChunks=[];
+  for(let i=0;i<sortedF.length;i+=ctChunkSize)ctChunks.push(sortedF.slice(i,i+ctChunkSize));
+  const crossTabHTML=sectors.length>1?ctChunks.map(chunk=>{
+    const secHdrs=sectors.map(s=>'<th style="text-align:center;font-size:8px;max-width:60px">'+s+'</th>').join('')+'<th style="text-align:center;font-size:8px;background:#1e2235">GERAL</th>';
+    const rows=chunk.map(f=>{const grc=RC(f.score);const secCells=sectors.map(sec=>{const sv=sectorFactorScores[sec]?.[f.name];if(sv==null)return '<td style="text-align:center;color:#9ca3af;font-size:8px">—</td>';const src=RC(sv);return '<td style="text-align:center;font-size:8.5px;font-weight:700;color:'+src.color+'">'+Math.round(sv*100)+'%</td>';}).join('')+'<td style="text-align:center;font-weight:800;font-size:9px;color:'+grc.color+';background:#fafafa">'+Math.round(f.score*100)+'%</td>';return '<tr><td style="font-weight:600;font-size:9px">'+f.name+'</td>'+secCells+'</tr>';}).join('');
+    return '<div class="no-break" style="margin-bottom:10px"><table class="factor-table"><thead><tr><th>Fator de Risco</th>'+secHdrs+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }).join(''):'';
+  const dimSummaryRows=dims.map(d=>{const s=ds[d.id],pct=s!=null?Math.round(s*100):null,rc=RC(s||0);return '<tr><td style="font-weight:700;font-size:9px;color:'+d.color+';width:50px">'+d.id+'</td><td style="font-weight:700">'+d.name+'</td><td style="text-align:center;font-weight:800;color:'+rc.color+'">'+(pct!=null?pct+'%':'—')+'</td><td style="text-align:center"><span class="'+rc.cls+'">'+rc.label+'</span></td><td style="font-size:8.5px;color:#4b5563">'+(fullDefsMap[d.id]||defsMap[d.id]||'')+'</td></tr>';}).join('');
+  const factorRowsDRPS=sortedF.map(f=>{const pct=Math.round(f.score*100),rc=RC(f.score),sev=SEV(f.score),dimName=dims.find(d=>d.id===f.dim)?.name||f.dim,qStr=fQuestNums(f);return '<tr><td style="font-weight:600;font-size:9.5px">'+f.name+'</td><td style="font-size:8px;color:#6b7280;text-align:center;white-space:nowrap">'+qStr+'</td><td style="text-align:center;font-weight:800;color:'+rc.color+'">'+pct+'%</td><td style="text-align:center"><span class="'+rc.cls+'">'+rc.label+'</span></td><td style="text-align:center;font-size:8.5px;font-weight:700;color:'+rc.color+'">'+sev+'</td><td style="font-size:8.5px;color:#6b7280">'+dimName+'</td></tr>';}).join('');
+  const actionRowsDRPS=riskFactors.map(f=>{const pct=Math.round(f.score*100),rc=RC(f.score),action=actions[f.name]||'—',complexity=f.score>=0.75?'Alta':'Média',tgt=dims.find(d=>d.id===f.dim)?.name||f.dim;return '<tr><td style="font-weight:600;font-size:9.5px">'+f.name+'</td><td style="text-align:center"><span class="'+rc.cls+'">'+rc.label+'</span><div style="font-size:8px;color:'+rc.color+';font-weight:700">'+pct+'%</div></td><td style="font-size:9px">'+action+'</td><td style="text-align:center;font-size:8.5px;color:#6b7280">'+tgt+'</td><td style="text-align:center;font-size:8.5px;font-weight:700;color:'+(complexity==='Alta'?'#ef4444':'#d97706')+'">'+complexity+'</td></tr>';}).join('');
+  const npsTotalR=npsResps.length||1,npsProPct=Math.round(npsPromoters/npsTotalR*100),npsNeutPct=Math.round(npsPassives/npsTotalR*100),npsDetPct=Math.round(npsDetractors/npsTotalR*100);
+  const npsCardsHTML=npsResps.length?'<div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex:1;border:2px solid #16a34a;border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:8.5px;color:#16a34a;text-transform:uppercase;font-weight:700;margin-bottom:4px">Promotores</div><div style="font-size:26px;font-weight:900;color:#16a34a">'+npsPromoters+'</div><div style="font-size:8.5px;color:#6b7280">'+npsProPct+'% · Notas 9–10</div></div><div style="flex:1;border:2px solid #d97706;border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:8.5px;color:#d97706;text-transform:uppercase;font-weight:700;margin-bottom:4px">Neutros</div><div style="font-size:26px;font-weight:900;color:#d97706">'+npsPassives+'</div><div style="font-size:8.5px;color:#6b7280">'+npsNeutPct+'% · Notas 7–8</div></div><div style="flex:1;border:2px solid #ef4444;border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:8.5px;color:#ef4444;text-transform:uppercase;font-weight:700;margin-bottom:4px">Detratores</div><div style="font-size:26px;font-weight:900;color:#ef4444">'+npsDetractors+'</div><div style="font-size:8.5px;color:#6b7280">'+npsDetPct+'% · Notas 0–6</div></div><div style="flex:1;border:2px solid '+npsColor+';border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:8.5px;color:'+npsColor+';text-transform:uppercase;font-weight:700;margin-bottom:4px">NPS Score</div><div style="font-size:26px;font-weight:900;color:'+npsColor+'">'+npsScore+'</div><div style="font-size:8.5px;color:'+npsColor+';font-weight:700">'+npsLabel+'</div></div></div><p style="font-size:8.5px;color:#6b7280;margin:4px 0">NPS = ((Promotores \u2212 Detratores) \u00f7 Total) \u00d7 100 \u00b7 Faixas: &lt;0 Cr\u00edtico \u00b7 0\u201349 Razo\u00e1vel \u00b7 50\u201374 Muito Bom \u00b7 75+ Excelente.</p>':'<p class="rp-body-text" style="color:#9ca3af">Nenhuma resposta de NPS coletada.</p>';
+  const dashFactorBars=sortedF.slice(0,20).map(f=>{const pct=Math.round(f.score*100),rc=RC(f.score);return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:8px;margin-bottom:1px"><span style="font-weight:600">'+f.name+'</span><span style="color:'+rc.color+';font-weight:700">'+pct+'%</span></div><div style="background:#f3f4f6;border-radius:99px;height:5px"><div style="height:5px;border-radius:99px;background:'+rc.color+';width:'+pct+'%"></div></div></div>';}).join('');
+  const dashDimCards=dims.map(d=>{const s=ds[d.id],pct=s!=null?Math.round(s*100):null,rc=RC(s||0);return '<div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;text-align:center;min-width:70px"><div style="font-size:8px;color:'+d.color+';text-transform:uppercase;font-weight:700;margin-bottom:3px">'+d.id+'</div><div style="font-size:20px;font-weight:900;color:'+rc.color+'">'+(pct!=null?pct+'%':'—')+'</div><div style="font-size:7.5px;font-weight:700;color:'+rc.color+'">'+rc.label+'</div><div style="font-size:7px;color:#9ca3af;margin-top:2px;line-height:1.3">'+d.name+'</div></div>';}).join('');
+  const dashSectorRows=sectorCounts.map(({sec,n})=>{const sR=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sec.toLowerCase());const sFs={};factors.forEach(f=>{const inv=new Set(f.invertedQs||[]);const v=[];sR.forEach(r=>{f.qs.forEach(qi=>{const x=r.respostas['q'+qi];if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);});});sFs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});const sDs={};dims.forEach(d=>{const v=d.factors.map(fn=>sFs[fn]).filter(x=>x!=null);sDs[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;});const sVals=Object.values(sDs).filter(v=>v!=null);const sAvg=sVals.length?sVals.reduce((a,b)=>a+b,0)/sVals.length:0;const src=RC(sAvg);return '<tr><td style="font-weight:600">'+sec+'</td><td style="text-align:center">'+n+'</td><td style="text-align:center;font-weight:800;color:'+src.color+'">'+Math.round(sAvg*100)+'%</td><td style="text-align:center"><span class="'+src.cls+'">'+src.label+'</span></td></tr>';}).join('');
+  const hasNps=npsResps.length>0, hasSectors=sectors.length>1;
+  const sn=(base)=>base+(hasNps&&base>=3?0:hasNps?0:base>=3?-1:-0);
+  // secção numbering: 1=Obj 2=Met 3=NPS(if) 4=Dim 5=Fat 6=Setor(if) 7=Plano 8=Conclusão
+  const snDim=hasNps?4:3, snFat=hasNps?5:4, snSetor=hasNps?6:5, snPlano=hasSectors?(hasNps?7:6):(hasNps?6:5), snConc=hasSectors?(hasNps?8:7):(hasNps?7:6);
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} \u2014 AMBRAC</title>
   <style>${printCSS(accent)}</style></head><body>
-  <div class="no-print">✅ <strong>Para salvar como PDF:</strong> pressione <strong>Ctrl+P</strong> → Destino: "Salvar como PDF" → Imprimir</div>
-  <div class="rp-topbar">AMBRAC · Medicina e Segurança do Trabalho · Riscos Psicossociais — NR-1 / PGR</div>
+  <div class="no-print">\u2705 <strong>Para salvar como PDF:</strong> pressione <strong>Ctrl+P</strong> \u2192 Destino: "Salvar como PDF" \u2192 Imprimir</div>
+  <!-- CAPA -->
+  <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always">
+    <div style="background:${accent};color:#fff;padding:8px 16px;font-size:9px;letter-spacing:.5px;text-transform:uppercase">AMBRAC \u00b7 Medicina e Seguran\u00e7a do Trabalho \u00b7 Riscos Psicossociais \u2014 NR-1/PGR</div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center">
+      <div style="margin-bottom:20px">${logoSvg}</div>
+      <div style="font-size:18px;font-weight:900;color:${accent};margin-bottom:8px;line-height:1.4">${repTitle}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:28px">Avalia\u00e7\u00e3o de Riscos Psicossociais \u2014 NR-1 / PGR</div>
+      <div style="background:#f8faff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 28px;min-width:320px;max-width:480px;text-align:left">
+        <table style="width:100%;border-collapse:collapse;font-size:10px">
+          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent};width:150px">Empresa Avaliada</td><td style="padding:5px 0"><strong>${coName}</strong></td></tr>
+          ${co?.cnpj?'<tr><td style="padding:5px 10px 5px 0;font-weight:700;color:'+accent+'">CNPJ</td><td style="padding:5px 0">'+co.cnpj+'</td></tr>':''}
+          ${co?.setor?'<tr><td style="padding:5px 10px 5px 0;font-weight:700;color:'+accent+'">Ramo de Atividade</td><td style="padding:5px 0">'+co.setor+'</td></tr>':''}
+          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Per\u00edodo</td><td style="padding:5px 0">${periodStart}${periodStart!==periodEnd?' a '+periodEnd:''}</td></tr>
+          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Instrumento</td><td style="padding:5px 0">${instrName}</td></tr>
+          <tr><td style="padding:5px 10px 5px 0;font-weight:700;color:${accent}">Elaborado por</td><td style="padding:5px 0">${currentMgr?.name||'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho'}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="border-top:1px solid #e5e7eb;padding:8px 16px;display:flex;justify-content:space-between;font-size:8px;color:#9ca3af">
+      <span>Documento t\u00e9cnico sigiloso \u2014 uso restrito a sa\u00fade ocupacional</span>
+      <span>Emitido em ${dateStr}</span>
+    </div>
+  </div>
+  <!-- CONTEÚDO -->
   <div style="padding:14px 0 0">
+    <div class="rp-topbar">AMBRAC \u00b7 Medicina e Seguran\u00e7a do Trabalho \u00b7 Riscos Psicossociais \u2014 NR-1 / PGR</div>
     <div class="rp-header">
       <div>${logoSvg}</div>
       <div class="rp-header-right">
@@ -3961,26 +4016,53 @@ function printReport(type) {
     </div>
     <div class="rp-sec no-break">
       <div class="rp-sec-title">1. Objetivo</div>
-      <p class="rp-body-text">Este relatório apresenta os resultados da avaliação de riscos psicossociais realizada com colaboradores de <strong>${coName}</strong>, em atendimento ao disposto na Norma Regulamentadora n° 1 (NR-1), que exige a identificação, avaliação e controle dos riscos ocupacionais, incluindo os de natureza psicossocial, no âmbito do Programa de Gerenciamento de Riscos (PGR). O objetivo é fornecer subsídios técnicos para a tomada de decisão e implementação de ações preventivas e corretivas voltadas à promoção da saúde mental e do bem-estar no trabalho.</p>
+      <p class="rp-body-text">Este relat\u00f3rio apresenta os resultados da avalia\u00e7\u00e3o de riscos psicossociais realizada com colaboradores de <strong>${coName}</strong>, em conformidade com a Norma Regulamentadora n\u00b0 1 (NR-1), que exige a identifica\u00e7\u00e3o, avalia\u00e7\u00e3o e controle dos riscos ocupacionais, incluindo os de natureza psicossocial, no Programa de Gerenciamento de Riscos (PGR). O objetivo \u00e9 fornecer subs\u00eddios t\u00e9cnicos para a tomada de decis\u00e3o e implementa\u00e7\u00e3o de a\u00e7\u00f5es preventivas e corretivas voltadas \u00e0 promo\u00e7\u00e3o da sa\u00fade mental e do bem-estar no trabalho.</p>
     </div>
     <div class="rp-sec no-break">
       <div class="rp-sec-title">2. Metodologia</div>
-      <table class="met-table">
-        <tr><td>Empresa Avaliada</td><td><strong>${coName}</strong>${co?.cnpj?' &nbsp;·&nbsp; CNPJ: '+co.cnpj:''}</td></tr>
-        ${co?.setor?`<tr><td>Ramo de Atividade</td><td>${co.setor}</td></tr>`:''}
-        <tr><td>Período da Avaliação</td><td>${periodStart}${periodStart!==periodEnd?' a '+periodEnd:''}</td></tr>
-        <tr><td>Colaboradores de Referência</td><td>${colRef} colaboradores cadastrados</td></tr>
-        <tr><td>Respondentes / Adesão</td><td><strong>${resps.length}</strong> respondentes &nbsp;·&nbsp; <strong style="color:${adhPct>=70?'#16a34a':adhPct>=50?'#d97706':'#ef4444'}">${adhPct}% de adesão</strong></td></tr>
+      <table class="met-table" style="margin-bottom:10px">
+        <tr><td>Empresa Avaliada</td><td><strong>${coName}</strong>${co?.cnpj?' &nbsp;\u00b7&nbsp; CNPJ: '+co.cnpj:''}</td></tr>
+        ${co?.setor?'<tr><td>Ramo de Atividade</td><td>'+co.setor+'</td></tr>':''}
+        <tr><td>Per\u00edodo da Avalia\u00e7\u00e3o</td><td>${periodStart}${periodStart!==periodEnd?' a '+periodEnd:''}</td></tr>
+        <tr><td>Colaboradores de Refer\u00eancia</td><td>${colRef} colaboradores cadastrados</td></tr>
+        <tr><td>Respondentes / Ades\u00e3o</td><td><strong>${resps.length}</strong> respondentes &nbsp;\u00b7&nbsp; <strong style="color:${adhPct>=70?'#16a34a':adhPct>=50?'#d97706':'#ef4444'}">${adhPct}% de ades\u00e3o</strong></td></tr>
         <tr><td>Instrumento Utilizado</td><td>${instrName}</td></tr>
-        <tr><td>Forma de Aplicação</td><td>Aplicação digital — autopreenchimento via plataforma AMBRAC (acesso individual por e-mail ou matrícula/CPF)</td></tr>
-        <tr><td>Responsável Técnico</td><td>${currentMgr?.name||'AMBRAC — Medicina e Segurança do Trabalho'}</td></tr>
-        <tr><td>Setores Avaliados</td><td>${sectorsStr}</td></tr>
+        <tr><td>Forma de Aplica\u00e7\u00e3o</td><td>Aplica\u00e7\u00e3o digital \u2014 autopreenchimento via plataforma AMBRAC</td></tr>
+        <tr><td>Respons\u00e1vel T\u00e9cnico</td><td>${currentMgr?.name||'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho'}</td></tr>
+        <tr><td>Setores Avaliados</td><td>${sectors.length?sectors.length+' setor(es): '+sectorsStr:'N\u00e3o especificado'}</td></tr>
+      </table>
+      ${sectors.length>1?'<table class="factor-table" style="margin-bottom:8px"><thead><tr><th>Setor</th><th style="text-align:center;width:120px">Respondentes (N)</th><th style="text-align:center;width:100px">% do Total</th></tr></thead><tbody>'+sectorTableRows+'</tbody></table>':''}
+      <p style="font-size:8.5px;color:#6b7280;margin-top:4px">F\u00f3rmula de c\u00e1lculo: Score (%) = m\u00e9dia das respostas individuais convertidas em escala 0\u2013100, onde 100% representa o m\u00e1ximo de risco. Para fatores protetores, a escala \u00e9 invertida (Score = 1 \u2212 (x\u22121)/4).</p>
+    </div>
+    ${hasNps?'<div class="rp-sec no-break"><div class="rp-sec-title">3. NPS Interno \u2014 \u00cdndice de Satisfa\u00e7\u00e3o</div>'+npsCardsHTML+'</div>':''}
+    <div class="rp-sec page-break">
+      <div class="rp-sec-title">${snDim}. Resultados por Dimens\u00e3o</div>
+      <table class="factor-table">
+        <thead><tr><th style="width:45px">ID</th><th>Dimens\u00e3o</th><th style="text-align:center;width:70px">Score</th><th style="text-align:center;width:100px">Classif.</th><th>Descri\u00e7\u00e3o</th></tr></thead>
+        <tbody>${dimSummaryRows}</tbody>
       </table>
     </div>
-    ${npsSection}
+    <div class="rp-sec no-break">
+      <div class="rp-sec-title">${snFat}. Resultados por Fator de Risco</div>
+      <table class="factor-table">
+        <thead><tr><th>Fator</th><th style="text-align:center;width:110px">Quest\u00f5es</th><th style="text-align:center;width:60px">Score</th><th style="text-align:center;width:90px">Classif.</th><th style="text-align:center;width:65px">Sever.</th><th>Fonte Geradora</th></tr></thead>
+        <tbody>${factorRowsDRPS}</tbody>
+      </table>
+    </div>
+    ${hasSectors?'<div class="rp-sec page-break"><div class="rp-sec-title">'+snSetor+'. An\u00e1lise por Setor</div>'+crossTabHTML+'</div>':''}
+    <div class="rp-sec ${hasSectors?'page-break':'no-break'}">
+      <div class="rp-sec-title">${snPlano}. Plano de A\u00e7\u00e3o Sugerido</div>
+      ${riskFactors.length?'<table class="actions-table"><thead><tr><th>Fator de Risco</th><th style="text-align:center;width:110px">Classif. / Score</th><th>A\u00e7\u00e3o Sugerida</th><th style="text-align:center;width:110px">Dimens\u00e3o</th><th style="text-align:center;width:80px">Complexidade</th></tr></thead><tbody>'+actionRowsDRPS+'</tbody></table><div style="margin-top:10px;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px"><div style="font-size:10px;font-weight:700;color:#1e4d3a;margin-bottom:8px">Protocolo AMBRAC de Acompanhamento</div><table class="met-table" style="font-size:9.5px"><tr><td>Acompanhamento psicol\u00f3gico</td><td>Rodas de conversa, escuta ativa e atendimentos breves no ambiente de trabalho.</td></tr><tr><td>Revis\u00e3o peri\u00f3dica</td><td>Reaaplica\u00e7\u00e3o do instrumento em 6 meses para verifica\u00e7\u00e3o da efetividade das a\u00e7\u00f5es.</td></tr><tr><td>Monitoramento cont\u00ednuo</td><td>Valida\u00e7\u00e3o das medidas aplicadas com escuta ativa dos colaboradores.</td></tr></table></div>':'<p class="rp-body-text">Nenhum fator com risco moderado ou alto identificado. Mantenha o monitoramento peri\u00f3dico.</p>'}
+    </div>
+    <div class="rp-sec no-break">
+      <div class="rp-sec-title">${snConc}. Conclus\u00e3o</div>
+      <p class="rp-body-text">${conclusionText}</p>
+      <p class="rp-body-text" style="margin-top:8px">A presente avalia\u00e7\u00e3o integra o Programa de Gerenciamento de Riscos (PGR) de <strong>${coName}</strong> e deve ser revisada periodicamente, em conformidade com as exig\u00eancias da NR-1 e da legisla\u00e7\u00e3o trabalhista vigente. Os resultados s\u00e3o de car\u00e1ter t\u00e9cnico e sigiloso, devendo ser utilizados exclusivamente para fins de gest\u00e3o de sa\u00fade ocupacional.</p>
+    </div>
+    <!-- DASHBOARD -->
     <div class="rp-sec page-break">
-      <div class="rp-sec-title">Dashboard — Visão Geral da Empresa</div>
-      <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div class="rp-sec-title">Dashboard \u2014 Vis\u00e3o Geral da Empresa</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
         <div style="flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;text-align:center">
           <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">Score Geral</div>
           <div style="font-size:26px;font-weight:900;color:${overallRC.color}">${Math.round(avgAll*100)}%</div>
@@ -3989,12 +4071,12 @@ function printReport(type) {
         <div style="flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;text-align:center">
           <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">Respondentes</div>
           <div style="font-size:26px;font-weight:900;color:#1e4d3a">${resps.length}</div>
-          <div style="font-size:9px;color:#6b7280">${adhPct}% de adesão</div>
+          <div style="font-size:9px;color:#6b7280">${adhPct}% de ades\u00e3o</div>
         </div>
         <div style="flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;text-align:center">
-          <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">Risco Alto</div>
+          <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">Fator Alto Risco</div>
           <div style="font-size:26px;font-weight:900;color:#ef4444">${sortedF.filter(f=>f.score>=0.75).length}</div>
-          <div style="font-size:9px;color:#6b7280">${sortedF.filter(f=>f.score>=0.5).length} fator(es) moderado/alto</div>
+          <div style="font-size:9px;color:#6b7280">${sortedF.filter(f=>f.score>=0.5).length} moderado/alto</div>
         </div>
         <div style="flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;text-align:center">
           <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">Setores</div>
@@ -4002,62 +4084,46 @@ function printReport(type) {
           <div style="font-size:9px;color:#6b7280">avaliados</div>
         </div>
       </div>
-      <div class="chart-wrap">${svgBarChart(dims, ds, accent)}</div>
-    </div>
-    <div class="rp-sec">
-      <div class="rp-sec-title">3. Resultados por Dimensão</div>
-      ${dimDetailRows}
-    </div>
-    <div class="rp-sec page-break">
-      <div class="rp-sec-title">4. Resultados por Fator de Risco</div>
-      <table class="factor-table">
-        <thead><tr><th style="width:24px">#</th><th>Fator</th><th>Dimensão</th><th style="width:55px;text-align:center">Score</th><th class="bar-cell">Nível</th><th style="width:90px;text-align:center">Classif.</th></tr></thead>
-        <tbody>${factorRows}</tbody>
-      </table>
-    </div>
-    ${sectors.length>1?'<div class="rp-sec page-break"><div class="rp-sec-title">5. Análise por Setor</div><table class="factor-table"><thead><tr><th>Setor</th><th style="width:90px;text-align:center">Respondentes</th><th style="width:70px;text-align:center">Score Médio</th><th style="width:100px;text-align:center">Classificação</th><th>Dimensão de Maior Risco</th></tr></thead><tbody>'+sectorAnalysis+'</tbody></table></div>':''}
-    <div class="rp-sec no-break">
-      <div class="rp-sec-title">${sectors.length>1?'6':'5'}. Plano de Ação Sugerido</div>
-      ${riskFactors.length?'<table class="actions-table"><thead><tr><th>Fator de Risco</th><th style="width:120px;text-align:center">Classificação</th><th>Ação Sugerida</th></tr></thead><tbody>'+actionRows+'</tbody></table>':'<p class="rp-body-text">Nenhum fator com risco moderado ou alto identificado. Mantenha o monitoramento periódico.</p>'}
-      <div style="margin-top:10px;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px">
-        <div style="font-size:10px;font-weight:700;color:#1e4d3a;margin-bottom:8px">Protocolo AMBRAC de Acompanhamento</div>
-        <table class="met-table" style="font-size:9.5px">
-          <tr><td>Acompanhamento psicológico</td><td>Rodas de conversa, escuta ativa e atendimentos breves no ambiente de trabalho.</td></tr>
-          <tr><td>Revisão periódica</td><td>Reaplicação do instrumento em 6 meses para verificação da efetividade das ações.</td></tr>
-          <tr><td>Monitoramento contínuo</td><td>Validação das medidas aplicadas com escuta ativa dos colaboradores.</td></tr>
-        </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#1e2235;text-transform:uppercase;margin-bottom:8px">Score por Fator (por risco \u2193)</div>
+          ${dashFactorBars}
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#1e2235;text-transform:uppercase;margin-bottom:8px">Score por Dimens\u00e3o</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${dashDimCards}</div>
+          <div class="chart-wrap">${svgBarChart(dims,ds,accent)}</div>
+        </div>
       </div>
+      ${hasSectors?'<div style="margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:#1e2235;text-transform:uppercase;margin-bottom:8px">Score por Setor</div><table class="factor-table"><thead><tr><th>Setor</th><th style="text-align:center;width:100px">Respondentes</th><th style="text-align:center;width:80px">Score M\u00e9dio</th><th style="text-align:center;width:110px">Classifica\u00e7\u00e3o</th></tr></thead><tbody>'+dashSectorRows+'</tbody></table></div>':''}
+      ${hasNps?'<div><div style="font-size:9px;font-weight:700;color:#1e2235;text-transform:uppercase;margin-bottom:8px">NPS Interno</div>'+npsCardsHTML+'</div>':''}
     </div>
-    <div class="rp-sec no-break">
-      <div class="rp-sec-title">${sectors.length>1?'7':'6'}. Conclusão</div>
-      <p class="rp-body-text">${conclusionText}</p>
-      <p class="rp-body-text" style="margin-top:8px">A presente avaliação integra o Programa de Gerenciamento de Riscos (PGR) de <strong>${coName}</strong> e deve ser revisada periodicamente, em conformidade com as exigências da NR-1 e da legislação trabalhista vigente. Os resultados aqui apresentados são de caráter técnico e sigiloso, devendo ser utilizados exclusivamente para fins de gestão de saúde ocupacional.</p>
-    </div>
+    <!-- ASSINATURA -->
     <div class="rp-sec no-break" style="margin-top:24px">
-      <div class="rp-sec-title">Responsabilidade Técnica</div>
+      <div class="rp-sec-title">Responsabilidade T\u00e9cnica</div>
       <div style="display:flex;gap:30px;margin-top:20px;align-items:flex-end">
         <div style="flex:1">
           <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
-          <div style="font-size:10.5px;font-weight:700;color:#1e2235">${currentMgr?.name||'Responsável Técnico'}</div>
-          <div style="font-size:9px;color:#6b7280">Responsável Técnico — AMBRAC</div>
+          <div style="font-size:10.5px;font-weight:700;color:#1e2235">${currentMgr?.name||'Respons\u00e1vel T\u00e9cnico'}</div>
+          <div style="font-size:9px;color:#6b7280">Respons\u00e1vel T\u00e9cnico \u2014 AMBRAC</div>
           <div style="font-size:9px;color:#6b7280;margin-top:2px">CRP / CRM: ______________________</div>
         </div>
         <div style="flex:1">
           <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
           <div style="font-size:10.5px;font-weight:700;color:#1e2235">Representante da Empresa</div>
           <div style="font-size:9px;color:#6b7280">${coName}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cargo / Função: _____________________</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cargo / Fun\u00e7\u00e3o: _____________________</div>
         </div>
         <div style="flex:1;text-align:center">
           <div style="border-bottom:1.5px solid #1e2235;margin-bottom:6px;height:40px"></div>
-          <div style="font-size:10.5px;font-weight:700;color:#1e2235">Data de Emissão</div>
+          <div style="font-size:10.5px;font-weight:700;color:#1e2235">Data de Emiss\u00e3o</div>
           <div style="font-size:9px;color:#6b7280">${dateStr}</div>
         </div>
       </div>
     </div>
     <div class="rp-footer">
-      <span>AMBRAC · Medicina e Segurança do Trabalho — ${repTitle}</span>
-      <span>Documento técnico sigiloso. Análise sob responsabilidade de profissional habilitado. Uso restrito a saúde ocupacional.</span>
+      <span>AMBRAC \u00b7 Medicina e Seguran\u00e7a do Trabalho \u2014 ${repTitle}</span>
+      <span>Documento t\u00e9cnico sigiloso. An\u00e1lise sob responsabilidade de profissional habilitado.</span>
     </div>
   </div></body></html>`;
 
