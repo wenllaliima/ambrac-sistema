@@ -3977,7 +3977,7 @@ function printReport(type) {
   const sn=(base)=>base+(hasNps&&base>=3?0:hasNps?0:base>=3?-1:-0);
   // secção numbering: 1=Obj 2=Met 3=NPS(if) 4=Dim 5=Fat 6=Setor(if) 7=Plano 8=Conclusão
   const snDim=hasNps?4:3, snFat=hasNps?5:4, snSetor=hasNps?6:5, snPlano=hasSectors?(hasNps?7:6):(hasNps?6:5), snConc=hasSectors?(hasNps?8:7):(hasNps?7:6);
-  const capName = s => s ? s.replace(/\b\w/g, c=>c.toUpperCase()) : s;
+  const capName = s => s ? s.toLowerCase().replace(/\b\w/g, c=>c.toUpperCase()) : s;
   const mgrNameDisplay = currentMgr?.name ? capName(currentMgr.name) : 'AMBRAC \u2014 Medicina e Seguran\u00e7a do Trabalho';
   const mgrSigName = currentMgr?.name ? capName(currentMgr.name) : 'Respons\u00e1vel T\u00e9cnico';
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${repTitle} \u2014 AMBRAC</title>
