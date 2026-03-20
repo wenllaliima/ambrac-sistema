@@ -8679,9 +8679,9 @@ function buildSetorDetailHTML(allResps, dims, dimScores, prefix) {
 // ═══════════════════════════════════════
 // PATCH doMgrLogin — update sidebar info, restore nav groups, update mobile nav
 // ═══════════════════════════════════════
-const _origDoMgrLogin = doMgrLogin;
+const _origDoMgrLogin2 = doMgrLogin;
 doMgrLogin = function() {
-  _origDoMgrLogin();
+  _origDoMgrLogin2();
   // Update sidebar manager info
   if (currentMgr) {
     const infoEl = $('sbMgrInfo');
