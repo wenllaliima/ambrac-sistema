@@ -4,6 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AMBRAC – Sistema de Avaliação Ocupacional</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e4d3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AMBRAC">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -247,6 +252,24 @@ body.manager-mode{
 .succ-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:50px 44px;text-align:center;max-width:450px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.08)}
 .succ-card h2{font-family:'Fraunces',serif;font-size:25px;font-weight:700;margin-bottom:10px}
 .succ-card p{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.75}
+
+/* ── Paginated Survey ── */
+.sq-page{display:flex;flex-direction:column;min-height:calc(100vh - 60px);padding:0}
+.sq-progress-bar{position:sticky;top:60px;z-index:10;background:#fff;padding:10px 18px;border-bottom:1px solid var(--border)}
+.sq-progress-track{height:6px;background:#e5e7eb;border-radius:3px;margin-top:6px;overflow:hidden}
+.sq-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+.sq-qbody{flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 20px;max-width:640px;margin:0 auto;width:100%}
+.sq-qnum{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.sq-qtext{font-size:18px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:28px}
+.sq-opts{display:flex;flex-direction:column;gap:10px}
+.sq-opt{padding:14px 18px;border:2px solid var(--border);border-radius:12px;font-size:15px;cursor:pointer;transition:all .15s;background:#fff;text-align:left;font-family:inherit;color:var(--text)}
+.sq-opt:hover{border-color:var(--accent);background:#f0f4ff}
+.sq-opt.selected{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}
+.sq-nav{display:flex;gap:12px;padding:16px 20px;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0}
+.sq-nav-prev{flex:1;padding:14px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;background:#fff;color:var(--text);font-family:inherit}
+.sq-nav-next{flex:2;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-family:inherit}
+.sq-nav-next:disabled{background:#9ca3af;cursor:not-allowed}
+.sq-section-title{font-size:13px;color:var(--accent);font-weight:600;background:#f0f4ff;border-radius:8px;padding:8px 12px;margin-bottom:16px}
 
 /* MANAGER LOGIN */
 .m-login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -1025,6 +1048,15 @@ body.manager-mode{
             <div class="chart-card"><h4>Distribuição por questionário</h4><div style="height:220px"><canvas id="chDist"></canvas></div></div>
           </div>
           <div class="chart-card"><h4>Respostas ao longo do tempo (14 dias)</h4><div style="height:180px"><canvas id="chTime"></canvas></div></div>
+
+          <!-- NR-1 Compliance Section -->
+          <div style="margin-bottom:24px;margin-top:24px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <h3 style="font-size:15px;font-weight:700;color:var(--accent)">Conformidade NR-1 por Empresa</h3>
+              <button class="abtn ab-ghost" onclick="renderNR1Compliance()" style="font-size:12px">↻ Atualizar</button>
+            </div>
+            <div id="nr1ComplianceGrid"></div>
+          </div>
         </div>
 
         <!-- COMPANIES -->
@@ -7340,6 +7372,222 @@ navTo=function(pid,btn){
   else if(pid==='pPGR')renderPGRPreview();
 };
 
+// ═══════════════════════════════════════════════════════
+// PAGINATED SURVEY ENGINE
+// ═══════════════════════════════════════════════════════
+const PQ = {
+  type: null,
+  questions: [],
+  current: 0,
+  answers: {},
+  screenId: null,
+
+  scales: {
+    standard: ['Nunca/Quase nunca','Raramente','Às vezes','Frequentemente','Sempre'],
+    nada:     ['Nada/Quase nada','Um pouco','Moderadamente','Muito','Extremamente'],
+    saude:    ['Excelente','Muito boa','Boa','Razoável','Deficitária'],
+  },
+
+  init(type, questions, ansObj, screenId) {
+    this.type = type;
+    this.questions = questions;
+    this.current = 0;
+    this.answers = ansObj;
+    this.screenId = screenId;
+    this.render();
+  },
+
+  getScale(q) {
+    if (typeof q === 'string') return this.scales.standard;
+    if (q.sec === 2 || q.sec === 4) return this.scales.nada;
+    if (q.sec === 3) return this.scales.saude;
+    if (q.scale === 'nada') return this.scales.nada;
+    if (q.scale === 'saude') return this.scales.saude;
+    return this.scales.standard;
+  },
+
+  getSectionTitle(idx) {
+    const q = this.questions[idx];
+    if (!q || q.sec == null) return null;
+    if (this.type === 'copsoq2s' && typeof C2S_SECTIONS !== 'undefined') {
+      const s = C2S_SECTIONS[q.sec];
+      return s ? s.title : null;
+    }
+    return null;
+  },
+
+  render() {
+    const cont = $('sqContainer'); if (!cont) return;
+    const q = this.questions[this.current];
+    if (!q) return;
+    const total = this.questions.length;
+    const pct = Math.round((this.current / total) * 100);
+    const scale = this.getScale(q);
+    const curVal = this.answers['q' + this.current];
+    const secTitle = this.getSectionTitle(this.current);
+    const qText = typeof q === 'string' ? q : (q.t || q.text || '');
+
+    cont.innerHTML = `
+      <div class="sq-progress-bar">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+          <span>Questão ${this.current + 1} de ${total}</span>
+          <span>${pct}% concluído</span>
+        </div>
+        <div class="sq-progress-track"><div class="sq-progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="sq-qbody">
+        ${secTitle ? `<div class="sq-section-title">${secTitle}</div>` : ''}
+        <div class="sq-qnum">Questão ${this.current + 1}</div>
+        <div class="sq-qtext">${qText}</div>
+        <div class="sq-opts">
+          ${scale.map((label, i) => `
+            <button class="sq-opt${curVal === (i + 1) ? ' selected' : ''}"
+              onclick="PQ.select(${i + 1})">${label}</button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="sq-nav">
+        <button class="sq-nav-prev" onclick="PQ.prev()" ${this.current === 0 ? 'style="visibility:hidden"' : ''}>← Anterior</button>
+        <button class="sq-nav-next" id="sqNextBtn" onclick="PQ.next()" ${curVal == null ? 'disabled' : ''}>
+          ${this.current === total - 1 ? 'Enviar respostas ✓' : 'Próxima →'}
+        </button>
+      </div>`;
+  },
+
+  select(val) {
+    const prevVal = this.answers['q' + this.current];
+    this.answers['q' + this.current] = val;
+    this.render();
+    if (this.current < this.questions.length - 1) {
+      setTimeout(() => { if (this.answers['q' + this.current] === val) this.next(); }, 500);
+    }
+  },
+
+  prev() {
+    if (this.current > 0) { this.current--; this.render(); window.scrollTo(0,0); }
+  },
+
+  next() {
+    if (this.current < this.questions.length - 1) {
+      this.current++;
+      this.render();
+      window.scrollTo(0, 0);
+    } else {
+      submitForm(this.type);
+    }
+  }
+};
+
+// Override startQ to use paginated engine for all surveys
+(function(){
+  const _origPQ = startQ;
+  startQ = function(type) {
+    let qs, ansObj, title;
+    if (type === 'copsoq' || type === 'copsoq2') {
+      // flatten CQ_SECS into a question array
+      qs = [];
+      CQ_SECS.forEach(sec => sec.qs.forEach(q => qs.push(q)));
+      cqAns = {};
+      ansObj = cqAns;
+      title = 'COPSOQ II — 76 questões';
+    } else if (type === 'copsoq2s') {
+      if (done[CU.email+'_copsoq2s']) return;
+      c2sAns = {};
+      qs = C2S_Q;
+      ansObj = c2sAns;
+      title = 'COPSOQ II Curta — 41 questões';
+    } else if (type === 'copsoq3') {
+      if (done[CU.email+'_copsoq3']) return;
+      c3Ans = {};
+      qs = C3_Q;
+      ansObj = c3Ans;
+      title = 'COPSOQ III — 40 questões';
+    } else if (type === 'bemestar') {
+      if (done[CU.email+'_bemestar']) return;
+      beAns = {};
+      qs = BE_Q.map(t => ({t}));
+      ansObj = beAns;
+      title = 'AOT — 24 questões';
+    } else {
+      return _origPQ ? _origPQ(type) : null;
+    }
+    if (type === 'copsoq' || type === 'copsoq2') {
+      if (done[CU.email+'_copsoq']) return;
+    }
+    if (!qs || !qs.length) return _origPQ ? _origPQ(type) : null;
+    $('sqTitle').textContent = title;
+    PQ.init(type, qs, ansObj, 'sSQ');
+    showSc('sSQ');
+  };
+})();
+
+// ═══════════════════════════════════════════════════════
+// NR-1 COMPLIANCE DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderNR1Compliance() {
+  const cont = $('nr1ComplianceGrid'); if (!cont) return;
+  const cos = visibleCompanies();
+  if (!cos.length) { cont.innerHTML = '<p style="color:var(--muted);font-size:13px">Nenhuma empresa cadastrada.</p>'; return; }
+
+  cont.innerHTML = cos.map(co => {
+    const resps = (STATE.responses || []).filter(r => r.empresa === co.id);
+    const ghes = (STATE.ghes || []).filter(g => g.empresa === co.id);
+    const perigos = (STATE.perigos || []).filter(p => p.empresa === co.id);
+    const plano = (ACTION_PLANS || []).filter(a => !a.empresa || a.empresa === co.id);
+    const aets = (STATE.aets || []).filter(a => a.empresa === co.id);
+
+    const checks = [
+      { label: 'Avaliação psicossocial realizada', done: resps.length >= 5, tip: `${resps.length} respostas coletadas (mín. 5)` },
+      { label: 'GHEs definidos', done: ghes.length > 0, tip: `${ghes.length} GHE(s) cadastrado(s)` },
+      { label: 'Inventário de riscos preenchido', done: perigos.length > 0, tip: `${perigos.length} perigo(s) identificado(s)` },
+      { label: 'CNAE informado (NTEP)', done: !!co.cnae, tip: co.cnae ? `CNAE: ${co.cnae}` : 'Informe o CNAE na ficha da empresa' },
+      { label: 'Plano de ação elaborado', done: plano.length > 0, tip: `${plano.length} ação(ões) no plano` },
+      { label: 'AET (NR-17) realizada', done: aets.length > 0, tip: `${aets.length} AET(s) cadastrada(s)` },
+    ];
+
+    const doneCount = checks.filter(c => c.done).length;
+    const pct = Math.round((doneCount / checks.length) * 100);
+    const color = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    const label = pct >= 80 ? 'Conforme' : pct >= 50 ? 'Em andamento' : 'Atenção';
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <strong style="font-size:14px">${co.nome}</strong>
+          ${co.cnae ? `<span style="font-size:11px;color:var(--muted);margin-left:8px">CNAE ${co.cnae}</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:${color}">${pct}% — ${label}</div>
+          <div style="width:60px;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${checks.map(c => `
+          <div style="display:flex;align-items:center;gap:7px;font-size:12.5px" title="${c.tip}">
+            <span style="width:18px;height:18px;border-radius:50%;background:${c.done ? '#22c55e' : '#e5e7eb'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:${c.done ? '#fff' : '#9ca3af'};font-weight:700">${c.done ? '✓' : '○'}</span>
+            <span style="color:${c.done ? 'var(--text)' : 'var(--muted)'}">${c.label}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Hook renderOv to also render NR-1 compliance
+const _origRenderOv = renderOv;
+renderOv = function() {
+  _origRenderOv();
+  renderNR1Compliance();
+};
+
+// PWA Service Worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
 </script>
 
 <!-- MODAL: GHE -->
@@ -7398,6 +7646,14 @@ navTo=function(pid,btn){
     </div>
     <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mPerigo')">Cancelar</button><button class="abtn ab-pri" onclick="savePerigo()">Salvar Perigo</button></div>
   </div>
+</div>
+
+<!-- PAGINATED SURVEY SCREEN -->
+<div id="sSQ" class="screen">
+  <div class="q-topbar">
+    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle" id="sqTitle">Questionário</span></div>
+  </div>
+  <div id="sqContainer" class="sq-page"></div>
 </div>
 
 <!-- MODAL: AET -->
