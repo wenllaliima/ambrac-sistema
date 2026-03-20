@@ -1541,8 +1541,9 @@ body.manager-mode{
     </div>
     <div class="modal-body" id="ncPanel1">
       <div class="form-grid"><div class="form-group"><label>Nome *</label><input id="nc_nome" placeholder="Indústria XYZ Ltda"/></div><div class="form-group"><label>CNPJ</label><input id="nc_cnpj" placeholder="00.000.000/0000-00" oninput="maskCNPJ(this)"/></div></div>
-      <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="nc_setor" placeholder="Indústria, Saúde, Varejo…"/></div><div class="form-group"><label>Contato RH</label><input id="nc_rh" placeholder="Nome do responsável"/></div></div>
-      <div class="form-grid"><div class="form-group"><label>E-mail RH</label><input id="nc_email" type="email" placeholder="rh@empresa.com.br"/></div><div class="form-group"><label>Questionário atribuído *</label>
+      <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="nc_setor" placeholder="Indústria, Saúde, Varejo…"/></div><div class="form-group"><label>CNAE (código)</label><input id="nc_cnae" placeholder="Ex.: 6201-5/00" maxlength="10"/></div></div>
+      <div class="form-grid"><div class="form-group"><label>Contato RH</label><input id="nc_rh" placeholder="Nome do responsável"/></div><div class="form-group"><label>E-mail RH</label><input id="nc_email" type="email" placeholder="rh@empresa.com.br"/></div></div>
+      <div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Questionário atribuído *</label>
         <select id="nc_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II Completo (76q)</option><option value="copsoq2s">COPSOQ II Curta (41q)</option><option value="copsoq3">COPSOQ III (40q)</option><option value="bemestar">AOT (24q)</option><option value="ambos">Todos</option></select>
       </div></div>
       <div class="form-group"><label>Informações adicionais</label><textarea id="nc_info" placeholder="Observações, contexto, histórico da empresa…" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
@@ -1622,11 +1623,11 @@ body.manager-mode{
     <div class="modal-body" id="ecPanel1">
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11.5px;color:var(--muted)">ID: <strong id="ecIdDisplay" style="color:var(--text);font-family:monospace;font-size:12px"></strong></div>
       <div class="form-grid"><div class="form-group"><label>Nome *</label><input id="ec_nome"/></div><div class="form-group"><label>CNPJ</label><input id="ec_cnpj" oninput="maskCNPJ(this)"/></div></div>
-      <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="ec_setor"/></div><div class="form-group"><label>Contato RH</label><input id="ec_rh"/></div></div>
-      <div class="form-grid"><div class="form-group"><label>E-mail RH</label><input id="ec_email" type="email"/></div><div class="form-group"><label>Status</label>
+      <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="ec_setor"/></div><div class="form-group"><label>CNAE (código)</label><input id="ec_cnae" placeholder="Ex.: 6201-5/00" maxlength="10"/></div></div>
+      <div class="form-grid"><div class="form-group"><label>Contato RH</label><input id="ec_rh"/></div><div class="form-group"><label>E-mail RH</label><input id="ec_email" type="email"/></div></div>
+      <div class="form-grid"><div class="form-group"><label>Status</label>
         <select id="ec_status"><option value="ativo">Ativo</option><option value="inconclusivo">Inconclusivo</option><option value="concluido">Concluído</option></select>
-      </div></div>
-      <div class="form-grid"><div class="form-group"><label>Questionário *</label>
+      </div><div class="form-group"><label>Questionário *</label>
         <select id="ec_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II Completo (76q)</option><option value="copsoq2s">COPSOQ II Curta (41q)</option><option value="copsoq3">COPSOQ III (40q)</option><option value="bemestar">AOT (24q)</option><option value="ambos">Ambos</option></select>
       </div></div>
       <div class="form-group"><label>Informações adicionais</label><textarea id="ec_info" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
@@ -2583,7 +2584,7 @@ function renderCo(f){
     const unids=(co.unidades||[]).length;const ghes=(co.ghes||[]).length;
     return `<tr>
       <td><span style="font-family:monospace;font-size:11px;background:var(--surface3);padding:2px 7px;border-radius:5px;color:var(--muted)">#${shortId}</span></td>
-      <td><div style="font-weight:600">${co.nome}</div><div style="font-size:11px;color:var(--muted)">${co.email||''}</div></td>
+      <td><div style="font-weight:600">${co.nome}${co.cnae?` <span style="font-size:10px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--muted);font-weight:400;margin-left:4px">CNAE ${co.cnae}</span>`:''}</div><div style="font-size:11px;color:var(--muted)">${co.email||''}</div></td>
       <td style="color:var(--muted);font-size:12px">${co.cnpj||'—'}</td>
       <td>${qBadge}</td>
       <td>${co.colaboradores.length}</td>
@@ -2591,7 +2592,7 @@ function renderCo(f){
       <td><span style="color:${ghes?'var(--text)':'var(--muted)'}">${ghes}</span></td>
       <td>${resp.length} <span style="font-size:11px;color:var(--muted)">(${taxa}%)</span></td>
       <td>${statusBadge(co.status||'ativo')}</td>
-      <td><div class="row-acts"><button class="icon-btn" onclick="editCo('${co.id}')" title="Editar">Editar</button></div></td>
+      <td><div class="row-acts">${co.cnae?`<button class="icon-btn" onclick="showNTEP('${co.cnae}','${co.nome.replace(/'/g,"\\'")}')" title="Ver NTEP">NTEP</button>`:''}  <button class="icon-btn" onclick="editCo('${co.id}')" title="Editar">Editar</button></div></td>
     </tr>`;
   }).join('');
 }
@@ -2602,9 +2603,9 @@ function saveCo(){
   const quest=$('nc_quest').value;if(!quest){alert('Selecione o questionário.');return;}
   const newId='c'+Date.now();
   const colabs=(window._ncColabs||[]).map((x,i)=>({...x,id:'col'+Date.now()+i}));
-  STATE.companies.push({id:newId,nome,cnpj:$('nc_cnpj').value,setor:$('nc_setor').value,rh:$('nc_rh').value,email:$('nc_email').value,questionario:quest,info:$('nc_info').value,status:'ativo',colaboradores:colabs,unidades:[],ghes:[],createdAt:new Date().toISOString()});
+  STATE.companies.push({id:newId,nome,cnpj:$('nc_cnpj').value,setor:$('nc_setor').value,cnae:$('nc_cnae')?.value||'',rh:$('nc_rh').value,email:$('nc_email').value,questionario:quest,info:$('nc_info').value,status:'ativo',colaboradores:colabs,unidades:[],ghes:[],createdAt:new Date().toISOString()});
   saveState();closeModal('mNewCo');
-  ['nc_nome','nc_cnpj','nc_setor','nc_rh','nc_email','nc_info'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  ['nc_nome','nc_cnpj','nc_setor','nc_cnae','nc_rh','nc_email','nc_info'].forEach(id=>{const el=$(id);if(el)el.value='';});
   $('nc_quest').value='';window._ncColabs=[];switchNcTab(1);renderNcColabList();
   renderCo();updateMgrSelects();
 }
@@ -2612,6 +2613,7 @@ function saveCo(){
 function editCo(id){
   const co=STATE.companies.find(x=>x.id===id);if(!co)return;
   $('ec_nome').value=co.nome||'';$('ec_cnpj').value=co.cnpj||'';$('ec_setor').value=co.setor||'';
+  if($('ec_cnae'))$('ec_cnae').value=co.cnae||'';
   $('ec_rh').value=co.rh||'';$('ec_email').value=co.email||'';$('ec_quest').value=co.questionario||'';
   $('ec_status').value=co.status||'ativo';$('ec_info').value=co.info||'';$('ecIdDisplay').textContent=co.id;
   $('mEditCo').dataset.editId=id;$('mEditCoTitle').textContent='Editar — '+co.nome;
@@ -2704,7 +2706,7 @@ function saveEditCo(){
   const id=$('mEditCo').dataset.editId;const co=STATE.companies.find(x=>x.id===id);if(!co)return;
   const nome=$('ec_nome').value.trim();if(!nome){alert('Informe o nome.');return;}
   const quest=$('ec_quest').value;if(!quest){alert('Selecione o questionário.');return;}
-  co.nome=nome;co.cnpj=$('ec_cnpj').value;co.setor=$('ec_setor').value;co.rh=$('ec_rh').value;
+  co.nome=nome;co.cnpj=$('ec_cnpj').value;co.setor=$('ec_setor').value;co.cnae=$('ec_cnae')?.value||'';co.rh=$('ec_rh').value;
   co.email=$('ec_email').value;co.questionario=quest;co.status=$('ec_status').value;co.info=$('ec_info').value;
   saveState();closeModal('mEditCo');renderCo();updateMgrSelects();
 }
@@ -6645,6 +6647,213 @@ const CATALOGO_PERIGOS=[
   {cat:'Psicossocial',nome:'Conflito trabalho-família',dano:'Estresse, esgotamento, problemas de saúde crônicos',nr:'NR-1 / OMS'},
 ];
 
+// ─── NTEP — Nexo Técnico Epidemiológico Previdenciário ───────────
+// Fonte: INSS / Decreto 6.042/2007 — principais correlações por seção CNAE
+const NTEP_TABLE = [
+  // ── SEÇÃO A — Agricultura, Pecuária, Produção Florestal
+  {cnae_sec:'A', cnae_div:'01-03', desc_cnae:'Agricultura, Pecuária e Silvicultura',
+   cids:[
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'M79.2',desc:'Nevralgia e neurite não especificadas',grupo:'Osteomuscular'},
+    {cid:'J00-J99',desc:'Doenças respiratórias por exposição a poeiras orgânicas/agrotóxicos',grupo:'Respiratório'},
+    {cid:'S00-T98',desc:'Traumatismos e envenenamentos (acidentes rurais)',grupo:'Acidente'},
+    {cid:'Z57.1',desc:'Exposição a radiação (solar)',grupo:'Ambiental'},
+    {cid:'L55-L59',desc:'Fotodermatoses (doenças de pele por radiação)',grupo:'Dermatológico'},
+   ]},
+  // ── SEÇÃO B — Indústrias Extrativas
+  {cnae_sec:'B', cnae_div:'05-09', desc_cnae:'Mineração, extração de petróleo e gás',
+   cids:[
+    {cid:'J60',desc:'Pneumoconiose dos trabalhadores do carvão',grupo:'Respiratório'},
+    {cid:'J61',desc:'Pneumoconiose devida ao amianto e outras fibras minerais',grupo:'Respiratório'},
+    {cid:'J62',desc:'Pneumoconiose devida a poeiras que contêm sílica',grupo:'Respiratório'},
+    {cid:'J63',desc:'Pneumoconiose devida a outras poeiras inorgânicas',grupo:'Respiratório'},
+    {cid:'C34',desc:'Tumor maligno dos brônquios e dos pulmões (amianto)',grupo:'Neoplasia'},
+    {cid:'H83.3',desc:'Efeitos do ruído sobre o ouvido interno (PAIR)',grupo:'Auditivo'},
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'S00-T98',desc:'Traumatismos — quedas e soterramento',grupo:'Acidente'},
+   ]},
+  // ── SEÇÃO C — Indústrias de Transformação
+  {cnae_sec:'C', cnae_div:'10-33', desc_cnae:'Indústria de transformação (manufatura)',
+   cids:[
+    {cid:'H83.3',desc:'Perda auditiva induzida por ruído — PAIR',grupo:'Auditivo'},
+    {cid:'M65',desc:'Sinovite e tenossinovite (LER/DORT)',grupo:'Osteomuscular'},
+    {cid:'M75',desc:'Lesões do ombro (LER/DORT)',grupo:'Osteomuscular'},
+    {cid:'M77.1',desc:'Epicondilite lateral (cotovelo de tenista)',grupo:'Osteomuscular'},
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo',grupo:'Osteomuscular'},
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'J60-J70',desc:'Pneumoconioses e doenças respiratórias ocupacionais',grupo:'Respiratório'},
+    {cid:'L23-L25',desc:'Dermatites de contato (produtos químicos)',grupo:'Dermatológico'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Outros transtornos ansiosos (estresse ocupacional)',grupo:'Saúde Mental'},
+    {cid:'S00-T98',desc:'Traumatismos — máquinas e equipamentos',grupo:'Acidente'},
+   ]},
+  // ── SEÇÃO D — Eletricidade e Gás
+  {cnae_sec:'D', cnae_div:'35-35', desc_cnae:'Eletricidade, gás e outras utilidades',
+   cids:[
+    {cid:'T75.4',desc:'Efeitos da corrente elétrica (choque)',grupo:'Acidente'},
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F43.1',desc:'Estado de estresse pós-traumático',grupo:'Saúde Mental'},
+   ]},
+  // ── SEÇÃO F — Construção Civil
+  {cnae_sec:'F', cnae_div:'41-43', desc_cnae:'Construção civil e obras de engenharia',
+   cids:[
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'M75',desc:'Lesões do ombro (sobrecarga)',grupo:'Osteomuscular'},
+    {cid:'S52',desc:'Fratura do antebraço (queda)',grupo:'Acidente'},
+    {cid:'S72',desc:'Fratura do fêmur (queda de altura)',grupo:'Acidente'},
+    {cid:'H83.3',desc:'PAIR por ruído de obras',grupo:'Auditivo'},
+    {cid:'J62',desc:'Silicose (corte e lixamento de concreto)',grupo:'Respiratório'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos',grupo:'Saúde Mental'},
+    {cid:'L23',desc:'Dermatite de contato alérgica (cimento)',grupo:'Dermatológico'},
+   ]},
+  // ── SEÇÃO G — Comércio
+  {cnae_sec:'G', cnae_div:'45-47', desc_cnae:'Comércio atacadista e varejista',
+   cids:[
+    {cid:'M54.5',desc:'Dor lombar baixa (esforço em estoque)',grupo:'Osteomuscular'},
+    {cid:'M79.3',desc:'Paniculite (trabalho em pé prolongado)',grupo:'Osteomuscular'},
+    {cid:'I83',desc:'Varizes dos membros inferiores (trabalho em pé)',grupo:'Circulatório'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41.1',desc:'Transtorno de ansiedade generalizada',grupo:'Saúde Mental'},
+    {cid:'F43',desc:'Reações ao estresse grave (pressão por metas)',grupo:'Saúde Mental'},
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo (operadores de caixa)',grupo:'Osteomuscular'},
+   ]},
+  // ── SEÇÃO H — Transporte e Armazenagem
+  {cnae_sec:'H', cnae_div:'49-53', desc_cnae:'Transporte terrestre, aquático, aéreo e armazenagem',
+   cids:[
+    {cid:'M54.5',desc:'Dor lombar baixa (vibração de corpo inteiro)',grupo:'Osteomuscular'},
+    {cid:'M47',desc:'Espondilose (vibração corpo inteiro — motoristas)',grupo:'Osteomuscular'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F43.1',desc:'TEPT (acidentes de trânsito com vítimas)',grupo:'Saúde Mental'},
+    {cid:'G47.3',desc:'Apneia do sono (motoristas)',grupo:'Neurológico'},
+    {cid:'I10',desc:'Hipertensão arterial primária (estresse)',grupo:'Cardiovascular'},
+    {cid:'S00-T98',desc:'Traumatismos em acidentes de transporte',grupo:'Acidente'},
+   ]},
+  // ── SEÇÃO I — Alojamento e Alimentação
+  {cnae_sec:'I', cnae_div:'55-56', desc_cnae:'Hotéis, restaurantes e serviços de alimentação',
+   cids:[
+    {cid:'M65',desc:'Sinovite/tenossinovite (trabalho repetitivo)',grupo:'Osteomuscular'},
+    {cid:'L23-L25',desc:'Dermatites de contato (detergentes, alimentos)',grupo:'Dermatológico'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos (carga horária)',grupo:'Saúde Mental'},
+    {cid:'I83',desc:'Varizes (trabalho em pé)',grupo:'Circulatório'},
+   ]},
+  // ── SEÇÃO J — Informação e Comunicação / TI
+  {cnae_sec:'J', cnae_div:'58-63', desc_cnae:'Tecnologia da informação, telecomunicações e mídia',
+   cids:[
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo',grupo:'Osteomuscular'},
+    {cid:'M65.3',desc:'Dedo em gatilho / tenossinovite estenosante',grupo:'Osteomuscular'},
+    {cid:'M54.2',desc:'Cervicalgia (postura inadequada)',grupo:'Osteomuscular'},
+    {cid:'H52',desc:'Distúrbios da acomodação visual (tela)',grupo:'Visual'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41.1',desc:'Transtorno de ansiedade generalizada',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Esgotamento (Burnout)',grupo:'Saúde Mental'},
+    {cid:'Z73.0',desc:'Esgotamento profissional — Síndrome de Burnout',grupo:'Saúde Mental'},
+   ]},
+  // ── SEÇÃO K — Atividades Financeiras
+  {cnae_sec:'K', cnae_div:'64-66', desc_cnae:'Serviços financeiros, seguros e previdência',
+   cids:[
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41.1',desc:'Transtorno de ansiedade generalizada (metas)',grupo:'Saúde Mental'},
+    {cid:'F43',desc:'Reações ao estresse — pressão por resultados',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Burnout',grupo:'Saúde Mental'},
+    {cid:'Z73.0',desc:'Síndrome de Burnout (CID-11 oficial)',grupo:'Saúde Mental'},
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo (digitação)',grupo:'Osteomuscular'},
+    {cid:'M54.2',desc:'Cervicalgia',grupo:'Osteomuscular'},
+    {cid:'I10',desc:'Hipertensão arterial (estresse crônico)',grupo:'Cardiovascular'},
+   ]},
+  // ── SEÇÃO M — Atividades Profissionais, Científicas e Técnicas
+  {cnae_sec:'M', cnae_div:'69-75', desc_cnae:'Atividades jurídicas, contábeis, arquitetura, engenharia, pesquisa',
+   cids:[
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Burnout',grupo:'Saúde Mental'},
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo',grupo:'Osteomuscular'},
+    {cid:'M54.2',desc:'Cervicalgia',grupo:'Osteomuscular'},
+    {cid:'H52',desc:'Distúrbios de refração visual',grupo:'Visual'},
+   ]},
+  // ── SEÇÃO N — Atividades Administrativas e Serviços Complementares
+  {cnae_sec:'N', cnae_div:'77-82', desc_cnae:'Serviços de apoio a escritórios, call center, limpeza, vigilância',
+   cids:[
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos',grupo:'Saúde Mental'},
+    {cid:'F43',desc:'Reações ao estresse grave (assédio, metas)',grupo:'Saúde Mental'},
+    {cid:'Z73.0',desc:'Síndrome de Burnout',grupo:'Saúde Mental'},
+    {cid:'M65',desc:'Tenossinovite (call center, digitação)',grupo:'Osteomuscular'},
+    {cid:'G56.0',desc:'Síndrome do túnel do carpo',grupo:'Osteomuscular'},
+    {cid:'I83',desc:'Varizes (vigilantes, trabalho em pé)',grupo:'Circulatório'},
+    {cid:'L23',desc:'Dermatite de contato (limpeza)',grupo:'Dermatológico'},
+   ]},
+  // ── SEÇÃO O — Administração Pública
+  {cnae_sec:'O', cnae_div:'84-84', desc_cnae:'Administração pública, defesa e seguridade social',
+   cids:[
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos',grupo:'Saúde Mental'},
+    {cid:'F43.1',desc:'TEPT (policiais, bombeiros)',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Burnout (servidores)',grupo:'Saúde Mental'},
+    {cid:'M54.5',desc:'Dor lombar baixa',grupo:'Osteomuscular'},
+    {cid:'S00-T98',desc:'Traumatismos (forças de segurança)',grupo:'Acidente'},
+   ]},
+  // ── SEÇÃO P — Educação
+  {cnae_sec:'P', cnae_div:'85-85', desc_cnae:'Educação — ensino básico, médio, superior',
+   cids:[
+    {cid:'J38.3',desc:'Outras doenças das pregas vocais — disfonia (professores)',grupo:'Voz'},
+    {cid:'J04',desc:'Laringite aguda (professores)',grupo:'Voz'},
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F41',desc:'Transtornos ansiosos',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Burnout (professores)',grupo:'Saúde Mental'},
+    {cid:'M54.2',desc:'Cervicalgia',grupo:'Osteomuscular'},
+    {cid:'I83',desc:'Varizes (trabalho em pé)',grupo:'Circulatório'},
+   ]},
+  // ── SEÇÃO Q — Saúde Humana e Serviços Sociais
+  {cnae_sec:'Q', cnae_div:'86-88', desc_cnae:'Hospitais, clínicas, serviços de saúde e assistência social',
+   cids:[
+    {cid:'F32',desc:'Episódio depressivo',grupo:'Saúde Mental'},
+    {cid:'F43.1',desc:'TEPT (trauma vicário, violência)',grupo:'Saúde Mental'},
+    {cid:'F48.0',desc:'Neurastenia / Burnout (profissionais de saúde)',grupo:'Saúde Mental'},
+    {cid:'Z73.0',desc:'Síndrome de Burnout',grupo:'Saúde Mental'},
+    {cid:'M65',desc:'Tenossinovite (cirurgiões, enfermagem)',grupo:'Osteomuscular'},
+    {cid:'M54.5',desc:'Dor lombar baixa (movimentação de pacientes)',grupo:'Osteomuscular'},
+    {cid:'B20-B24',desc:'HIV/AIDS (exposição a material biológico)',grupo:'Infeccioso'},
+    {cid:'B15-B19',desc:'Hepatites virais (exposição percutânea)',grupo:'Infeccioso'},
+    {cid:'A15-A19',desc:'Tuberculose (exposição a pacientes)',grupo:'Infeccioso'},
+    {cid:'Z57.8',desc:'Exposição a outros fatores de risco no local de trabalho',grupo:'Ambiental'},
+   ]},
+];
+
+// Lookup NTEP by CNAE code
+function getNTEPByCNAE(cnae){
+  if(!cnae)return null;
+  const clean=cnae.replace(/[^0-9]/g,'').slice(0,2);
+  const divNum=parseInt(clean);
+  if(isNaN(divNum))return null;
+  return NTEP_TABLE.find(row=>{
+    const [start,end]=row.cnae_div.split('-').map(Number);
+    return end?divNum>=start&&divNum<=end:divNum===start;
+  })||null;
+}
+
+// Show NTEP quick-view in reusable help modal
+function showNTEP(cnae, nomeEmpresa){
+  const ntep = getNTEPByCNAE(cnae);
+  const m = $('mInstrHelp');
+  if(!m) return;
+  $('mInstrHelpTitle').textContent = `NTEP — ${nomeEmpresa||'Empresa'} (CNAE ${cnae||'—'})`;
+  if(!ntep){
+    $('mInstrHelpBody').innerHTML = '<p style="color:var(--muted)">CNAE não identificado na tabela NTEP. Verifique o código CNAE da empresa.</p>';
+  } else {
+    $('mInstrHelpBody').innerHTML = `
+      <p><strong>Seção CNAE:</strong> ${ntep.desc_cnae}</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Doenças presumidamente relacionadas ao trabalho neste setor (Decreto 6.042/2007):</p>
+      <table class="pgr-table">
+        <thead><tr><th>CID-10</th><th>Doença / Agravo</th><th>Grupo</th></tr></thead>
+        <tbody>${ntep.cids.map(c=>`<tr><td><strong>${c.cid}</strong></td><td>${c.desc}</td><td><span class="cat-badge">${c.grupo}</span></td></tr>`).join('')}</tbody>
+      </table>`;
+  }
+  m.style.display='flex';
+}
+
 // ─── Risco = Probabilidade × Severidade ─────────────────────────
 function calcRisco(prob,sev){
   const r=parseInt(prob)*parseInt(sev);
@@ -7008,6 +7217,7 @@ function renderPGRPreview(){
           <tr><td style="font-weight:600">CNPJ</td><td>${co.cnpj||'—'}</td></tr>
           <tr><td style="font-weight:600">Endereço</td><td>${co.endereco||'—'}</td></tr>
           <tr><td style="font-weight:600">Atividade econômica</td><td>${co.setor||co.atividade||'—'}</td></tr>
+          <tr><td style="font-weight:600">CNAE</td><td>${co.cnae||'—'}</td></tr>
           <tr><td style="font-weight:600">Nº de trabalhadores</td><td>${co.ntrab||ghes.reduce((s,g)=>s+(parseInt(g.ntrab)||0),0)||'—'}</td></tr>
           <tr><td style="font-weight:600">GHEs cadastrados</td><td>${ghes.length}</td></tr>
         </table>
@@ -7044,15 +7254,34 @@ function renderPGRPreview(){
           </tbody>
         </table>`:`<p style="color:var(--muted)">Menos de 5 respostas coletadas. A anonimização exige mínimo de 5 respondentes por grupo.</p>`}
       </div>
+      ${(()=>{const ntep=getNTEPByCNAE(co.cnae);return ntep?`
+      <div class="pgr-section">
+        <h3>6. Nexo Técnico Epidemiológico Previdenciário — NTEP</h3>
+        <p>Com base no <strong>CNAE ${co.cnae||ntep.cnae_div} — ${ntep.desc_cnae}</strong>, o NTEP (Decreto 6.042/2007) estabelece correlação epidemiológica com as seguintes doenças e agravos ocupacionais. Afastamentos superiores a 15 dias com os CID-10 listados abaixo são presumidamente relacionados ao trabalho, gerando CAT automática e potencial impacto no <strong>FAP (Fator Acidentário de Prevenção)</strong>:</p>
+        <table class="pgr-table">
+          <thead><tr><th>CID-10</th><th>Doença / Agravo</th><th>Grupo</th><th>Atenção PGR</th></tr></thead>
+          <tbody>${ntep.cids.map(c=>`<tr>
+            <td><strong>${c.cid}</strong></td>
+            <td>${c.desc}</td>
+            <td><span class="cat-badge">${c.grupo}</span></td>
+            <td style="font-size:12px;color:var(--muted)">${c.grupo==='Saúde Mental'?'Incluir avaliação psicossocial (COPSOQ/AOT) como evidência':c.grupo==='Osteomuscular'?'Incluir AET (NR-17) e análise ergonômica como evidência':c.grupo==='Respiratório'?'Incluir medições ambientais e uso de EPI respiratório':c.grupo==='Auditivo'?'Incluir PPPA e medição de ruído (NHO-01)':'Incluir controles de engenharia e EPIs'}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px"><strong>Fonte:</strong> INSS — Lista B do NTEP (Decreto 6.042/2007). A identificação de afastamentos com esses CIDs deve ser monitorada pelo eSocial (evento S-2230) e integrada ao monitoramento de indicadores de saúde deste PGR.</p>
+      </div>`:`
+      <div class="pgr-section">
+        <h3>6. Nexo Técnico Epidemiológico Previdenciário — NTEP</h3>
+        <p style="color:var(--muted)">CNAE da empresa não informado ou não identificado na tabela NTEP. Preencha o CNAE na ficha da empresa para exibir as correlações epidemiológicas aplicáveis.</p>
+      </div>`;})()}
       ${aets.length?`<div class="pgr-section">
-        <h3>6. Análise Ergonômica do Trabalho (AET) — NR-17</h3>
+        <h3>7. Análise Ergonômica do Trabalho (AET) — NR-17</h3>
         <table class="pgr-table">
           <thead><tr><th>GHE / Posto</th><th>Data</th><th>Analista</th><th>Nível de Risco</th><th>Prazo</th><th>Recomendações</th></tr></thead>
           <tbody>${aets.map(a=>{const gheName=(STATE.ghes||[]).find(g=>g.id===a.ghe)?.nome||'—';const riskColors={Trivial:'#22c55e',Tolerável:'#84cc16',Moderado:'#f59e0b',Substancial:'#f97316',Intolerável:'#ef4444'};return`<tr><td>${gheName}</td><td>${a.data||'—'}</td><td>${a.analista||'—'}</td><td><span style="color:#fff;background:${riskColors[a.risco]||'#6b7280'};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${a.risco}</span></td><td>${a.prazo||'—'}</td><td style="font-size:12px">${a.rec||'—'}</td></tr>`;}).join('')}</tbody>
         </table>
       </div>`:''}
       <div class="pgr-section">
-        <h3>7. Plano de Ação</h3>
+        <h3>8. Plano de Ação</h3>
         ${(()=>{
           const acoes=[
             ...perigos.filter(p=>p.acao).map(p=>{const r=calcRisco(p.prob,p.sev);return{origem:p.cat,desc:p.acao,risco:r.nivel,cls:r.cls};}),
@@ -7066,7 +7295,7 @@ function renderPGRPreview(){
         })()}
       </div>
       <div class="pgr-section">
-        <h3>8. Conclusão e Revisão</h3>
+        <h3>9. Conclusão e Revisão</h3>
         <p>Este PGR deve ser revisado anualmente ou sempre que houver mudança nas condições de trabalho, introdução de novas tecnologias ou processos, após acidentes graves ou incidentes significativos, e sempre que solicitado por autoridade competente (NR-1.5.3).</p>
         <p>A implementação das medidas de controle identificadas é responsabilidade da alta direção, devendo ser monitorada pelo SESMT ou profissional de SST responsável.</p>
         <table class="pgr-table" style="margin-top:16px">
