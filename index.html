@@ -661,6 +661,15 @@ body.manager-mode{
   .sec-title + .dim-grid { page-break-before: avoid !important; }
   .da-grid, .profile-grid { page-break-before: auto !important; }
   h4, h5 { page-break-after: avoid !important; }
+
+  /* Additional PGR/GHE print improvements */
+  .pgr-section { page-break-inside: avoid }
+  .pgr-section h3 { page-break-after: avoid }
+  .ghe-card { page-break-inside: avoid }
+  canvas { max-width: 100% !important }
+  .pgr-table { page-break-inside: auto }
+  .pgr-table tr { page-break-inside: avoid }
+  #pgrPreview { padding: 0 !important }
 }
 
 /* ── Safety Engineering ── */
@@ -675,6 +684,40 @@ body.manager-mode{
 .pgr-section{margin-bottom:28px}.pgr-section h3{font-size:15px;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:4px;margin-bottom:12px}
 .pgr-table{width:100%;border-collapse:collapse;font-size:13px}.pgr-table th{background:#f0f4ff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid #dbeafe}
 .pgr-table td{padding:7px 10px;border:1px solid var(--border);vertical-align:top}
+
+/* ─── COLLAPSIBLE NAV GROUPS ─── */
+.nav-sec{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.nav-sec-chevron{font-size:10px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.nav-group{overflow:hidden;transition:max-height .25s ease}
+.nav-group.collapsed{max-height:0!important}
+
+/* ─── ACTIVE NAV ITEM INDICATOR ─── */
+.nav-item.active{background:var(--accent-pale,#e8f0fe);color:var(--accent);font-weight:600;border-left:3px solid var(--accent);padding-left:13px}
+
+/* ─── SIDEBAR SCROLLABLE INNER ─── */
+.sb-inner{overflow-y:auto;flex:1;padding-bottom:20px}
+
+/* ─── MOBILE BOTTOM NAV ─── */
+@media(max-width:768px){
+  #mobileBottomNav{display:block!important}
+  .qwrap{padding-bottom:80px}
+  .sq-page{padding-bottom:80px}
+}
+
+/* ─── RESPONSIVE TABLES (card view on mobile) ─── */
+@media(max-width:640px){
+  .pgr-table thead{display:none}
+  .pgr-table tr{display:block;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;padding:10px}
+  .pgr-table td{display:flex;justify-content:space-between;padding:4px 0;border:none;font-size:13px}
+  .pgr-table td::before{content:attr(data-label);font-weight:600;color:var(--muted);margin-right:8px;flex-shrink:0}
+  .ghe-card{border-radius:8px;padding:12px}
+  .ghe-card-hd{flex-direction:column;gap:8px}
+  .perigo-row{grid-template-columns:1fr;gap:4px}
+  .rep-toolbar{flex-direction:column;align-items:stretch}
+  .rep-toolbar select,.rep-toolbar input{width:100%}
+  .modal-box{max-width:100%!important;margin:0;border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:90vh;overflow-y:auto}
+  .modal-overlay{align-items:flex-end!important}
+}
 
 </style>
 </head>
@@ -934,64 +977,87 @@ body.manager-mode{
 <div id="sMgr" class="screen">
   <div class="shell">
     <aside class="sidebar">
-      <div class="sb-logo"><div class="brand">AMBRAC<span>.</span></div><div class="role">Painel de Gerenciamento</div></div>
-      <nav class="sb-nav">
-        <div class="nav-sec">Visão Geral</div>
-        <button class="nav-item active" onclick="navTo('pOv',this)">Dashboard</button>
-        <div class="nav-sec">Empresas</div>
-        <button class="nav-item" onclick="navTo('pCo',this)">Empresas</button>
-        <button class="nav-item" onclick="navTo('pUp',this)">Importar Colaboradores</button>
-        <div class="nav-sec">Relatórios</div>
-        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
-          <button class="nav-item" style="flex:1" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
-          <button onclick="showInstrHelp('copsoq')" title="Manual COPSOQ II" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
-          <button class="nav-item" style="flex:1" onclick="navTo('pRC2S',this)">Relatório COPSOQ II Curta</button>
-          <button onclick="showInstrHelp('copsoq2s')" title="Manual COPSOQ II Curta" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
-          <button class="nav-item" style="flex:1" onclick="navTo('pRC3',this)">Relatório COPSOQ III</button>
-          <button onclick="showInstrHelp('copsoq3')" title="Manual COPSOQ III" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
-          <button class="nav-item" style="flex:1" onclick="navTo('pRBe',this)">Relatório AOT</button>
-          <button onclick="showInstrHelp('aot')" title="Manual AOT" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
-        </div>
-        <button class="nav-item" onclick="navTo('pResp',this)">Respostas Individuais</button>
-        <button class="nav-item" onclick="navTo('pPlano',this)">Plano de Ação</button>
-        <button class="nav-item" onclick="navTo('pPulso',this)">Pulso Mensal</button>
-        <div class="nav-sec">Ferramentas</div>
-        <button class="nav-item" onclick="navTo('pBancoAcoes',this)">Banco de Ações</button>
-        <div class="nav-sec">Segurança do Trabalho</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pGHE',this)">GHE</button>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pInventario',this)">Inventário de Riscos</button>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pMatriz',this)">Matriz de Risco</button>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pAET',this)">AET (NR-17)</button>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pPGR',this)">PGR Completo</button>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="nav-item" style="flex:1" onclick="navTo('pPCMSO',this)">PCMSO (NR-7)</button>
-        </div>
-        <div class="nav-sec">Academy</div>
-        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
-          <button class="nav-item" style="flex:1" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
-          <button onclick="showInstrHelp('academy')" title="Manual Academy" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
-        </div>
-        <div class="nav-sec">Administração</div>
-        <button class="nav-item" onclick="navTo('pHist',this)">Histórico de Relatórios</button>
-        <button class="nav-item" onclick="navTo('pContas',this)">Contas Gerenciais</button>
-        <button class="nav-item" onclick="navTo('pConfig',this)">Configurações</button>
-      </nav>
+      <div class="sb-logo">
+        <div class="brand">AMBRAC<span>.</span></div>
+        <div class="role">Painel de Gerenciamento</div>
+        <div id="sbMgrInfo" style="font-size:12px;color:var(--muted);margin-top:4px;padding:0 4px"></div>
+      </div>
+      <div class="sb-inner">
+        <nav class="sb-nav" style="padding:14px 10px">
+
+          <!-- ── Visão Geral ── -->
+          <div class="nav-sec" data-nav-key="visao" onclick="toggleNavGroup('visao',this)">Visão Geral<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:200px">
+            <button class="nav-item active" onclick="navTo('pOv',this)">Dashboard</button>
+          </div>
+
+          <!-- ── Empresas & Equipes ── -->
+          <div class="nav-sec" data-nav-key="empresas" onclick="toggleNavGroup('empresas',this)">Empresas &amp; Equipes<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:200px">
+            <button class="nav-item" onclick="navTo('pCo',this)">Empresas</button>
+            <button class="nav-item" onclick="navTo('pContas',this)">Gestores</button>
+          </div>
+
+          <!-- ── Avaliação Psicossocial ── -->
+          <div class="nav-sec" data-nav-key="psico" onclick="toggleNavGroup('psico',this)">Avaliação Psicossocial<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:300px">
+            <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+              <button class="nav-item" style="flex:1" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
+              <button onclick="showInstrHelp('copsoq')" title="Manual COPSOQ II" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+              <button class="nav-item" style="flex:1" onclick="navTo('pRC2S',this)">Relatório COPSOQ II Curta</button>
+              <button onclick="showInstrHelp('copsoq2s')" title="Manual COPSOQ II Curta" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+              <button class="nav-item" style="flex:1" onclick="navTo('pRC3',this)">Relatório COPSOQ III</button>
+              <button onclick="showInstrHelp('copsoq3')" title="Manual COPSOQ III" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+              <button class="nav-item" style="flex:1" onclick="navTo('pRBe',this)">Relatório AOT</button>
+              <button onclick="showInstrHelp('aot')" title="Manual AOT" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+            </div>
+          </div>
+
+          <!-- ── PGR / NR-1 ── -->
+          <div class="nav-sec" data-nav-key="pgr" onclick="toggleNavGroup('pgr',this)">PGR / NR-1<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:300px">
+            <button class="nav-item" onclick="navTo('pGHE',this)">GHE</button>
+            <button class="nav-item" onclick="navTo('pInventario',this)">Inventário de Riscos</button>
+            <button class="nav-item" onclick="navTo('pMatriz',this)">Matriz de Risco</button>
+            <button class="nav-item" onclick="navTo('pPlano',this)">Plano de Ação</button>
+            <button class="nav-item" onclick="navTo('pPGR',this)">PGR Completo</button>
+          </div>
+
+          <!-- ── Saúde Ocupacional ── -->
+          <div class="nav-sec" data-nav-key="saude" onclick="toggleNavGroup('saude',this)">Saúde Ocupacional<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:200px">
+            <button class="nav-item" onclick="navTo('pAET',this)">AET (NR-17)</button>
+            <button class="nav-item" onclick="navTo('pPCMSO',this)">PCMSO (NR-7)</button>
+            <button class="nav-item" onclick="navTo('pPulso',this)">Pulse Mensal</button>
+          </div>
+
+          <!-- ── Desenvolvimento ── -->
+          <div class="nav-sec" data-nav-key="dev" onclick="toggleNavGroup('dev',this)">Desenvolvimento<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:200px">
+            <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+              <button class="nav-item" style="flex:1" onclick="navTo('pAcademy',this)">Academy</button>
+              <button onclick="showInstrHelp('academy')" title="Manual Academy" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+            </div>
+            <button class="nav-item" onclick="navTo('pBancoAcoes',this)">Banco de Ações</button>
+          </div>
+
+          <!-- ── Sistema ── -->
+          <div class="nav-sec" data-nav-key="sistema" onclick="toggleNavGroup('sistema',this)">Sistema<span class="nav-sec-chevron">▾</span></div>
+          <div class="nav-group" style="max-height:200px">
+            <button class="nav-item" onclick="navTo('pConfig',this)">Configurações</button>
+            <button class="nav-item" onclick="navTo('pHist',this)">Histórico de Relatórios</button>
+            <button class="nav-item" onclick="navTo('pUp',this)">Importar Colaboradores</button>
+            <button class="nav-item" onclick="navTo('pResp',this)">Respostas Individuais</button>
+          </div>
+
+        </nav>
+      </div>
       <div class="sb-footer">
         <div class="sb-user"><div class="sb-av" id="sbAv">A</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role" id="sbRole">Gerenciador</div><div id="sbPlan" style="font-size:10px;background:var(--accent-pale);color:var(--accent);border-radius:99px;padding:2px 8px;display:inline-block;margin-top:3px;font-weight:600">Essencial</div></div></div>
         <button class="sb-logout" onclick="doMgrLogout()">← Sair do painel</button>
@@ -1009,6 +1075,11 @@ body.manager-mode{
 
         <!-- DASHBOARD -->
         <div class="panel active" id="pOv">
+          <div id="kpiRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px"></div>
+          <div id="activityFeed" style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;max-height:180px;overflow-y:auto">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Atividade Recente</div>
+            <div id="activityList"></div>
+          </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <span style="font-size:13px;color:var(--muted);white-space:nowrap">Filtrar por empresa:</span>
             <input id="ovSearch" placeholder="Nome, CNPJ ou ID da empresa…" oninput="renderOv()" style="flex:1;min-width:220px;padding:8px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
@@ -2390,16 +2461,18 @@ function setTheme(mode){document.body.className=mode+'-mode';}
 // ═══════════════════════════════════════
 function goBack(){showSc('sSel');}
 function doLogout(){
-  CU=null;OTP=null;clearInterval(otpInt);beAns={};cqAns={};
-  $('iNome').value='';$('iEmail').value='';
-  backTo1();
-  // Revoga sessão Google e re-renderiza o botão de login
+  CU=null;OTP=null;clearInterval(otpInt);
+  beAns={};cqAns={};c2sAns={};c3Ans={};pulseAns={};
+  const nome=$('iNome');if(nome)nome.value='';
+  const email=$('iEmail');if(email)email.value='';
+  try{backTo1();}catch(e){}
   if(typeof google!=='undefined'){
     try{ google.accounts.id.disableAutoSelect(); }catch(e){}
   }
   const err=$('errGoogle');if(err){err.className='alert alert-e';err.innerHTML='';}
-  setTimeout(initGoogleSignIn,100);
-  setTheme('participant');showSc('sLogin');
+  setTimeout(()=>{try{initGoogleSignIn();}catch(e){}},100);
+  setTheme('participant');
+  showSc('sLogin');
 }
 function setStep(n){$('step1').classList.toggle('active',n===1);$('step2').classList.toggle('active',n===2);$('dot1').className='step-dot'+(n===1?' active':' done');$('dot2').className='step-dot'+(n===2?' active':'');$('line1').className='step-line'+(n===2?' done':'');}
 function backTo1(){setStep(1);$('errLogin').classList.remove('show');['iNome','iEmail'].forEach(id=>$(id).classList.remove('err'));}
@@ -4746,6 +4819,8 @@ const PLANS = {
 };
 function getPlan(mgr){ return PLANS[(mgr||currentMgr)?.plan] || PLANS.essencial; }
 function requirePlan(feature){
+  // superadmin always has access regardless of plan field
+  if(!currentMgr || currentMgr.role==='superadmin' || !currentMgr.role) return true;
   const plan = getPlan();
   if(!plan[feature]){ showPlanUpgradeModal(feature); return false; }
   return true;
@@ -8232,6 +8307,191 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ═══════════════════════════════════════
+// CHANGE 1 — COLLAPSIBLE NAV GROUPS
+// ═══════════════════════════════════════
+function toggleNavGroup(key, el) {
+  const grp = el.nextElementSibling;
+  if (!grp) return;
+  const collapsed = grp.classList.toggle('collapsed');
+  const chev = el.querySelector('.nav-sec-chevron');
+  if (chev) chev.style.transform = collapsed ? 'rotate(-90deg)' : '';
+  const s = JSON.parse(localStorage.getItem('sbGroups')||'{}');
+  s[key] = collapsed; localStorage.setItem('sbGroups', JSON.stringify(s));
+}
+function restoreNavGroups() {
+  const s = JSON.parse(localStorage.getItem('sbGroups')||'{}');
+  document.querySelectorAll('[data-nav-key]').forEach(el => {
+    if (s[el.dataset.navKey]) {
+      const grp = el.nextElementSibling;
+      if (grp) {
+        grp.classList.add('collapsed');
+        const chev = el.querySelector('.nav-sec-chevron');
+        if (chev) chev.style.transform = 'rotate(-90deg)';
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// CHANGE 2 — DASHBOARD KPI CARDS + ACTIVITY FEED
+// ═══════════════════════════════════════
+function renderKPIs() {
+  const el = $('kpiRow'); if (!el) return;
+  const cos = visibleCompanies();
+  const resps = STATE.responses || [];
+  const plano = (typeof ACTION_PLANS !== 'undefined' ? ACTION_PLANS : []);
+  const perigos = STATE.perigos || [];
+
+  const totalResps = resps.length;
+  const lastWeek = resps.filter(r => r.timestamp && new Date(r.timestamp) > new Date(Date.now()-7*86400000)).length;
+  const overdueActions = plano.filter(a => typeof isOverdue === 'function' ? isOverdue(a) : false).length;
+  const highRisks = perigos.filter(p => {
+    if (typeof calcRisco === 'function') {
+      const r = calcRisco(p.prob, p.sev);
+      return r.nivel === 'Intolerável' || r.nivel === 'Substancial';
+    }
+    return false;
+  }).length;
+
+  const kpis = [
+    { label:'Empresas ativas', value: cos.filter(c=>c.status==='ativo'||!c.status).length, total: cos.length, color:'#3d7aed', icon:'🏢', sub: `${cos.length} total` },
+    { label:'Respostas coletadas', value: totalResps, color:'#22c55e', icon:'📋', sub: `+${lastWeek} esta semana` },
+    { label:'Riscos elevados', value: highRisks, color: highRisks>0?'#ef4444':'#22c55e', icon:'⚠', sub: 'Substancial + Intolerável' },
+    { label:'Ações em atraso', value: overdueActions, color: overdueActions>0?'#f97316':'#22c55e', icon:'📅', sub: 'do plano de ação' },
+  ];
+
+  el.innerHTML = kpis.map(k => `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:default">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:600;color:var(--muted)">${k.label}</div>
+        <div style="font-size:18px">${k.icon}</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:${k.color};line-height:1">${k.value}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${k.sub}</div>
+    </div>`).join('');
+}
+
+function renderActivityFeed() {
+  const el = $('activityList'); if (!el) return;
+  const events = [];
+  (STATE.responses||[]).slice(-10).reverse().forEach(r => {
+    events.push({ time: r.timestamp, text: `Nova resposta — ${(r.questionario||'').toUpperCase()||'Questionário'} — ${r.colaborador||r.email||'Colaborador'}`, color:'#22c55e' });
+  });
+  const plano = (typeof ACTION_PLANS !== 'undefined' ? ACTION_PLANS : []);
+  plano.filter(a=>a.status==='Concluído'||a.status==='concluido').slice(-5).forEach(a => {
+    events.push({ time: a.updatedAt||'', text: `Ação concluída — ${a.text||a.titulo||'Plano de ação'}`, color:'#3d7aed' });
+  });
+  events.sort((a,b) => new Date(b.time||0)-new Date(a.time||0));
+  if (!events.length) {
+    el.innerHTML='<div style="font-size:13px;color:var(--muted)">Nenhuma atividade registrada ainda.</div>';
+    return;
+  }
+  el.innerHTML = events.slice(0,12).map(e => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)">
+      <div style="width:8px;height:8px;border-radius:50%;background:${e.color};flex-shrink:0;margin-top:5px"></div>
+      <div style="flex:1;font-size:12.5px;color:var(--text)">${e.text}</div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap">${e.time?new Date(e.time).toLocaleDateString('pt-BR'):''}</div>
+    </div>`).join('');
+}
+
+// Patch renderOv to also call KPIs + activity feed
+const _origRenderOvKpi = renderOv;
+renderOv = function() {
+  _origRenderOvKpi();
+  renderKPIs();
+  renderActivityFeed();
+};
+
+// ═══════════════════════════════════════
+// CHANGE 3 — MOBILE BOTTOM NAV
+// ═══════════════════════════════════════
+function mobileNav(screenId) {
+  if (screenId === 'sSel') showSc('sSel');
+  else if (screenId === 'sSelAcademy') {
+    showSc('sSel');
+    const sec = $('selAcademySection');
+    if (sec) { sec.style.display='block'; sec.scrollIntoView({behavior:'smooth'}); }
+  }
+  ['mnHome','mnAcademy','mnSair'].forEach(id => {
+    const btn = $(id);
+    if (btn) btn.style.color = 'var(--muted)';
+  });
+}
+
+function updateMobileNav(isParticipant) {
+  const nav = $('mobileBottomNav');
+  if (!nav) return;
+  nav.style.display = isParticipant ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════
+// CHANGE 6 — WHITE-LABEL REPORT HEADER
+// ═══════════════════════════════════════
+(function patchBuildRepHTMLWhiteLabel() {
+  const _orig = buildRepHTML;
+  buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co) {
+    const wlCfg = (typeof loadWhiteLabel === 'function') ? loadWhiteLabel() : {};
+    const wl = wlCfg.nome || 'AMBRAC';
+    const wlFooter = wlCfg.footer || 'AMBRAC — Saúde Ocupacional';
+    const wlLogo = wlCfg.logo || '';
+
+    const reportHeader = `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:2px solid var(--accent);margin-bottom:20px;page-break-inside:avoid">
+      ${wlLogo ? `<img src="${wlLogo}" style="height:40px;object-fit:contain" alt="${wl}"/>` : `<div style="font-size:18px;font-weight:800;color:var(--accent)">${wl}</div>`}
+      <div style="text-align:right;font-size:11px;color:var(--muted)"><div style="font-weight:600">${wlFooter}</div><div>Gerado em ${new Date().toLocaleDateString('pt-BR')}</div></div>
+    </div>`;
+
+    return reportHeader + _orig(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+  };
+})();
+
+// ═══════════════════════════════════════
+// PATCH doMgrLogin — update sidebar info, restore nav groups, update mobile nav
+// ═══════════════════════════════════════
+const _origDoMgrLogin = doMgrLogin;
+doMgrLogin = function() {
+  _origDoMgrLogin();
+  // Update sidebar manager info
+  if (currentMgr) {
+    const infoEl = $('sbMgrInfo');
+    if (infoEl) infoEl.textContent = currentMgr.nome || currentMgr.name || currentMgr.email || currentMgr.user || '';
+  }
+  // Restore nav groups collapse state
+  restoreNavGroups();
+  // Hide mobile bottom nav for manager
+  updateMobileNav(false);
+};
+
+// ═══════════════════════════════════════
+// PATCH doLogout — show mobile nav for participants, hide for manager
+// ═══════════════════════════════════════
+const _origDoLogout = doLogout;
+doLogout = function() {
+  updateMobileNav(false);
+  _origDoLogout();
+};
+
+// After participant login via Google — show mobile nav
+const _origHandleGoogleLogin = handleGoogleLogin;
+handleGoogleLogin = function(response) {
+  _origHandleGoogleLogin(response);
+  if (CU) updateMobileNav(true);
+};
+
+// After participant login via CPF — show mobile nav
+const _origLoginWithCpf = loginWithCpf;
+loginWithCpf = function() {
+  _origLoginWithCpf();
+  if (CU) updateMobileNav(true);
+};
+
+// Patch doMgrLogout — hide mobile nav
+const _origDoMgrLogout = doMgrLogout;
+doMgrLogout = function() {
+  updateMobileNav(false);
+  _origDoMgrLogout();
+};
+
 </script>
 
 <!-- MODAL: GHE -->
@@ -8419,6 +8679,20 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 </div>
+
+<nav id="mobileBottomNav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:200;padding:6px 0 env(safe-area-inset-bottom)">
+  <div style="display:flex;justify-content:space-around;max-width:480px;margin:0 auto">
+    <button onclick="mobileNav('sSel')" id="mnHome" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 12px;font-family:inherit;color:var(--muted);font-size:10px;font-weight:600">
+      <span style="font-size:20px">🏠</span>Início
+    </button>
+    <button onclick="mobileNav('sSelAcademy')" id="mnAcademy" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 12px;font-family:inherit;color:var(--muted);font-size:10px;font-weight:600">
+      <span style="font-size:20px">📚</span>Academy
+    </button>
+    <button onclick="doLogout()" id="mnSair" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 12px;font-family:inherit;color:var(--muted);font-size:10px;font-weight:600">
+      <span style="font-size:20px">↗</span>Sair
+    </button>
+  </div>
+</nav>
 
 </body>
 </html>
