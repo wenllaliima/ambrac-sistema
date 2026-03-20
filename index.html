@@ -1372,6 +1372,20 @@ body.manager-mode{
             </div>
           </div>
           <div class="ucard">
+            <h3>Responsável Técnico</h3>
+            <p class="desc">Dados do profissional responsável pela elaboração dos relatórios e do PGR. Estas informações são incluídas automaticamente em todos os documentos gerados.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:700px;margin-bottom:14px">
+              <div class="form-group" style="grid-column:1/-1"><label>Nome completo</label><input id="rt_nome" placeholder="Ex.: Dra. Ana Paula Lima" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Registro profissional</label><input id="rt_reg" placeholder="CRP 06/12345 ou CRM 123456" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Especialidade</label><input id="rt_esp" placeholder="Psicologia Organizacional" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+              <div class="form-group"><label>Empresa / Consultoria</label><input id="rt_empresa" placeholder="Ex.: AMBRAC Consultoria" style="width:100%;padding:9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none"/></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="abtn ab-pri" onclick="saveRespTec()">Salvar dados</button>
+              <span id="rtStatus" style="font-size:12.5px;color:var(--muted)"></span>
+            </div>
+          </div>
+          <div class="ucard">
             <h3>Webhooks e Integrações</h3>
             <p class="desc">Configure URLs de webhook para receber notificações automáticas quando eventos importantes ocorrerem (nova resposta recebida, relatório gerado, campanha encerrada). Use para integrar com Zapier, Make (Integromat), n8n ou sistemas próprios.</p>
             <div id="webhookList" style="margin-bottom:16px"></div>
@@ -5524,13 +5538,46 @@ ${riskFactors.length?`<table>
 <p>Conforme a NR-1, o PGR deve ser revisado periodicamente ou quando houver alterações nas condições de trabalho. Recomenda-se a reaplicação do instrumento em até 12 meses, ou em 6 meses para fatores classificados como alto risco.</p>
 
 <h2>8. Responsabilidade Técnica</h2>
-<div style="margin-top:30px">
-  <div style="border-bottom:1.5px solid #1e2235;margin-bottom:8px;height:36px;max-width:300px"></div>
-  <div style="font-weight:700">${mgr}</div>
-  <div style="color:#6b7280">Responsável Técnico — AMBRAC</div>
-  <div style="color:#6b7280;margin-top:3px">CRP/CRM: ______________________</div>
-  <div style="color:#6b7280;margin-top:3px">Data: ${dateStr}</div>
-</div>
+${(()=>{const rt=loadRespTec();const nome=rt.nome||mgr||'—';const reg=rt.reg||'';const esp=rt.esp||'';const emp=rt.empresa||'AMBRAC';return`<div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:600px">
+  <div>
+    <div style="border-bottom:1.5px solid #1e2235;margin-bottom:8px;height:36px;max-width:280px"></div>
+    <div style="font-weight:700;font-size:13px">${nome}</div>
+    ${reg?`<div style="color:#6b7280;margin-top:2px;font-size:12px">Registro: ${reg}</div>`:'<div style="color:#6b7280;margin-top:2px;font-size:12px">Registro Profissional: ______________________</div>'}
+    ${esp?`<div style="color:#6b7280;margin-top:2px;font-size:12px">Especialidade: ${esp}</div>`:''}
+    <div style="color:#6b7280;margin-top:2px;font-size:12px">Empresa: ${emp}</div>
+    <div style="color:#6b7280;margin-top:2px;font-size:12px">Data: ${dateStr}</div>
+  </div>
+  <div style="background:#f8fafc;border-radius:8px;padding:14px;font-size:12px">
+    <div style="font-weight:700;margin-bottom:8px;color:#1e4d3a">Certificação</div>
+    <p style="margin:0;line-height:1.6;color:#4b5563">Este documento é de responsabilidade técnica do profissional identificado acima, elaborado com base nos dados coletados e na metodologia ${isCQ?'COPSOQ II':'AOT'} validada internacionalmente.</p>
+  </div>
+</div>`})()}
+
+${(()=>{
+  const sectors=[...new Set(resps.map(r=>r.respostas?.setor||'').filter(Boolean))];
+  if(!sectors.length)return'';
+  const riskSevProb=(score)=>{if(score>=0.75)return{sev:3,prob:3,res:9,cls:'Alto',color:'#ef4444',bg:'#fef2f2'};if(score>=0.5)return{sev:2,prob:2,res:4,cls:'Moderado',color:'#d97706',bg:'#fffbeb'};return{sev:1,prob:1,res:1,cls:'Baixo',color:'#16a34a',bg:'#f0fdf4'};};
+  const sectorBlocks=sectors.map(setor=>{
+    const sResps=resps.filter(r=>(r.respostas?.setor||'')===setor);
+    if(sResps.length<MIN_ANON)return`<p><em>${setor}</em>: Dados insuficientes (n &lt; ${MIN_ANON}).</p>`;
+    const sc=isCQ?calcCQ(sResps):calcBE(sResps);
+    const dimVals=(isCQ?CQ_DIMS:BE_DIMS).map(d=>({...d,score:sc.ds[d.id]})).filter(d=>d.score!=null);
+    const avgS=dimVals.length?dimVals.reduce((a,b)=>a+b.score,0)/dimVals.length:0;
+    const agravosMap={'EL':'Burnout, Distúrbios osteomusculares, Ansiedade','OTC':'Estresse crônico, Síndrome de burnout','REL':'Conflitos, Assédio moral, Depressão','ITI':'Estresse crônico, Insegurança psicológica','VLT':'Desmotivação, Rotatividade, Depressão','PER':'Doenças psicossomáticas, Presenteísmo','SAU':'Burnout, Ansiedade, Depressão, Distúrbios do sono','CO':'Assédio moral/sexual, TEPT, Depressão','RSL':'Assédio moral, Conflitos, Depressão','EL':'Burnout, Estresse, Distúrbios osteomusculares'};
+    const domRows=dimVals.map(d=>{const pct=Math.round(d.score*100);const rp=riskSevProb(d.score);return`<tr><td style="padding:7px 10px;border:1px solid #e5e7eb;font-weight:600;font-size:11px">${d.name}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700;font-size:11px;color:${rp.color}">${pct}%</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-size:11px;font-weight:700;color:${rp.color}">${rp.cls}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;font-size:11px">${rp.cls==='Baixo'?'Manter monitoramento periódico.':(isCQ?CQ_ACTIONS:BE_ACTIONS)[d.factors?.[0]]||'Implementar ações preventivas.'}</td></tr>`}).join('');
+    const matRows=dimVals.map(d=>{const rp=riskSevProb(d.score);const agr=agravosMap[d.id]||'Alterações na saúde mental e bem-estar';return`<tr><td style="padding:7px 10px;border:1px solid #e5e7eb;font-weight:600;font-size:11px">${d.name}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;font-size:11px">${agr}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700">${rp.sev}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700">${rp.prob}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700;color:${rp.color}">${rp.res}</td><td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-size:11px;font-weight:700;color:${rp.color}">${rp.cls}</td></tr>`}).join('');
+    return`<div style="page-break-inside:avoid;margin-bottom:28px">
+      <div style="background:#f8fafc;border-left:4px solid #1e4d3a;padding:10px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Setor: ${setor}</strong> &nbsp; <span style="color:#6b7280;font-size:11px">Participantes: ${sResps.length} · Média geral: ${Math.round(avgS*100)}%</span></div>
+        <span style="padding:2px 12px;border-radius:99px;font-size:11px;font-weight:700;background:${riskSevProb(avgS).bg};color:${riskSevProb(avgS).color}">${riskSevProb(avgS).cls}</span>
+      </div>
+      <table><thead><tr><th>Domínio</th><th style="width:70px">Índice</th><th style="width:90px">Classificação</th><th>Observações</th></tr></thead><tbody>${domRows}</tbody></table>
+      <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin:10px 0 6px">Aplicação da Matriz — ${setor}</div>
+      <table><thead><tr><th>Domínio</th><th>Agravos à Saúde</th><th style="width:45px">Sev.</th><th style="width:45px">Prob.</th><th style="width:65px">SEV×PROB</th><th style="width:80px">Classificação</th></tr></thead><tbody>${matRows}</tbody></table>
+    </div>`;
+  }).join('');
+  return`<h2>9. Domínios por Setor</h2><p>Análise detalhada dos domínios psicossociais por setor, com Matriz de Risco Psicossocial (NR-1).</p>${sectorBlocks}`;
+})()}
 
 <div style="margin-top:40px;text-align:center;font-size:10px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:12px">
   AMBRAC · Medicina e Segurança do Trabalho · Documento técnico sigiloso — uso exclusivo para gestão ocupacional
@@ -6997,11 +7044,35 @@ function updateMgrSelectsExt(){
   const c3Sec=$('c3SecFilter');if(c3Sec)c3Sec.innerHTML=se3;
 }
 
+// ═══════════════════════════════════════
+// RESPONSÁVEL TÉCNICO
+// ═══════════════════════════════════════
+function saveRespTec(){
+  const rt={
+    nome:$('rt_nome')?.value.trim()||'',
+    reg:$('rt_reg')?.value.trim()||'',
+    esp:$('rt_esp')?.value.trim()||'',
+    empresa:$('rt_empresa')?.value.trim()||''
+  };
+  localStorage.setItem('ambrac_resp_tec',JSON.stringify(rt));
+  const st=$('rtStatus');if(st){st.textContent='Salvo com sucesso!';st.style.color='var(--accent)';setTimeout(()=>{st.textContent='';},2500);}
+}
+function loadRespTec(){
+  try{return JSON.parse(localStorage.getItem('ambrac_resp_tec')||'{}');}catch(e){return{};}
+}
+function populateRespTec(){
+  const rt=loadRespTec();
+  if($('rt_nome'))$('rt_nome').value=rt.nome||'';
+  if($('rt_reg'))$('rt_reg').value=rt.reg||'';
+  if($('rt_esp'))$('rt_esp').value=rt.esp||'';
+  if($('rt_empresa'))$('rt_empresa').value=rt.empresa||'';
+}
+
 // Wire renderWebhookList when navigating to pConfig
 const _origNavTo2 = navTo;
 navTo = function(pid, btn) {
   _origNavTo2(pid, btn);
-  if (pid === 'pConfig') renderWebhookList();
+  if (pid === 'pConfig') { renderWebhookList(); populateRespTec(); }
 };
 
 // Wire fireWebhook to submitForm (patch)
@@ -7643,21 +7714,23 @@ function renderPGRPreview(){
   perigos.forEach(p=>{const r=calcRisco(p.prob,p.sev);riskCounts[r.nivel]=(riskCounts[r.nivel]||0)+1;});
   cont.innerHTML=`
     <div style="font-size:13px;line-height:1.7;color:var(--text)">
-      <div style="text-align:center;padding:30px 20px 20px;border-bottom:2px solid var(--accent);margin-bottom:24px">
+      ${(()=>{const rt=loadRespTec();const rtBar=rt.nome?`<div style="margin-top:10px;font-size:12px;color:var(--muted)"><strong>Resp. Técnico:</strong> ${rt.nome}${rt.reg?' · '+rt.reg:''}${rt.esp?' · '+rt.esp:''}</div>`:'';return`<div style="text-align:center;padding:30px 20px 20px;border-bottom:2px solid var(--accent);margin-bottom:24px">
         <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Programa de Gerenciamento de Riscos</div>
         <div style="font-size:22px;font-weight:700;color:var(--accent)">${co.nome||'Empresa'}</div>
         <div style="font-size:13px;color:var(--muted);margin-top:6px">NR-1 (Port. MTE nº 1.419/2024) · Elaborado em ${new Date().toLocaleDateString('pt-BR')}</div>
-      </div>
+        ${rtBar}
+      </div>`;})()}
       <div class="pgr-section">
         <h3>1. Identificação da Empresa</h3>
         <table class="pgr-table">
-          <tr><td style="width:35%;font-weight:600">Razão social</td><td>${co.nome||'—'}</td></tr>
+          ${(()=>{const rt=loadRespTec();return`<tr><td style="width:35%;font-weight:600">Razão social</td><td>${co.nome||'—'}</td></tr>
           <tr><td style="font-weight:600">CNPJ</td><td>${co.cnpj||'—'}</td></tr>
           <tr><td style="font-weight:600">Endereço</td><td>${co.endereco||'—'}</td></tr>
           <tr><td style="font-weight:600">Atividade econômica</td><td>${co.setor||co.atividade||'—'}</td></tr>
           <tr><td style="font-weight:600">CNAE</td><td>${co.cnae||'—'}</td></tr>
           <tr><td style="font-weight:600">Nº de trabalhadores</td><td>${co.ntrab||ghes.reduce((s,g)=>s+(parseInt(g.ntrab)||0),0)||'—'}</td></tr>
           <tr><td style="font-weight:600">GHEs cadastrados</td><td>${ghes.length}</td></tr>
+          <tr><td style="font-weight:600">Responsável Técnico</td><td>${rt.nome||'—'}${rt.reg?' · '+rt.reg:''}${rt.esp?' · '+rt.esp:''}</td></tr>`;})()}
         </table>
       </div>
       <div class="pgr-section">
@@ -7776,14 +7849,30 @@ function renderPGRPreview(){
           </table>`;
         })()}
       </div>
+      ${(()=>{
+        const cqResps=respostas.filter(r=>r.questionario==='copsoq');
+        const beResps=respostas.filter(r=>r.questionario==='bemestar');
+        const sections=[];
+        if(cqResps.length>=MIN_ANON){
+          const sc=calcCQ(cqResps);
+          const html=buildSetorDetailHTML(cqResps,CQ_DIMS,sc.ds,'cq');
+          if(html)sections.push(`<h3>5b. Domínios por Setor — COPSOQ II</h3>${html}`);
+        }
+        if(beResps.length>=MIN_ANON){
+          const sc=calcBE(beResps);
+          const html=buildSetorDetailHTML(beResps,BE_DIMS,sc.ds,'be');
+          if(html)sections.push(`<h3>5c. Domínios por Setor — AOT</h3>${html}`);
+        }
+        return sections.length?`<div class="pgr-section">${sections.join('')}</div>`:'';
+      })()}
       <div class="pgr-section">
         <h3>9. Conclusão e Revisão</h3>
         <p>Este PGR deve ser revisado anualmente ou sempre que houver mudança nas condições de trabalho, introdução de novas tecnologias ou processos, após acidentes graves ou incidentes significativos, e sempre que solicitado por autoridade competente (NR-1.5.3).</p>
         <p>A implementação das medidas de controle identificadas é responsabilidade da alta direção, devendo ser monitorada pelo SESMT ou profissional de SST responsável.</p>
-        <table class="pgr-table" style="margin-top:16px">
-          <tr><td style="width:50%;height:50px">Responsável técnico: ___________________________</td><td>Aprovado por: ___________________________</td></tr>
-          <tr><td>CREA/CRM/CRP: ___________________________</td><td>Data: ${new Date().toLocaleDateString('pt-BR')}</td></tr>
-        </table>
+        ${(()=>{const rt=loadRespTec();return`<table class="pgr-table" style="margin-top:16px">
+          <tr><td style="width:50%;height:50px">Responsável técnico: ${rt.nome||'___________________________'}</td><td>Aprovado por: ___________________________</td></tr>
+          <tr><td>${rt.reg||'CREA/CRM/CRP: ___________________________'}</td><td>Data: ${new Date().toLocaleDateString('pt-BR')}</td></tr>
+        </table>`;})()}
       </div>
     </div>`;
 }
@@ -8426,7 +8515,7 @@ function updateMobileNav(isParticipant) {
 }
 
 // ═══════════════════════════════════════
-// CHANGE 6 — WHITE-LABEL REPORT HEADER
+// CHANGE 6 — WHITE-LABEL REPORT HEADER + RESPONSÁVEL TÉCNICO
 // ═══════════════════════════════════════
 (function patchBuildRepHTMLWhiteLabel() {
   const _orig = buildRepHTML;
@@ -8435,15 +8524,157 @@ function updateMobileNav(isParticipant) {
     const wl = wlCfg.nome || 'AMBRAC';
     const wlFooter = wlCfg.footer || 'AMBRAC — Saúde Ocupacional';
     const wlLogo = wlCfg.logo || '';
+    const rt = (typeof loadRespTec === 'function') ? loadRespTec() : {};
 
-    const reportHeader = `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:2px solid var(--accent);margin-bottom:20px;page-break-inside:avoid">
+    const rtLine = rt.nome ? `<div style="font-size:11px;color:var(--muted);margin-top:4px"><strong>Resp. Técnico:</strong> ${rt.nome}${rt.reg ? ' · ' + rt.reg : ''}${rt.esp ? ' · ' + rt.esp : ''}</div>` : '';
+
+    const reportHeader = `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:2px solid var(--accent);margin-bottom:20px;page-break-inside:avoid">
       ${wlLogo ? `<img src="${wlLogo}" style="height:40px;object-fit:contain" alt="${wl}"/>` : `<div style="font-size:18px;font-weight:800;color:var(--accent)">${wl}</div>`}
-      <div style="text-align:right;font-size:11px;color:var(--muted)"><div style="font-weight:600">${wlFooter}</div><div>Gerado em ${new Date().toLocaleDateString('pt-BR')}</div></div>
+      <div style="text-align:right;font-size:11px;color:var(--muted)"><div style="font-weight:600">${wlFooter}</div><div>Gerado em ${new Date().toLocaleDateString('pt-BR')}</div>${rtLine}</div>
     </div>`;
 
-    return reportHeader + _orig(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+    const body = _orig(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co);
+    const setorSection = (typeof buildSetorDetailHTML === 'function') ? buildSetorDetailHTML(resps, dims, dimScores, prefix) : '';
+    return reportHeader + body + setorSection;
   };
 })();
+
+// ═══════════════════════════════════════
+// DOMÍNIOS POR SETOR — análise detalhada por GHE/setor
+// ═══════════════════════════════════════
+const DOMAIN_AGRAVOS = {
+  // COPSOQ II dims
+  'EL':  'Burnout, Distúrbios osteomusculares, Ansiedade, Estresse',
+  'OTC': 'Estresse crônico, Síndrome de burnout, Desmotivação',
+  'REL': 'Conflitos interpessoais, Assédio moral, Depressão, Absenteísmo',
+  'ITI': 'Estresse crônico, Síndrome do impostor, Insegurança psicológica',
+  'VLT': 'Desmotivação, Rotatividade, Depressão, Síndrome de esgotamento',
+  'PER': 'Doenças psicossomáticas, Presenteísmo, Absenteísmo',
+  'SAU': 'Burnout, Transtorno de ansiedade, Depressão, Distúrbios do sono',
+  'CO':  'Assédio moral/sexual, TEPT, Depressão, Ansiedade',
+  // AOT (BE) dims
+  'RSL': 'Assédio moral, Conflitos interpessoais, Depressão, Absenteísmo',
+  // COPSOQ II Curta dims
+  'c2s_exig': 'Burnout, Distúrbios osteomusculares, Ansiedade, Estresse',
+  'c2s_org':  'Estresse crônico, Síndrome de burnout, Desmotivação',
+  'c2s_rel':  'Conflitos interpessoais, Assédio moral, Depressão, Absenteísmo',
+  'c2s_int':  'Desmotivação, Rotatividade, Depressão, Insegurança laboral',
+  'c2s_sau':  'Burnout, Transtorno de ansiedade, Depressão, Distúrbios do sono',
+  'c2s_ofe':  'Assédio moral/sexual, TEPT, Depressão, Ansiedade',
+  // COPSOQ III dims
+  'c3_exig':  'Burnout, Distúrbios osteomusculares, Ansiedade, Estresse',
+  'c3_tfam':  'Conflito trabalho–família, Estresse, Insatisfação no trabalho',
+  'c3_org':   'Estresse crônico, Desmotivação, Síndrome de burnout',
+  'c3_rel':   'Conflitos interpessoais, Assédio moral, Depressão',
+  'c3_just':  'Conflitos organizacionais, Síndrome do impostor, Rotatividade',
+  'c3_ind':   'Desmotivação, Insatisfação, Depressão, Esgotamento',
+  'c3_sau':   'Burnout, Ansiedade, Depressão, Distúrbios do sono',
+};
+
+function buildSetorDetailHTML(allResps, dims, dimScores, prefix) {
+  if (!allResps || allResps.length < MIN_ANON) return '';
+  const sectors = [...new Set(allResps.map(r => r.respostas?.setor || '').filter(Boolean))];
+  if (!sectors.length) return '';
+
+  // Determine calc function based on prefix
+  const isC2S = prefix === 'c2s';
+  const isC3 = prefix === 'c3';
+  const isBE = prefix === 'be';
+  const calcFn = isBE ? calcBE : (isC2S ? (typeof calcC2S!=='undefined'?calcC2S:calcCQ) : (isC3 ? (typeof calcC3!=='undefined'?calcC3:calcCQ) : calcCQ));
+
+  const riskSevProb = (score) => {
+    if (score >= 0.75) return {sev:3, prob:3, res:9, cls:'Alto'};
+    if (score >= 0.5)  return {sev:2, prob:2, res:4, cls:'Moderado'};
+    return {sev:1, prob:1, res:1, cls:'Baixo'};
+  };
+
+  const colorFor = (cls) => cls === 'Alto' ? '#ef4444' : cls === 'Moderado' ? '#f59e0b' : '#22c55e';
+  const bgFor   = (cls) => cls === 'Alto' ? '#fef2f2' : cls === 'Moderado' ? '#fffbeb' : '#f0fdf4';
+
+  const obsSuggestion = (cls, dim) => {
+    if (cls === 'Baixo') return 'Manter monitoramento periódico. Nível satisfatório.';
+    if (cls === 'Moderado') return (typeof CQ_ACTIONS !== 'undefined' && CQ_ACTIONS[dim?.factors?.[0]]) || 'Planejar e implementar ações preventivas.';
+    return (typeof CQ_ACTIONS !== 'undefined' && CQ_ACTIONS[dim?.factors?.[0]]) || 'Intervenção imediata — implementar ações corretivas urgentes.';
+  };
+
+  const sectorBlocks = sectors.map(setor => {
+    const sResps = allResps.filter(r => (r.respostas?.setor || '') === setor);
+    if (sResps.length < MIN_ANON) {
+      return `<div style="margin-bottom:8px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:12.5px;color:var(--muted)">
+        <strong>${setor}</strong> — Dados insuficientes para análise (n &lt; ${MIN_ANON}, LGPD).
+      </div>`;
+    }
+    const sc = calcFn(sResps);
+    const dimVals = dims.map(d => ({...d, score: sc.ds[d.id]})).filter(d => d.score != null);
+    const avgSetor = dimVals.length ? dimVals.reduce((a,b)=>a+b.score,0)/dimVals.length : 0;
+
+    const domainRows = dimVals.map(d => {
+      const pct = Math.round(d.score * 100);
+      const rc = riskClass(d.score);
+      const obs = obsSuggestion(rc.label, d);
+      return `<tr>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;font-weight:600;font-size:12px">${d.name}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700;font-size:12px;color:${rc.color}">${pct}%</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center">
+          <span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${bgFor(rc.label)};color:${colorFor(rc.label)}">${rc.label}</span>
+        </td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;font-size:11.5px;color:#374151">${obs}</td>
+      </tr>`;
+    }).join('');
+
+    const matrizRows = dimVals.map(d => {
+      const rp = riskSevProb(d.score);
+      const agravos = DOMAIN_AGRAVOS[d.id] || 'Alterações na saúde mental e bem-estar';
+      return `<tr>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;font-weight:600;font-size:12px">${d.name}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;font-size:11.5px">${agravos}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700">${rp.sev}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700">${rp.prob}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center;font-weight:700;color:${colorFor(rp.cls)}">${rp.res}</td>
+        <td style="padding:7px 10px;border:1px solid #e5e7eb;text-align:center">
+          <span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${bgFor(rp.cls)};color:${colorFor(rp.cls)}">${rp.cls}</span>
+        </td>
+      </tr>`;
+    }).join('');
+
+    return `<div style="page-break-inside:avoid;margin-bottom:28px">
+      <div style="background:var(--surface2);border-left:4px solid var(--accent);padding:10px 16px;border-radius:0 8px 8px 0;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">Setor: ${setor}</div>
+          <div style="font-size:11.5px;color:var(--muted)">Participantes: ${sResps.length} · Média geral: ${Math.round(avgSetor*100)}%</div>
+        </div>
+        <span style="padding:4px 14px;border-radius:99px;font-size:12px;font-weight:700;background:${bgFor(riskClass(avgSetor).label)};color:${colorFor(riskClass(avgSetor).label)}">${riskClass(avgSetor).label}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12px">
+        <thead><tr style="background:var(--accent)">
+          <th style="padding:8px 10px;text-align:left;color:#fff;font-size:11px;font-weight:700">Domínio</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:80px">Índice</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:100px">Classificação</th>
+          <th style="padding:8px 10px;text-align:left;color:#fff;font-size:11px;font-weight:700">Observações / Recomendações</th>
+        </tr></thead>
+        <tbody>${domainRows}</tbody>
+      </table>
+      <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px">Aplicação da Matriz — ${setor}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:#374151">
+          <th style="padding:8px 10px;text-align:left;color:#fff;font-size:11px;font-weight:700">Domínio</th>
+          <th style="padding:8px 10px;text-align:left;color:#fff;font-size:11px;font-weight:700">Agravos à Saúde</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:50px">Sev.</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:50px">Prob.</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:70px">SEV×PROB</th>
+          <th style="padding:8px 10px;text-align:center;color:#fff;font-size:11px;font-weight:700;width:90px">Classificação</th>
+        </tr></thead>
+        <tbody>${matrizRows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-top:32px;page-break-before:always">
+    <div style="font-size:16px;font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:20px">Domínios por Setor</div>
+    <p style="font-size:12.5px;color:var(--muted);margin-bottom:20px">Análise detalhada dos domínios psicossociais por setor/GHE, com aplicação da Matriz de Risco Psicossocial (Severidade × Probabilidade) conforme NR-1.</p>
+    ${sectorBlocks}
+  </div>`;
+}
 
 // ═══════════════════════════════════════
 // PATCH doMgrLogin — update sidebar info, restore nav groups, update mobile nav
