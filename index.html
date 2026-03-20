@@ -640,6 +640,19 @@ body.manager-mode{
   h4, h5 { page-break-after: avoid !important; }
 }
 
+/* ── Safety Engineering ── */
+.risk-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;color:#fff}
+.risk-trivial{background:#22c55e}.risk-toleravel{background:#84cc16}.risk-moderado{background:#f59e0b}
+.risk-substancial{background:#f97316}.risk-intoleravel{background:#ef4444}
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#e0f2fe;color:#0369a1}
+.ghe-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.ghe-card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.perigo-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.matriz-cell{width:60px;height:60px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;cursor:pointer;transition:opacity .15s}
+.pgr-section{margin-bottom:28px}.pgr-section h3{font-size:15px;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:4px;margin-bottom:12px}
+.pgr-table{width:100%;border-collapse:collapse;font-size:13px}.pgr-table th{background:#f0f4ff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid #dbeafe}
+.pgr-table td{padding:7px 10px;border:1px solid var(--border);vertical-align:top}
+
 </style>
 </head>
 <body class="participant-mode">
@@ -921,6 +934,22 @@ body.manager-mode{
         <button class="nav-item" onclick="navTo('pPulso',this)">Pulso Mensal</button>
         <div class="nav-sec">Ferramentas</div>
         <button class="nav-item" onclick="navTo('pBancoAcoes',this)">Banco de Ações</button>
+        <div class="nav-sec">Segurança do Trabalho</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pGHE',this)">GHE</button>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pInventario',this)">Inventário de Riscos</button>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pMatriz',this)">Matriz de Risco</button>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pAET',this)">AET (NR-17)</button>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pPGR',this)">PGR Completo</button>
+        </div>
         <div class="nav-sec">Academy</div>
         <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
           <button class="nav-item" style="flex:1" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
@@ -1338,6 +1367,62 @@ body.manager-mode{
           </div>
 
           <div id="courseGrid" class="da-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
+        </div>
+
+        <!-- GHE — Grupos Homogêneos de Exposição -->
+        <div class="panel" id="pGHE">
+          <div class="rep-toolbar">
+            <select class="sel-s" id="gheCoFilter" onchange="renderGHE()"><option value="">Selecione a empresa</option></select>
+            <button class="abtn ab-pri" onclick="openGHEModal()">+ Novo GHE</button>
+          </div>
+          <div id="gheList"><div class="empty-st"><p>Selecione uma empresa para ver os GHEs.</p></div></div>
+        </div>
+
+        <!-- INVENTÁRIO DE RISCOS -->
+        <div class="panel" id="pInventario">
+          <div class="rep-toolbar" style="flex-wrap:wrap;gap:8px">
+            <select class="sel-s" id="invCoFilter" onchange="renderInventario()"><option value="">Selecione a empresa</option></select>
+            <select class="sel-s" id="invGheFilter" onchange="renderInventario()"><option value="all">Todos os GHEs</option></select>
+            <select class="sel-s" id="invCatFilter" onchange="renderInventario()">
+              <option value="all">Todas as categorias</option>
+              <option value="Físico">Físico</option>
+              <option value="Químico">Químico</option>
+              <option value="Biológico">Biológico</option>
+              <option value="Ergonômico">Ergonômico</option>
+              <option value="Acidente">Acidente / Mecânico</option>
+              <option value="Psicossocial">Psicossocial</option>
+            </select>
+            <button class="abtn ab-pri" onclick="openPerigoModal()">+ Adicionar Perigo</button>
+            <button class="abtn ab-ghost" onclick="importCatalogPerigos()">Importar Catálogo</button>
+          </div>
+          <div id="inventarioList"><div class="empty-st"><p>Selecione uma empresa e adicione perigos ao inventário.</p></div></div>
+        </div>
+
+        <!-- MATRIZ DE RISCO -->
+        <div class="panel" id="pMatriz">
+          <div class="rep-toolbar">
+            <select class="sel-s" id="matrizCoFilter" onchange="renderMatriz()"><option value="">Selecione a empresa</option></select>
+            <select class="sel-s" id="matrizGheFilter" onchange="renderMatriz()"><option value="all">Todos os GHEs</option></select>
+          </div>
+          <div id="matrizContent"><div class="empty-st"><p>Selecione uma empresa para visualizar a Matriz de Risco.</p></div></div>
+        </div>
+
+        <!-- AET — NR-17 -->
+        <div class="panel" id="pAET">
+          <div class="rep-toolbar">
+            <select class="sel-s" id="aetCoFilter" onchange="renderAETList()"><option value="">Selecione a empresa</option></select>
+            <button class="abtn ab-pri" onclick="openAETModal()">+ Nova AET</button>
+          </div>
+          <div id="aetList"><div class="empty-st"><p>Selecione uma empresa para ver as AETs.</p></div></div>
+        </div>
+
+        <!-- PGR COMPLETO -->
+        <div class="panel" id="pPGR">
+          <div class="rep-toolbar" style="flex-wrap:wrap;gap:8px">
+            <select class="sel-s" id="pgrCoFilter" onchange="renderPGRPreview()"><option value="">Selecione a empresa</option></select>
+            <button class="abtn ab-pri" onclick="exportPGRCompleto()">Gerar PGR (PDF/Impressão)</button>
+          </div>
+          <div id="pgrPreview"><div class="empty-st"><p>Selecione uma empresa para pré-visualizar o PGR.</p></div></div>
         </div>
 
       </div>
@@ -2078,6 +2163,12 @@ let STATE=JSON.parse(localStorage.getItem('ambrac_state')||'null')||{
 
 // Migrate old companies missing unidades/ghes fields
 STATE.companies.forEach(c=>{if(!c.unidades)c.unidades=[];if(!c.ghes)c.ghes=[];});
+
+// ── Segurança do Trabalho — STATE defaults ──
+STATE.ghes    = STATE.ghes    || [];  // Grupos Homogêneos de Exposição
+STATE.perigos = STATE.perigos || [];  // Inventário de Riscos
+STATE.aets    = STATE.aets    || [];  // AETs por posto de trabalho
+STATE.aeps    = STATE.aeps    || [];  // AEPs por GHE
 
 // ═══════════════════════════════════════
 // GOOGLE SIGN-IN
@@ -6489,6 +6580,642 @@ addToReportHist = function(type, label, empresa, setor, nResp, mgr) {
   fireWebhook('relatorio_gerado', { tipo: type, empresa: empresa, nResp: nResp });
 };
 
+// ═══════════════════════════════════════════════════════════════════
+// SEGURANÇA DO TRABALHO — MÓDULO SST
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── Catálogo de Perigos NR-1 / NR-9 / NR-15 ─────────────────────
+const CATALOGO_PERIGOS=[
+  // FÍSICOS
+  {cat:'Físico',nome:'Ruído contínuo ou intermitente',dano:'Perda auditiva induzida por ruído (PAIR), estresse',nr:'NR-15 Anexo I'},
+  {cat:'Físico',nome:'Ruído de impacto',dano:'Trauma acústico, PAIR',nr:'NR-15 Anexo II'},
+  {cat:'Físico',nome:'Calor excessivo',dano:'Estresse térmico, insolação, desidratação',nr:'NR-15 Anexo III'},
+  {cat:'Físico',nome:'Frio extremo',dano:'Hipotermia, problemas circulatórios',nr:'NR-15 Anexo IX'},
+  {cat:'Físico',nome:'Radiação ionizante',dano:'Cânceres, danos genéticos, queimaduras por radiação',nr:'NR-15 Anexo VI'},
+  {cat:'Físico',nome:'Radiação não ionizante (UV, laser)',dano:'Queimaduras, catarata, câncer de pele',nr:'NR-15 Anexo VII'},
+  {cat:'Físico',nome:'Vibrações em membros superiores',dano:'Síndrome da vibração mão-braço, vasospasmo',nr:'NR-15 Anexo VIII'},
+  {cat:'Físico',nome:'Vibrações de corpo inteiro',dano:'Lombalgias, hérnias de disco, lesões musculoesqueléticas',nr:'NR-15 Anexo VIII'},
+  {cat:'Físico',nome:'Pressões anormais',dano:'Barotrauma, doença de descompressão',nr:'NR-15 Anexo V'},
+  {cat:'Físico',nome:'Umidade excessiva',dano:'Doenças dermatológicas, problemas respiratórios',nr:'NR-15 Anexo X'},
+  {cat:'Físico',nome:'Iluminação inadequada',dano:'Fadiga visual, cefaleia, acidentes por falta de visibilidade',nr:'NR-17 / NBR 5413'},
+  // QUÍMICOS
+  {cat:'Químico',nome:'Poeiras minerais (sílica)',dano:'Silicose, DPOC, câncer de pulmão',nr:'NR-15 Anexo XII'},
+  {cat:'Químico',nome:'Poeiras vegetais (algodão, madeira)',dano:'Bissinose, asma ocupacional, DPOC',nr:'NR-15 Anexo XIII'},
+  {cat:'Químico',nome:'Névoas e vapores de solventes orgânicos',dano:'Hepatotoxicidade, neurotoxicidade, dermatites',nr:'NR-15 Anexo XI'},
+  {cat:'Químico',nome:'Gases e vapores tóxicos',dano:'Intoxicação aguda/crônica, lesões respiratórias',nr:'NR-15 Anexo XI'},
+  {cat:'Químico',nome:'Fumos metálicos (soldagem)',dano:'Febre dos metais, pneumoconiose, toxicidade sistêmica',nr:'NR-15 Anexo XI'},
+  {cat:'Químico',nome:'Produtos químicos corrosivos / ácidos',dano:'Queimaduras químicas, irritação de mucosas, dermatites',nr:'NR-26'},
+  {cat:'Químico',nome:'Agentes cancerígenos (benzeno, asbesto)',dano:'Leucemia, mesotelioma, câncer pulmonar',nr:'NR-15 / LINACH'},
+  {cat:'Químico',nome:'Defensivos agrícolas / agrotóxicos',dano:'Intoxicação aguda, disfunções neurológicas, câncer',nr:'NR-31'},
+  // BIOLÓGICOS
+  {cat:'Biológico',nome:'Vírus (influenza, SARS-CoV-2, hepatite)',dano:'Infecções respiratórias, hepatites, doenças sistêmicas',nr:'NR-32 / NR-9'},
+  {cat:'Biológico',nome:'Bactérias (tuberculose, leptospirose)',dano:'Infecções respiratórias, renais e sistêmicas',nr:'NR-32'},
+  {cat:'Biológico',nome:'Fungos (histoplasmose, dermatofitose)',dano:'Micoses pulmonares e cutâneas',nr:'NR-9'},
+  {cat:'Biológico',nome:'Parasitas (ancilostomíase, toxoplasmose)',dano:'Anemia, doenças sistêmicas',nr:'NR-9'},
+  {cat:'Biológico',nome:'Material biológico (sangue, secreções)',dano:'HIV, hepatite B/C, outras infecções por via percutânea',nr:'NR-32'},
+  {cat:'Biológico',nome:'Vetores (mosquitos, carrapatos)',dano:'Dengue, Zika, febre maculosa, leishmaniose',nr:'NR-9'},
+  // ERGONÔMICOS
+  {cat:'Ergonômico',nome:'Postura inadequada / estática prolongada',dano:'LER/DORT, lombalgias, cervicalgias',nr:'NR-17'},
+  {cat:'Ergonômico',nome:'Movimentos repetitivos de membros superiores',dano:'LER/DORT — tendinite, síndrome do túnel do carpo',nr:'NR-17'},
+  {cat:'Ergonômico',nome:'Levantamento e transporte manual de cargas',dano:'Lombalgias, hérnias de disco, distensões musculares',nr:'NR-17.2'},
+  {cat:'Ergonômico',nome:'Trabalho em pé por tempo prolongado',dano:'Varizes, edemas, lombalgias, fadiga muscular',nr:'NR-17'},
+  {cat:'Ergonômico',nome:'Mobiliário e equipamentos inadequados',dano:'LER/DORT, problemas posturais, fadiga visual',nr:'NR-17.3 / 17.4'},
+  {cat:'Ergonômico',nome:'Uso intensivo de computador / monitor',dano:'Síndrome do olho seco, fadiga visual, LER/DORT em MMSS',nr:'NR-17.4'},
+  {cat:'Ergonômico',nome:'Iluminação insuficiente ou ofuscante',dano:'Fadiga visual, cefaleia, acidentes',nr:'NR-17.5.3'},
+  {cat:'Ergonômico',nome:'Ritmo excessivo de trabalho',dano:'Fadiga, estresse, erros operacionais',nr:'NR-17.6'},
+  {cat:'Ergonômico',nome:'Jornada de trabalho prolongada / turno noturno',dano:'Distúrbios do sono, síndrome metabólica, fadiga crônica',nr:'NR-17 / CLT'},
+  // ACIDENTE / MECÂNICO
+  {cat:'Acidente',nome:'Máquinas e equipamentos sem proteção',dano:'Amputações, esmagamentos, lacerações',nr:'NR-12'},
+  {cat:'Acidente',nome:'Risco de queda de nível (escadas, plataformas)',dano:'Fraturas, TCE, óbito',nr:'NR-35 / NR-18'},
+  {cat:'Acidente',nome:'Risco de queda de objetos / materiais',dano:'TCE, fraturas, contusões',nr:'NR-6 / NR-18'},
+  {cat:'Acidente',nome:'Risco elétrico (choque, arco voltaico)',dano:'Choque elétrico, queimaduras, fibrilação ventricular, óbito',nr:'NR-10'},
+  {cat:'Acidente',nome:'Risco de incêndio e explosão',dano:'Queimaduras, intoxicação por fumaça, óbito',nr:'NR-23 / IT CBPMESP'},
+  {cat:'Acidente',nome:'Risco de cortes e perfurações',dano:'Lacerações, perfurações, infecções',nr:'NR-12 / NR-6'},
+  {cat:'Acidente',nome:'Trabalho em espaço confinado',dano:'Asfixia, intoxicação, óbito',nr:'NR-33'},
+  {cat:'Acidente',nome:'Trabalho em altura (acima de 2m)',dano:'Queda, fraturas, TCE, óbito',nr:'NR-35'},
+  {cat:'Acidente',nome:'Risco de atropelamento (veículos internos)',dano:'Fraturas, esmagamentos, óbito',nr:'NR-12 / NR-18'},
+  // PSICOSSOCIAL
+  {cat:'Psicossocial',nome:'Sobrecarga de trabalho / exigências excessivas',dano:'Burnout, transtornos de ansiedade, depressão',nr:'NR-1 / COPSOQ'},
+  {cat:'Psicossocial',nome:'Baixo controle / falta de autonomia',dano:'Estresse ocupacional, desmotivação, absenteísmo',nr:'NR-1'},
+  {cat:'Psicossocial',nome:'Falta de suporte social e liderança inadequada',dano:'Isolamento, burnout, conflitos interpessoais',nr:'NR-1'},
+  {cat:'Psicossocial',nome:'Conflitos interpessoais / assédio moral',dano:'Ansiedade, depressão, TEPT, afastamentos',nr:'NR-1 / Lei 14.457/22'},
+  {cat:'Psicossocial',nome:'Assédio sexual',dano:'TEPT, depressão, afastamentos',nr:'NR-1 / Lei 14.457/22'},
+  {cat:'Psicossocial',nome:'Insegurança no trabalho',dano:'Ansiedade crônica, depressão, baixo comprometimento',nr:'NR-1'},
+  {cat:'Psicossocial',nome:'Violência no trabalho (física ou verbal)',dano:'TEPT, lesões físicas, afastamentos prolongados',nr:'NR-1 / OIT'},
+  {cat:'Psicossocial',nome:'Conflito trabalho-família',dano:'Estresse, esgotamento, problemas de saúde crônicos',nr:'NR-1 / OMS'},
+];
+
+// ─── Risco = Probabilidade × Severidade ─────────────────────────
+function calcRisco(prob,sev){
+  const r=parseInt(prob)*parseInt(sev);
+  if(r<=4)return{nivel:'Trivial',cls:'trivial',cor:'#22c55e'};
+  if(r<=8)return{nivel:'Tolerável',cls:'toleravel',cor:'#84cc16'};
+  if(r<=12)return{nivel:'Moderado',cls:'moderado',cor:'#f59e0b'};
+  if(r<=20)return{nivel:'Substancial',cls:'substancial',cor:'#f97316'};
+  return{nivel:'Intolerável',cls:'intoleravel',cor:'#ef4444'};
+}
+
+// ─── GHE ─────────────────────────────────────────────────────────
+function renderGHE(){
+  const cf=$('gheCoFilter')?.value||'';
+  const list=$('gheList');if(!list)return;
+  if(!cf){list.innerHTML='<div class="empty-st"><p>Selecione uma empresa.</p></div>';return;}
+  const ghes=(STATE.ghes||[]).filter(g=>g.empresa===cf);
+  if(!ghes.length){list.innerHTML='<div class="empty-st"><p>Nenhum GHE cadastrado. Clique em "+ Novo GHE" para começar.</p></div>';return;}
+  list.innerHTML=ghes.map(g=>{
+    const nPerigos=(STATE.perigos||[]).filter(p=>p.empresa===cf&&(p.ghe===g.id||p.ghe==='all')).length;
+    return`<div class="ghe-card">
+      <div class="ghe-card-hd">
+        <div><strong style="font-size:15px">${g.nome}</strong> <span style="color:var(--muted);font-size:12px;margin-left:8px">${g.cargo||''}</span></div>
+        <div style="display:flex;gap:6px">
+          <span style="font-size:12px;color:var(--muted)">${g.ntrab||'?'} trabalhadores · ${nPerigos} perigos</span>
+          <button class="abtn ab-ghost" style="padding:3px 8px;font-size:12px" onclick="editGHE('${g.id}')">Editar</button>
+          <button class="abtn ab-ghost" style="padding:3px 8px;font-size:12px;color:#ef4444" onclick="deleteGHE('${g.id}')">Excluir</button>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--muted)"><strong>Setor:</strong> ${g.setor||'—'} &nbsp;|&nbsp; <strong>Atividades:</strong> ${g.desc||'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openGHEModal(id){
+  $('gheEditId').value=id||'';
+  $('gheModalTitle').textContent=id?'Editar GHE':'Novo GHE';
+  const sel=$('ghe_empresa');sel.innerHTML='<option value="">— Selecione —</option>';
+  visibleCompanies().forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;});
+  if(id){
+    const g=(STATE.ghes||[]).find(x=>x.id===id);
+    if(g){sel.value=g.empresa;$('ghe_nome').value=g.nome;$('ghe_cargo').value=g.cargo||'';$('ghe_setor').value=g.setor||'';$('ghe_ntrab').value=g.ntrab||'';$('ghe_desc').value=g.desc||'';}
+  }else{
+    ['ghe_nome','ghe_cargo','ghe_setor','ghe_ntrab','ghe_desc'].forEach(fid=>{const el=$(fid);if(el)el.value='';});
+    const cf=$('gheCoFilter')?.value;if(cf)sel.value=cf;
+  }
+  openModal('mGHE');
+}
+
+function saveGHE(){
+  const id=$('gheEditId').value||('ghe_'+Date.now());
+  const g={id,empresa:$('ghe_empresa').value,nome:$('ghe_nome').value.trim(),cargo:$('ghe_cargo').value.trim(),setor:$('ghe_setor').value.trim(),ntrab:$('ghe_ntrab').value,desc:$('ghe_desc').value.trim()};
+  if(!g.empresa||!g.nome)return alert('Preencha empresa e nome do GHE.');
+  STATE.ghes=STATE.ghes||[];
+  const idx=STATE.ghes.findIndex(x=>x.id===id);
+  if(idx>=0)STATE.ghes[idx]=g;else STATE.ghes.push(g);
+  saveState();closeModal('mGHE');renderGHE();
+}
+
+function editGHE(id){openGHEModal(id);}
+
+function deleteGHE(id){
+  if(!confirm('Excluir este GHE?'))return;
+  STATE.ghes=(STATE.ghes||[]).filter(x=>x.id!==id);
+  saveState();renderGHE();
+}
+
+// ─── Inventário de Perigos ────────────────────────────────────────
+function updatePerigoGHEs(){
+  const co=$('per_empresa')?.value;
+  const sel=$('per_ghe');if(!sel)return;
+  sel.innerHTML='<option value="all">Todos os GHEs</option>';
+  if(co)(STATE.ghes||[]).filter(g=>g.empresa===co).forEach(g=>{sel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});
+}
+
+function openPerigoModal(id){
+  $('perigoEditId').value=id||'';
+  $('perigoModalTitle').textContent=id?'Editar Perigo':'Adicionar Perigo';
+  const sel=$('per_empresa');sel.innerHTML='<option value="">— Selecione —</option>';
+  visibleCompanies().forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;});
+  if(id){
+    const p=(STATE.perigos||[]).find(x=>x.id===id);
+    if(p){
+      sel.value=p.empresa;updatePerigoGHEs();$('per_ghe').value=p.ghe||'all';
+      $('per_cat').value=p.cat;$('per_nome').value=p.nome;$('per_fonte').value=p.fonte||'';
+      $('per_dano').value=p.dano||'';$('per_nr').value=p.nr||'';
+      $('per_prob').value=p.prob||'3';$('per_sev').value=p.sev||'3';
+      $('per_controles').value=p.controles||'';$('per_acao').value=p.acao||'';
+    }
+  }else{
+    const cf=$('invCoFilter')?.value;
+    if(cf)sel.value=cf;
+    updatePerigoGHEs();
+    ['per_nome','per_fonte','per_dano','per_nr','per_controles','per_acao'].forEach(x=>{const el=$(x);if(el)el.value='';});
+    $('per_prob').value='3';$('per_sev').value='3';
+  }
+  openModal('mPerigo');
+}
+
+function savePerigo(){
+  const id=$('perigoEditId').value||('per_'+Date.now());
+  const p={id,empresa:$('per_empresa').value,ghe:$('per_ghe').value||'all',cat:$('per_cat').value,nome:$('per_nome').value.trim(),fonte:$('per_fonte').value.trim(),dano:$('per_dano').value.trim(),nr:$('per_nr').value.trim(),prob:$('per_prob').value,sev:$('per_sev').value,controles:$('per_controles').value.trim(),acao:$('per_acao').value.trim()};
+  if(!p.empresa||!p.nome)return alert('Preencha empresa e nome do perigo.');
+  STATE.perigos=STATE.perigos||[];
+  const idx=STATE.perigos.findIndex(x=>x.id===id);
+  if(idx>=0)STATE.perigos[idx]=p;else STATE.perigos.push(p);
+  saveState();closeModal('mPerigo');renderInventario();
+}
+
+function renderInventario(){
+  const cf=$('invCoFilter')?.value||'';
+  const gf=$('invGheFilter')?.value||'all';
+  const catf=$('invCatFilter')?.value||'all';
+  const list=$('inventarioList');if(!list)return;
+  if(!cf){list.innerHTML='<div class="empty-st"><p>Selecione uma empresa.</p></div>';return;}
+  // Update GHE filter
+  const ghesel=$('invGheFilter');if(ghesel){const cv=ghesel.value;ghesel.innerHTML='<option value="all">Todos os GHEs</option>';(STATE.ghes||[]).filter(g=>g.empresa===cf).forEach(g=>{ghesel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});ghesel.value=cv;}
+  let perigos=(STATE.perigos||[]).filter(p=>p.empresa===cf);
+  if(gf!=='all')perigos=perigos.filter(p=>p.ghe===gf||p.ghe==='all');
+  if(catf!=='all')perigos=perigos.filter(p=>p.cat===catf);
+  if(!perigos.length){list.innerHTML='<div class="empty-st"><p>Nenhum perigo cadastrado. Use "+ Adicionar Perigo" ou importe o catálogo.</p></div>';return;}
+  const bycat={};
+  perigos.forEach(p=>{(bycat[p.cat]=bycat[p.cat]||[]).push(p);});
+  list.innerHTML=Object.entries(bycat).map(([cat,ps])=>`
+    <div style="margin-bottom:20px">
+      <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:6px;padding:4px 10px;background:#f0f4ff;border-radius:6px">${cat} (${ps.length})</div>
+      <table class="pgr-table">
+        <thead><tr><th>Perigo / Agente</th><th>GHE</th><th>Dano Potencial</th><th>NR/Ref.</th><th>Prob.</th><th>Sev.</th><th>Risco</th><th></th></tr></thead>
+        <tbody>${ps.map(p=>{
+          const r=calcRisco(p.prob,p.sev);
+          const gheName=(STATE.ghes||[]).find(g=>g.id===p.ghe)?.nome||'Todos';
+          return`<tr>
+            <td><strong>${p.nome}</strong>${p.fonte?`<div style="font-size:11px;color:var(--muted)">${p.fonte}</div>`:''}</td>
+            <td style="font-size:12px">${gheName}</td>
+            <td style="font-size:12px">${p.dano||'—'}</td>
+            <td style="font-size:11px">${p.nr||'—'}</td>
+            <td style="text-align:center">${p.prob}</td>
+            <td style="text-align:center">${p.sev}</td>
+            <td><span class="risk-badge risk-${r.cls}">${r.nivel}</span></td>
+            <td style="white-space:nowrap">
+              <button class="abtn ab-ghost" style="padding:2px 6px;font-size:11px" onclick="openPerigoModal('${p.id}')">Ed.</button>
+              <button class="abtn ab-ghost" style="padding:2px 6px;font-size:11px;color:#ef4444" onclick="deletePerigo('${p.id}')">✕</button>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+
+function deletePerigo(id){
+  if(!confirm('Excluir este perigo?'))return;
+  STATE.perigos=(STATE.perigos||[]).filter(x=>x.id!==id);
+  saveState();renderInventario();
+}
+
+function importCatalogPerigos(){
+  const cf=$('invCoFilter')?.value;
+  if(!cf)return alert('Selecione uma empresa primeiro.');
+  const existing=new Set((STATE.perigos||[]).filter(p=>p.empresa===cf).map(p=>p.nome));
+  let added=0;
+  CATALOGO_PERIGOS.forEach(c=>{
+    if(!existing.has(c.nome)){
+      STATE.perigos=STATE.perigos||[];
+      STATE.perigos.push({id:'per_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),empresa:cf,ghe:'all',cat:c.cat,nome:c.nome,fonte:'',dano:c.dano,nr:c.nr,prob:'3',sev:'3',controles:'',acao:''});
+      added++;
+    }
+  });
+  saveState();renderInventario();
+  const already=CATALOGO_PERIGOS.length-added;
+  alert(`${added} perigos importados do catálogo AMBRAC (${already} já existiam).`);
+}
+
+// ─── Matriz de Risco 5×5 ─────────────────────────────────────────
+function renderMatriz(){
+  const cf=$('matrizCoFilter')?.value||'';
+  const gf=$('matrizGheFilter')?.value||'all';
+  const cont=$('matrizContent');if(!cont)return;
+  if(!cf){cont.innerHTML='<div class="empty-st"><p>Selecione uma empresa.</p></div>';return;}
+  const ghesel=$('matrizGheFilter');if(ghesel){const cv=ghesel.value;ghesel.innerHTML='<option value="all">Todos os GHEs</option>';(STATE.ghes||[]).filter(g=>g.empresa===cf).forEach(g=>{ghesel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});ghesel.value=cv;}
+  let perigos=(STATE.perigos||[]).filter(p=>p.empresa===cf);
+  if(gf!=='all')perigos=perigos.filter(p=>p.ghe===gf||p.ghe==='all');
+  if(!perigos.length){cont.innerHTML='<div class="empty-st"><p>Nenhum perigo no inventário. Adicione perigos primeiro.</p></div>';return;}
+  const cells={};
+  for(let s=5;s>=1;s--)for(let p=1;p<=5;p++){cells[`${p}_${s}`]=[];}
+  perigos.forEach(per=>{const k=`${per.prob}_${per.sev}`;if(cells[k])cells[k].push(per);});
+  const probLabels=['Improvável','Pouco Provável','Provável','Muito Provável','Quase Certo'];
+  const sevLabels=['Insignificante','Menor','Moderada','Grave','Catastrófica'];
+  const getCellColor=(p,s)=>{const r=p*s;if(r<=4)return'#bbf7d0';if(r<=8)return'#d9f99d';if(r<=12)return'#fef08a';if(r<=20)return'#fed7aa';return'#fecaca';};
+  let html=`<div style="margin-bottom:20px">
+    <h3 style="font-size:15px;color:var(--accent);margin-bottom:12px">Matriz de Risco 5×5 — Probabilidade × Severidade</h3>
+    <div style="overflow-x:auto">
+    <table style="border-collapse:separate;border-spacing:4px;margin:0 auto">
+      <thead><tr>
+        <th style="font-size:11px;color:var(--muted);text-align:right;padding-right:8px">Sev. / Prob. →</th>
+        ${probLabels.map((l,i)=>`<th style="font-size:11px;width:120px;text-align:center;color:var(--muted)">${i+1}<br><span style="font-weight:400">${l}</span></th>`).join('')}
+      </tr></thead>
+      <tbody>`;
+  for(let s=5;s>=1;s--){
+    html+=`<tr><td style="font-size:11px;text-align:right;padding-right:8px;color:var(--muted);white-space:nowrap">${s} ${sevLabels[s-1]}</td>`;
+    for(let p=1;p<=5;p++){
+      const key=`${p}_${s}`;const ps=cells[key]||[];const r=calcRisco(p,s);
+      html+=`<td style="background:${getCellColor(p,s)};border-radius:6px;padding:6px;min-height:60px;vertical-align:top;min-width:110px">
+        <div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:3px">${r.nivel} (${p*s})</div>
+        ${ps.map(per=>`<div style="font-size:11px;background:rgba(255,255,255,.7);border-radius:3px;padding:2px 4px;margin-top:2px;cursor:pointer" title="${per.dano||''}" onclick="openPerigoModal('${per.id}')">${per.nome.length>30?per.nome.slice(0,30)+'…':per.nome}</div>`).join('')}
+      </td>`;
+    }
+    html+='</tr>';
+  }
+  html+=`</tbody></table></div></div>`;
+  const byRisco={Trivial:[],Tolerável:[],Moderado:[],Substancial:[],Intolerável:[]};
+  perigos.forEach(p=>{const r=calcRisco(p.prob,p.sev);if(byRisco[r.nivel])byRisco[r.nivel].push(p);});
+  html+=`<div style="margin-top:24px"><h3 style="font-size:15px;color:var(--accent);margin-bottom:12px">Resumo por Nível de Risco</h3>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
+      ${['Intolerável','Substancial','Moderado','Tolerável','Trivial'].map(n=>{
+        const colors={'Intolerável':'#fecaca','Substancial':'#fed7aa','Moderado':'#fef08a','Tolerável':'#d9f99d','Trivial':'#bbf7d0'};
+        return`<div style="background:${colors[n]};border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700">${(byRisco[n]||[]).length}</div>
+          <div style="font-size:12px;font-weight:600">${n}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+  cont.innerHTML=html;
+}
+
+// ─── AET — NR-17 ─────────────────────────────────────────────────
+const AET_CHECKLIST={
+  mob:[
+    'Cadeiras com regulagem de altura e apoio lombar',
+    'Mesa de trabalho com altura adequada',
+    'Suporte para monitor posicionado corretamente',
+    'Apoio para punhos disponível',
+    'Espaço suficiente para movimentação',
+    'Equipamentos de proteção individual disponíveis',
+  ],
+  amb:[
+    'Iluminação adequada (mínimo 500 lux para escritório)',
+    'Temperatura confortável (20–23°C para escritório)',
+    'Umidade relativa adequada (40–70%)',
+    'Nível de ruído aceitável (abaixo de 65 dB para escritório)',
+    'Ventilação adequada',
+    'Ausência de trepidações e vibrações excessivas',
+  ],
+  org:[
+    'Pausas e intervalos adequados',
+    'Alternância de tarefas / rotação de funções',
+    'Ritmo de trabalho compatível com capacidade humana',
+    'Autonomia suficiente para organização das tarefas',
+    'Capacitação e treinamento adequados',
+    'Procedimentos documentados e acessíveis',
+  ]
+};
+
+function populateAETChecks(){
+  ['mob','amb','org'].forEach(sec=>{
+    const cap=sec.charAt(0).toUpperCase()+sec.slice(1);
+    const div=$('aet'+cap+'Checks');
+    if(!div)return;
+    div.innerHTML=AET_CHECKLIST[sec].map((item,i)=>`
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="aet_${sec}_${i}" style="cursor:pointer"/> ${item}
+      </label>`).join('');
+  });
+}
+
+function aetEmpresaChanged(){
+  const co=$('aet_empresa')?.value;
+  const gsel=$('aet_ghe');if(!gsel)return;
+  gsel.innerHTML='<option value="">— Selecione —</option>';
+  if(co)(STATE.ghes||[]).filter(g=>g.empresa===co).forEach(g=>{gsel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});
+}
+
+function openAETModal(id){
+  $('aetEditId').value=id||'';
+  populateAETChecks();
+  const esel=$('aet_empresa');esel.innerHTML='<option value="">— Selecione —</option>';
+  visibleCompanies().forEach(c=>{esel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;});
+  const gsel=$('aet_ghe');gsel.innerHTML='<option value="">— Selecione —</option>';
+  if(id){
+    const a=(STATE.aets||[]).find(x=>x.id===id);
+    if(a){
+      esel.value=a.empresa;
+      (STATE.ghes||[]).filter(g=>g.empresa===a.empresa).forEach(g=>{gsel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});
+      gsel.value=a.ghe||'';
+      $('aet_analista').value=a.analista||'';$('aet_data').value=a.data||'';
+      $('aet_risco').value=a.risco||'Moderado';$('aet_prazo').value=a.prazo||'';$('aet_rec').value=a.rec||'';
+      $('aet_mob_obs').value=a.mob_obs||'';$('aet_amb_obs').value=a.amb_obs||'';$('aet_org_obs').value=a.org_obs||'';
+      ['mob','amb','org'].forEach(sec=>{AET_CHECKLIST[sec].forEach((_,i)=>{const el=$(`aet_${sec}_${i}`);if(el)el.checked=(a.checks||{})[`${sec}_${i}`]||false;});});
+    }
+  }else{
+    ['aet_analista','aet_mob_obs','aet_amb_obs','aet_org_obs','aet_rec'].forEach(x=>{const el=$(x);if(el)el.value='';});
+    $('aet_data').value=new Date().toISOString().slice(0,10);
+    $('aet_risco').value='Moderado';$('aet_prazo').value='';
+    const cf=$('aetCoFilter')?.value;
+    if(cf){esel.value=cf;(STATE.ghes||[]).filter(g=>g.empresa===cf).forEach(g=>{gsel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});}
+  }
+  openModal('mAET');
+}
+
+function saveAET(){
+  const checks={};
+  ['mob','amb','org'].forEach(sec=>{AET_CHECKLIST[sec].forEach((_,i)=>{const el=$(`aet_${sec}_${i}`);if(el)checks[`${sec}_${i}`]=el.checked;});});
+  const id=$('aetEditId').value||('aet_'+Date.now());
+  const a={id,empresa:$('aet_empresa').value,ghe:$('aet_ghe').value,analista:$('aet_analista').value.trim(),data:$('aet_data').value,risco:$('aet_risco').value,prazo:$('aet_prazo').value,rec:$('aet_rec').value.trim(),mob_obs:$('aet_mob_obs').value.trim(),amb_obs:$('aet_amb_obs').value.trim(),org_obs:$('aet_org_obs').value.trim(),checks};
+  if(!a.empresa)return alert('Selecione uma empresa.');
+  STATE.aets=STATE.aets||[];
+  const idx=STATE.aets.findIndex(x=>x.id===id);
+  if(idx>=0)STATE.aets[idx]=a;else STATE.aets.push(a);
+  saveState();closeModal('mAET');renderAETList();
+}
+
+function renderAETList(){
+  const cf=$('aetCoFilter')?.value||'';
+  const list=$('aetList');if(!list)return;
+  if(!cf){list.innerHTML='<div class="empty-st"><p>Selecione uma empresa.</p></div>';return;}
+  const aets=(STATE.aets||[]).filter(a=>a.empresa===cf);
+  if(!aets.length){list.innerHTML='<div class="empty-st"><p>Nenhuma AET cadastrada. Clique em "+ Nova AET".</p></div>';return;}
+  const riskColors={Trivial:'#22c55e',Tolerável:'#84cc16',Moderado:'#f59e0b',Substancial:'#f97316',Intolerável:'#ef4444'};
+  list.innerHTML=aets.map(a=>{
+    const gheName=(STATE.ghes||[]).find(g=>g.id===a.ghe)?.nome||'—';
+    const checksOk=Object.values(a.checks||{}).filter(Boolean).length;
+    const checksTotal=Object.values(a.checks||{}).length;
+    return`<div class="ghe-card">
+      <div class="ghe-card-hd">
+        <div><strong>${gheName}</strong> <span style="font-size:12px;color:var(--muted);margin-left:8px">${a.data||''} · Analista: ${a.analista||'—'}</span></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="padding:2px 10px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:${riskColors[a.risco]||'#6b7280'}">${a.risco}</span>
+          <button class="abtn ab-ghost" style="padding:3px 8px;font-size:12px" onclick="openAETModal('${a.id}')">Editar</button>
+          <button class="abtn ab-ghost" style="padding:3px 8px;font-size:12px;color:#ef4444" onclick="deleteAET('${a.id}')">Excluir</button>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">${checksOk}/${checksTotal} critérios conformes &nbsp;|&nbsp; ${a.rec?a.rec.slice(0,100)+'…':'Sem recomendações registradas'}</div>
+    </div>`;
+  }).join('');
+}
+
+function deleteAET(id){if(!confirm('Excluir esta AET?'))return;STATE.aets=(STATE.aets||[]).filter(x=>x.id!==id);saveState();renderAETList();}
+
+// ─── PGR Completo ─────────────────────────────────────────────────
+function renderPGRPreview(){
+  const cf=$('pgrCoFilter')?.value||'';
+  const cont=$('pgrPreview');if(!cont)return;
+  if(!cf){cont.innerHTML='<div class="empty-st"><p>Selecione uma empresa para pré-visualizar o PGR.</p></div>';return;}
+  const co=STATE.companies.find(x=>x.id===cf);if(!co)return;
+  const perigos=(STATE.perigos||[]).filter(p=>p.empresa===cf);
+  const ghes=(STATE.ghes||[]).filter(g=>g.empresa===cf);
+  const aets=(STATE.aets||[]).filter(a=>a.empresa===cf);
+  const respostas=STATE.responses.filter(r=>r.empresa===cf);
+  const riskCounts={Trivial:0,Tolerável:0,Moderado:0,Substancial:0,Intolerável:0};
+  perigos.forEach(p=>{const r=calcRisco(p.prob,p.sev);riskCounts[r.nivel]=(riskCounts[r.nivel]||0)+1;});
+  cont.innerHTML=`
+    <div style="font-size:13px;line-height:1.7;color:var(--text)">
+      <div style="text-align:center;padding:30px 20px 20px;border-bottom:2px solid var(--accent);margin-bottom:24px">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Programa de Gerenciamento de Riscos</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent)">${co.nome||'Empresa'}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">NR-1 (Port. MTE nº 1.419/2024) · Elaborado em ${new Date().toLocaleDateString('pt-BR')}</div>
+      </div>
+      <div class="pgr-section">
+        <h3>1. Identificação da Empresa</h3>
+        <table class="pgr-table">
+          <tr><td style="width:35%;font-weight:600">Razão social</td><td>${co.nome||'—'}</td></tr>
+          <tr><td style="font-weight:600">CNPJ</td><td>${co.cnpj||'—'}</td></tr>
+          <tr><td style="font-weight:600">Endereço</td><td>${co.endereco||'—'}</td></tr>
+          <tr><td style="font-weight:600">Atividade econômica</td><td>${co.setor||co.atividade||'—'}</td></tr>
+          <tr><td style="font-weight:600">Nº de trabalhadores</td><td>${co.ntrab||ghes.reduce((s,g)=>s+(parseInt(g.ntrab)||0),0)||'—'}</td></tr>
+          <tr><td style="font-weight:600">GHEs cadastrados</td><td>${ghes.length}</td></tr>
+        </table>
+      </div>
+      <div class="pgr-section">
+        <h3>2. Objetivo e Escopo</h3>
+        <p>O presente Programa de Gerenciamento de Riscos (PGR) foi elaborado em conformidade com a Norma Regulamentadora NR-1 (Portaria MTE nº 1.419, de 01/10/2024) e tem como objetivo identificar, avaliar e controlar os riscos ocupacionais presentes nas atividades desenvolvidas na empresa <strong>${co.nome||'—'}</strong>, visando a eliminação ou redução dos danos à saúde e à segurança dos trabalhadores.</p>
+        <p>Este PGR é composto pelo <strong>Inventário de Riscos Ocupacionais</strong> e pelo <strong>Plano de Ação</strong>, integrando dados de avaliação psicossocial (${respostas.length} respostas coletadas) com avaliação ergonômica e análise de perigos físicos, químicos, biológicos e de acidentes.</p>
+      </div>
+      ${ghes.length?`<div class="pgr-section">
+        <h3>3. Grupos Homogêneos de Exposição (GHE)</h3>
+        <table class="pgr-table">
+          <thead><tr><th>#</th><th>Nome do GHE</th><th>Cargo / Função</th><th>Setor</th><th>Nº Trabalhadores</th><th>Descrição das Atividades</th></tr></thead>
+          <tbody>${ghes.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nome}</td><td>${g.cargo||'—'}</td><td>${g.setor||'—'}</td><td style="text-align:center">${g.ntrab||'—'}</td><td>${g.desc||'—'}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`:''}
+      ${perigos.length?`<div class="pgr-section">
+        <h3>4. Inventário de Riscos Ocupacionais</h3>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px">
+          ${['Intolerável','Substancial','Moderado','Tolerável','Trivial'].map(n=>{const colors={'Intolerável':'#fecaca','Substancial':'#fed7aa','Moderado':'#fef08a','Tolerável':'#d9f99d','Trivial':'#bbf7d0'};return`<div style="background:${colors[n]};border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:700">${riskCounts[n]||0}</div><div style="font-size:11px">${n}</div></div>`;}).join('')}
+        </div>
+        <table class="pgr-table">
+          <thead><tr><th>Categoria</th><th>Perigo / Agente</th><th>GHE</th><th>Dano Potencial</th><th>NR/Ref.</th><th>P</th><th>S</th><th>Risco</th><th>Controles</th></tr></thead>
+          <tbody>${perigos.map(p=>{const r=calcRisco(p.prob,p.sev);const gheName=(STATE.ghes||[]).find(g=>g.id===p.ghe)?.nome||'Todos';return`<tr><td><span class="cat-badge">${p.cat}</span></td><td><strong>${p.nome}</strong>${p.fonte?`<div style="font-size:11px;color:var(--muted)">${p.fonte}</div>`:''}</td><td style="font-size:12px">${gheName}</td><td style="font-size:12px">${p.dano||'—'}</td><td style="font-size:11px">${p.nr||'—'}</td><td style="text-align:center">${p.prob}</td><td style="text-align:center">${p.sev}</td><td><span class="risk-badge risk-${r.cls}">${r.nivel}</span></td><td style="font-size:12px">${p.controles||'—'}</td></tr>`;}).join('')}</tbody>
+        </table>
+      </div>`:'<div class="pgr-section"><h3>4. Inventário de Riscos Ocupacionais</h3><p style="color:var(--muted)">Nenhum perigo cadastrado. Acesse o módulo "Inventário de Riscos" para adicionar.</p></div>'}
+      <div class="pgr-section">
+        <h3>5. Avaliação de Riscos Psicossociais</h3>
+        ${respostas.length>=5?`<p>Foram coletadas <strong>${respostas.length} respostas</strong> de avaliação psicossocial para esta empresa, utilizando os instrumentos validados COPSOQ/AOT em conformidade com a NR-1.</p>
+        <table class="pgr-table">
+          <thead><tr><th>Instrumento</th><th>Respostas</th><th>Status</th></tr></thead>
+          <tbody>
+            ${['copsoq','copsoq2s','copsoq3','bemestar'].map(q=>{const n=respostas.filter(r=>r.questionario===q).length;const names={copsoq:'COPSOQ II Completo (76q)',copsoq2s:'COPSOQ II Curta (41q)',copsoq3:'COPSOQ III (40q)',bemestar:'AOT (24q)'};return n?`<tr><td>${names[q]}</td><td>${n}</td><td style="color:#22c55e">Dados disponíveis</td></tr>`:null;}).filter(Boolean).join('')||'<tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhuma resposta coletada</td></tr>'}
+          </tbody>
+        </table>`:`<p style="color:var(--muted)">Menos de 5 respostas coletadas. A anonimização exige mínimo de 5 respondentes por grupo.</p>`}
+      </div>
+      ${aets.length?`<div class="pgr-section">
+        <h3>6. Análise Ergonômica do Trabalho (AET) — NR-17</h3>
+        <table class="pgr-table">
+          <thead><tr><th>GHE / Posto</th><th>Data</th><th>Analista</th><th>Nível de Risco</th><th>Prazo</th><th>Recomendações</th></tr></thead>
+          <tbody>${aets.map(a=>{const gheName=(STATE.ghes||[]).find(g=>g.id===a.ghe)?.nome||'—';const riskColors={Trivial:'#22c55e',Tolerável:'#84cc16',Moderado:'#f59e0b',Substancial:'#f97316',Intolerável:'#ef4444'};return`<tr><td>${gheName}</td><td>${a.data||'—'}</td><td>${a.analista||'—'}</td><td><span style="color:#fff;background:${riskColors[a.risco]||'#6b7280'};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${a.risco}</span></td><td>${a.prazo||'—'}</td><td style="font-size:12px">${a.rec||'—'}</td></tr>`;}).join('')}</tbody>
+        </table>
+      </div>`:''}
+      <div class="pgr-section">
+        <h3>7. Plano de Ação</h3>
+        ${(()=>{
+          const acoes=[
+            ...perigos.filter(p=>p.acao).map(p=>{const r=calcRisco(p.prob,p.sev);return{origem:p.cat,desc:p.acao,risco:r.nivel,cls:r.cls};}),
+            ...((STATE.plano||[]).filter(a=>!a.empresa||a.empresa===cf).map(a=>({origem:'Plano de Ação',desc:a.text||a.titulo||a.descricao||'',risco:a.prioridade||'—',cls:'moderado',resp:a.resp,prazo:a.prazo,status:a.status})))
+          ].filter(a=>a.desc);
+          if(!acoes.length)return'<p style="color:var(--muted)">Nenhuma ação cadastrada. Registre ações corretivas nos perigos do inventário ou no módulo Plano de Ação.</p>';
+          return`<table class="pgr-table">
+            <thead><tr><th>#</th><th>Origem</th><th>Ação necessária</th><th>Risco / Prioridade</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead>
+            <tbody>${acoes.map((a,i)=>`<tr><td>${i+1}</td><td><span class="cat-badge">${a.origem}</span></td><td>${a.desc}</td><td><span class="risk-badge risk-${a.cls}">${a.risco}</span></td><td>${a.resp||'—'}</td><td>${a.prazo||'—'}</td><td>${a.status||'Pendente'}</td></tr>`).join('')}</tbody>
+          </table>`;
+        })()}
+      </div>
+      <div class="pgr-section">
+        <h3>8. Conclusão e Revisão</h3>
+        <p>Este PGR deve ser revisado anualmente ou sempre que houver mudança nas condições de trabalho, introdução de novas tecnologias ou processos, após acidentes graves ou incidentes significativos, e sempre que solicitado por autoridade competente (NR-1.5.3).</p>
+        <p>A implementação das medidas de controle identificadas é responsabilidade da alta direção, devendo ser monitorada pelo SESMT ou profissional de SST responsável.</p>
+        <table class="pgr-table" style="margin-top:16px">
+          <tr><td style="width:50%;height:50px">Responsável técnico: ___________________________</td><td>Aprovado por: ___________________________</td></tr>
+          <tr><td>CREA/CRM/CRP: ___________________________</td><td>Data: ${new Date().toLocaleDateString('pt-BR')}</td></tr>
+        </table>
+      </div>
+    </div>`;
+}
+
+function exportPGRCompleto(){
+  const cf=$('pgrCoFilter')?.value||'';
+  if(!cf)return alert('Selecione uma empresa primeiro.');
+  renderPGRPreview();
+  setTimeout(()=>window.print(),300);
+}
+
+// ─── PANEL_MAP + navTo extension para painéis SST ──────────────
+if(typeof PANEL_MAP!=='undefined'){
+  PANEL_MAP['pGHE']=['GHE — Grupos Homogêneos de Exposição','Gestão dos grupos de trabalhadores por exposição similar (NR-1)'];
+  PANEL_MAP['pInventario']=['Inventário de Riscos','Identificação e avaliação de perigos ocupacionais (NR-1 Anexo I)'];
+  PANEL_MAP['pMatriz']=['Matriz de Risco','Probabilidade × Severidade — visualização e priorização de riscos'];
+  PANEL_MAP['pAET']=['AET — Análise Ergonômica do Trabalho','Avaliação de postos de trabalho conforme NR-17'];
+  PANEL_MAP['pPGR']=['PGR — Programa de Gerenciamento de Riscos','Documento completo NR-1 integrando todos os dados SST'];
+}
+
+const _origNavToSST=navTo;
+navTo=function(pid,btn){
+  _origNavToSST(pid,btn);
+  const coFilterMap={pGHE:'gheCoFilter',pInventario:'invCoFilter',pMatriz:'matrizCoFilter',pAET:'aetCoFilter',pPGR:'pgrCoFilter'};
+  const cfId=coFilterMap[pid];
+  if(cfId){
+    const sel=$(cfId);if(!sel)return;
+    sel.innerHTML='<option value="">Selecione a empresa</option>';
+    visibleCompanies().forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;});
+    if(visibleCompanies().length===1)sel.value=visibleCompanies()[0].id;
+  }
+  if(pid==='pGHE')renderGHE();
+  else if(pid==='pInventario')renderInventario();
+  else if(pid==='pMatriz')renderMatriz();
+  else if(pid==='pAET')renderAETList();
+  else if(pid==='pPGR')renderPGRPreview();
+};
+
 </script>
+
+<!-- MODAL: GHE -->
+<div class="modal-ov" id="mGHE">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr"><h3 id="gheModalTitle">Novo GHE</h3><button class="modal-close" onclick="closeModal('mGHE')">×</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="gheEditId"/>
+      <div class="drow"><div class="dlabel">Empresa</div><select id="ghe_empresa" class="tinput"><option value="">— Selecione —</option></select></div>
+      <div class="drow"><div class="dlabel">Nome do GHE</div><input type="text" id="ghe_nome" class="tinput" placeholder="Ex.: Operadores de Produção"/></div>
+      <div class="drow"><div class="dlabel">Cargo(s) / Função</div><input type="text" id="ghe_cargo" class="tinput" placeholder="Ex.: Operador de Máquinas, Montador"/></div>
+      <div class="drow"><div class="dlabel">Setor / Área</div><input type="text" id="ghe_setor" class="tinput" placeholder="Ex.: Produção, Administrativo"/></div>
+      <div class="drow"><div class="dlabel">Nº de trabalhadores</div><input type="number" id="ghe_ntrab" class="tinput" placeholder="Ex.: 15" min="1"/></div>
+      <div class="drow"><div class="dlabel">Descrição das atividades</div><textarea id="ghe_desc" class="tinput" rows="3" placeholder="Descreva as principais atividades e tarefas do grupo…"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mGHE')">Cancelar</button><button class="abtn ab-pri" onclick="saveGHE()">Salvar GHE</button></div>
+  </div>
+</div>
+
+<!-- MODAL: PERIGO -->
+<div class="modal-ov" id="mPerigo">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-hdr"><h3 id="perigoModalTitle">Adicionar Perigo</h3><button class="modal-close" onclick="closeModal('mPerigo')">×</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="perigoEditId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Empresa</div><select id="per_empresa" class="tinput" onchange="updatePerigoGHEs()"><option value="">— Selecione —</option></select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">GHE</div><select id="per_ghe" class="tinput"><option value="all">Todos os GHEs</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Categoria</div>
+          <select id="per_cat" class="tinput">
+            <option value="Físico">Físico</option><option value="Químico">Químico</option>
+            <option value="Biológico">Biológico</option><option value="Ergonômico">Ergonômico</option>
+            <option value="Acidente">Acidente / Mecânico</option><option value="Psicossocial">Psicossocial</option>
+          </select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Perigo / Agente</div><input type="text" id="per_nome" class="tinput" placeholder="Ex.: Ruído contínuo"/></div>
+      </div>
+      <div><div class="dlabel" style="margin-bottom:4px">Fonte / Situação geradora</div><input type="text" id="per_fonte" class="tinput" placeholder="Ex.: Máquinas de produção em operação"/></div>
+      <div><div class="dlabel" style="margin-bottom:4px">Possível dano / efeito à saúde</div><input type="text" id="per_dano" class="tinput" placeholder="Ex.: Perda auditiva induzida por ruído (PAIR)"/></div>
+      <div><div class="dlabel" style="margin-bottom:4px">NR / Referência legal</div><input type="text" id="per_nr" class="tinput" placeholder="Ex.: NR-15 Anexo I"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Probabilidade</div>
+          <select id="per_prob" class="tinput">
+            <option value="1">1 — Improvável</option><option value="2">2 — Pouco provável</option>
+            <option value="3" selected>3 — Provável</option><option value="4">4 — Muito provável</option><option value="5">5 — Quase certo</option>
+          </select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Severidade</div>
+          <select id="per_sev" class="tinput">
+            <option value="1">1 — Insignificante</option><option value="2">2 — Menor</option>
+            <option value="3" selected>3 — Moderada</option><option value="4">4 — Grave</option><option value="5">5 — Catastrófica</option>
+          </select></div>
+      </div>
+      <div><div class="dlabel" style="margin-bottom:4px">Medidas de controle existentes (EPC / EPI)</div><textarea id="per_controles" class="tinput" rows="2" placeholder="Ex.: Protetor auricular tipo concha (EPI) · Enclausuramento da fonte (EPC)"></textarea></div>
+      <div><div class="dlabel" style="margin-bottom:4px">Ação necessária</div><textarea id="per_acao" class="tinput" rows="2" placeholder="Ex.: Realizar medição de ruído NHO-01 até 30/06/2025"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mPerigo')">Cancelar</button><button class="abtn ab-pri" onclick="savePerigo()">Salvar Perigo</button></div>
+  </div>
+</div>
+
+<!-- MODAL: AET -->
+<div class="modal-ov" id="mAET">
+  <div class="modal" style="max-width:680px;max-height:90vh;overflow-y:auto">
+    <div class="modal-hdr"><h3>Análise Ergonômica do Trabalho — NR-17</h3><button class="modal-close" onclick="closeModal('mAET')">×</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+      <input type="hidden" id="aetEditId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Empresa</div><select id="aet_empresa" class="tinput" onchange="aetEmpresaChanged()"><option value="">— Selecione —</option></select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">GHE / Posto de Trabalho</div><select id="aet_ghe" class="tinput"><option value="">— Selecione —</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Analista responsável</div><input type="text" id="aet_analista" class="tinput" placeholder="Nome do técnico/ergonomista"/></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Data da análise</div><input type="date" id="aet_data" class="tinput"/></div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:14px">
+        <div style="font-weight:600;color:var(--accent);margin-bottom:10px">1. Mobiliário e Equipamentos (NR-17.3 / 17.4)</div>
+        <div id="aetMobChecks" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px"></div>
+        <div style="margin-top:10px"><div class="dlabel" style="margin-bottom:4px">Observações</div><textarea id="aet_mob_obs" class="tinput" rows="2" placeholder="Descreva inconformidades encontradas…"></textarea></div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:14px">
+        <div style="font-weight:600;color:var(--accent);margin-bottom:10px">2. Condições Ambientais de Trabalho (NR-17.5)</div>
+        <div id="aetAmbChecks" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px"></div>
+        <div style="margin-top:10px"><div class="dlabel" style="margin-bottom:4px">Observações</div><textarea id="aet_amb_obs" class="tinput" rows="2"></textarea></div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:14px">
+        <div style="font-weight:600;color:var(--accent);margin-bottom:10px">3. Organização do Trabalho (NR-17.6)</div>
+        <div id="aetOrgChecks" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px"></div>
+        <div style="margin-top:10px"><div class="dlabel" style="margin-bottom:4px">Observações</div><textarea id="aet_org_obs" class="tinput" rows="2"></textarea></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Nível de risco ergonômico</div>
+          <select id="aet_risco" class="tinput">
+            <option value="Trivial">Trivial — sem ação necessária</option>
+            <option value="Tolerável">Tolerável — monitorar</option>
+            <option value="Moderado" selected>Moderado — ação planejada</option>
+            <option value="Substancial">Substancial — ação urgente</option>
+            <option value="Intolerável">Intolerável — paralisar atividade</option>
+          </select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Prazo para medidas corretivas</div><input type="date" id="aet_prazo" class="tinput"/></div>
+      </div>
+      <div><div class="dlabel" style="margin-bottom:4px">Recomendações e medidas corretivas</div><textarea id="aet_rec" class="tinput" rows="3" placeholder="Descreva as intervenções recomendadas…"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mAET')">Cancelar</button><button class="abtn ab-pri" onclick="saveAET()">Salvar AET</button></div>
+  </div>
+</div>
+
 </body>
 </html>
