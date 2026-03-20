@@ -729,9 +729,30 @@ body.manager-mode{
         <div class="qmeta"><div class="qchip">~10 min</div><div class="qchip">24 questões</div><div class="qchip">PGR / NR-1</div></div>
         <div class="qcstart"><span id="beLabel">Iniciar questionário →</span></div>
       </div>
+      <div class="qcard" id="cC2s" style="display:none" onclick="startQ('copsoq2s')">
+        <div class="qtag green">Internacional · COPSOQ II Curta</div>
+        <h3>COPSOQ II Curta</h3>
+        <p>Versão curta do COPSOQ II — 41 questões cobrindo 6 dimensões psicossociais. Kristensen (2001) · Silva et al. (2011).</p>
+        <div class="qmeta"><div class="qchip">~12 min</div><div class="qchip">41 questões</div><div class="qchip">Versão Curta</div></div>
+        <div class="qcstart"><span id="c2sLabel">Iniciar questionário →</span></div>
+      </div>
+      <div class="qcard" id="cC3" style="display:none" onclick="startQ('copsoq3')">
+        <div class="qtag green">Internacional · COPSOQ III</div>
+        <h3>COPSOQ III</h3>
+        <p>Versão 2019+ do COPSOQ com novas dimensões de Trabalho–Família, Justiça Organizacional e Confiança na Gestão.</p>
+        <div class="qmeta"><div class="qchip">~12 min</div><div class="qchip">40 questões</div><div class="qchip">COPSOQ III 2019+</div></div>
+        <div class="qcstart"><span id="c3Label">Iniciar questionário →</span></div>
+      </div>
     </div>
     <div id="assignedNotice" style="display:none;background:var(--accent-pale);border:1px solid rgba(30,77,58,.25);border-radius:12px;padding:13px 18px;font-size:13px;color:var(--accent);margin-bottom:16px;align-items:center;gap:10px">
       <p id="assignedNoticeText"></p>
+    </div>
+    <div id="selAcademySection" style="display:none;margin-bottom:24px">
+      <div style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:16px">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--text)">Cursos Disponíveis <span style="font-size:13px;font-weight:400;color:var(--muted)">Academy</span></h2>
+        <p style="font-size:13px;color:var(--muted);margin-top:3px">Cursos e treinamentos disponibilizados pela sua empresa.</p>
+      </div>
+      <div id="selAcademyGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
     </div>
     <div class="info-bar"><p><strong>Sobre a confidencialidade:</strong> suas respostas são anônimas e analisadas exclusivamente de forma coletiva. Cada colaborador pode responder cada questionário apenas <strong>uma única vez</strong>.</p></div>
     <button class="logout-lnk" onclick="doLogout()">Sair ↗</button>
@@ -879,13 +900,32 @@ body.manager-mode{
         <button class="nav-item" onclick="navTo('pCo',this)">Empresas</button>
         <button class="nav-item" onclick="navTo('pUp',this)">Importar Colaboradores</button>
         <div class="nav-sec">Relatórios</div>
-        <button class="nav-item" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
-        <button class="nav-item" onclick="navTo('pRBe',this)">Relatório AOT</button>
+        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+          <button class="nav-item" style="flex:1" onclick="navTo('pRCq',this)">Relatório COPSOQ II</button>
+          <button onclick="showInstrHelp('copsoq')" title="Manual COPSOQ II" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+          <button class="nav-item" style="flex:1" onclick="navTo('pRC2S',this)">Relatório COPSOQ II Curta</button>
+          <button onclick="showInstrHelp('copsoq2s')" title="Manual COPSOQ II Curta" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+          <button class="nav-item" style="flex:1" onclick="navTo('pRC3',this)">Relatório COPSOQ III</button>
+          <button onclick="showInstrHelp('copsoq3')" title="Manual COPSOQ III" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+          <button class="nav-item" style="flex:1" onclick="navTo('pRBe',this)">Relatório AOT</button>
+          <button onclick="showInstrHelp('aot')" title="Manual AOT" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+        </div>
         <button class="nav-item" onclick="navTo('pResp',this)">Respostas Individuais</button>
         <button class="nav-item" onclick="navTo('pPlano',this)">Plano de Ação</button>
         <button class="nav-item" onclick="navTo('pPulso',this)">Pulso Mensal</button>
+        <div class="nav-sec">Ferramentas</div>
+        <button class="nav-item" onclick="navTo('pBancoAcoes',this)">Banco de Ações</button>
         <div class="nav-sec">Academy</div>
-        <button class="nav-item" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
+        <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
+          <button class="nav-item" style="flex:1" onclick="navTo('pAcademy',this)">Cursos e Treinamentos</button>
+          <button onclick="showInstrHelp('academy')" title="Manual Academy" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:4px 7px;font-size:11px;font-weight:700;flex-shrink:0;font-family:inherit">?</button>
+        </div>
         <div class="nav-sec">Administração</div>
         <button class="nav-item" onclick="navTo('pHist',this)">Histórico de Relatórios</button>
         <button class="nav-item" onclick="navTo('pContas',this)">Contas Gerenciais</button>
@@ -1228,6 +1268,54 @@ body.manager-mode{
           </div>
         </div>
 
+        <!-- REPORT COPSOQ II CURTA -->
+        <div class="panel" id="pRC2S">
+          <div class="rep-toolbar">
+            <select class="sel-s" id="c2sCoFilter" onchange="renderC2S()"><option value="all">Todas as empresas</option></select>
+            <select class="sel-s" id="c2sSecFilter" onchange="renderC2S()"><option value="all">Todos os setores</option></select>
+            <button class="abtn ab-ghost" onclick="renderC2S()">↻ Atualizar</button>
+            <button class="abtn ab-pdf" onclick="printReport('c2s')" title="Imprimir / Salvar como PDF">PDF</button>
+            <button class="abtn ab-pgr" onclick="exportPGR('c2s')" title="Exportar PGR">Exportar PGR</button>
+          </div>
+          <div id="c2sRepContent"><div class="empty-st"><p>Nenhuma resposta COPSOQ II Curta recebida ainda.</p></div></div>
+        </div>
+
+        <!-- REPORT COPSOQ III -->
+        <div class="panel" id="pRC3">
+          <div class="rep-toolbar">
+            <select class="sel-s" id="c3CoFilter" onchange="renderC3()"><option value="all">Todas as empresas</option></select>
+            <select class="sel-s" id="c3SecFilter" onchange="renderC3()"><option value="all">Todos os setores</option></select>
+            <button class="abtn ab-ghost" onclick="renderC3()">↻ Atualizar</button>
+            <button class="abtn ab-pdf" onclick="printReport('c3')" title="Imprimir / Salvar como PDF">PDF</button>
+            <button class="abtn ab-pgr" onclick="exportPGR('c3')" title="Exportar PGR">Exportar PGR</button>
+          </div>
+          <div id="c3RepContent"><div class="empty-st"><p>Nenhuma resposta COPSOQ III recebida ainda.</p></div></div>
+        </div>
+
+        <!-- BANCO DE AÇÕES -->
+        <div class="panel" id="pBancoAcoes">
+          <div class="toolbar">
+            <div class="toolbar-l">
+              <input class="srch" id="srchBanco" placeholder="Buscar ação ou fator…" oninput="renderBancoAcoes()" style="width:260px"/>
+              <select class="sel-s" id="bancoFatorFilter" onchange="renderBancoAcoes()"><option value="all">Todos os fatores</option></select>
+              <select class="sel-s" id="bancoPriorFilter" onchange="renderBancoAcoes()">
+                <option value="all">Todas as prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px">
+              <label style="display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);cursor:pointer">
+                Importar documento<input type="file" accept=".pdf,.xlsx,.xls,.doc,.docx" style="display:none" onchange="bancoImportDoc(event)"/>
+              </label>
+              <button class="abtn ab-pri" onclick="openNewBancoAcao()">+ Nova Ação</button>
+            </div>
+          </div>
+          <div id="bancoCounts" style="font-size:12px;color:var(--muted);margin-bottom:12px;text-align:right"></div>
+          <div id="bancoGrid" class="da-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"></div>
+        </div>
+
         <!-- ACADEMY / CURSOS -->
         <div class="panel" id="pAcademy">
           <div class="toolbar">
@@ -1370,7 +1458,7 @@ body.manager-mode{
       <div class="form-grid"><div class="form-group"><label>Nome *</label><input id="nc_nome" placeholder="Indústria XYZ Ltda"/></div><div class="form-group"><label>CNPJ</label><input id="nc_cnpj" placeholder="00.000.000/0000-00" oninput="maskCNPJ(this)"/></div></div>
       <div class="form-grid"><div class="form-group"><label>Ramo</label><input id="nc_setor" placeholder="Indústria, Saúde, Varejo…"/></div><div class="form-group"><label>Contato RH</label><input id="nc_rh" placeholder="Nome do responsável"/></div></div>
       <div class="form-grid"><div class="form-group"><label>E-mail RH</label><input id="nc_email" type="email" placeholder="rh@empresa.com.br"/></div><div class="form-group"><label>Questionário atribuído *</label>
-        <select id="nc_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option><option value="ambos">Todos</option></select>
+        <select id="nc_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II Completo (76q)</option><option value="copsoq2s">COPSOQ II Curta (41q)</option><option value="copsoq3">COPSOQ III (40q)</option><option value="bemestar">AOT (24q)</option><option value="ambos">Todos</option></select>
       </div></div>
       <div class="form-group"><label>Informações adicionais</label><textarea id="nc_info" placeholder="Observações, contexto, histórico da empresa…" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
     </div>
@@ -1454,7 +1542,7 @@ body.manager-mode{
         <select id="ec_status"><option value="ativo">Ativo</option><option value="inconclusivo">Inconclusivo</option><option value="concluido">Concluído</option></select>
       </div></div>
       <div class="form-grid"><div class="form-group"><label>Questionário *</label>
-        <select id="ec_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II</option><option value="bemestar">Bem-Estar</option><option value="ambos">Ambos</option></select>
+        <select id="ec_quest"><option value="">— Selecione —</option><option value="copsoq">COPSOQ II Completo (76q)</option><option value="copsoq2s">COPSOQ II Curta (41q)</option><option value="copsoq3">COPSOQ III (40q)</option><option value="bemestar">AOT (24q)</option><option value="ambos">Ambos</option></select>
       </div></div>
       <div class="form-group"><label>Informações adicionais</label><textarea id="ec_info" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
     </div>
@@ -1567,7 +1655,9 @@ body.manager-mode{
           <div class="form-group" style="margin:0"><label>Nome do Ciclo *</label><input id="ec_ciclo_nome" placeholder="Ex.: Diagnóstico 2025.1"/></div>
           <div class="form-group" style="margin:0"><label>Instrumento</label>
             <select id="ec_ciclo_inst" style="width:100%;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
-              <option value="copsoq">COPSOQ II</option>
+              <option value="copsoq">COPSOQ II Completo</option>
+              <option value="copsoq2s">COPSOQ II Curta</option>
+              <option value="copsoq3">COPSOQ III</option>
               <option value="bemestar">AOT</option>
               <option value="ambos">Ambos</option>
             </select>
@@ -1650,6 +1740,148 @@ body.manager-mode{
     <div class="modal-footer">
       <button class="abtn ab-ghost" onclick="closeModal('mNewAction')">Cancelar</button>
       <button class="abtn ab-pri" onclick="saveAction()">Salvar ação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AJUDA / MANUAL DO INSTRUMENTO -->
+<div class="modal-ov" id="mInstrHelp">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-hdr">
+      <h3 id="mInstrHelpTitle">Manual do Instrumento</h3>
+      <button class="modal-close" onclick="closeModal('mInstrHelp')">×</button>
+    </div>
+    <div class="modal-body" id="mInstrHelpBody"></div>
+    <div class="modal-footer">
+      <button class="abtn ab-ghost" onclick="closeModal('mInstrHelp')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA AÇÃO BANCO -->
+<div class="modal-ov" id="mNewBancoAcao">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-hdr">
+      <h3 id="mNewBancoAcaoTitle">Nova Ação — Banco de Ações</h3>
+      <button class="modal-close" onclick="closeModal('mNewBancoAcao')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ba_editId"/>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1"><label>Título da Ação *</label><input id="ba_titulo" placeholder="Ex.: Programa de reconhecimento por pares"/></div>
+      </div>
+      <div class="form-group" style="margin-bottom:13px"><label>Descrição</label>
+        <textarea id="ba_desc" style="width:100%;min-height:70px;padding:10px 13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;resize:vertical" placeholder="Detalhes da ação..."></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Fator / Categoria</label><input id="ba_fator" placeholder="Ex.: Reconhecimento, Burnout…"/></div>
+        <div class="form-group"><label>Prioridade</label>
+          <select id="ba_prioridade" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+            <option value="Alta">Alta</option><option value="Média">Média</option><option value="Baixa">Baixa</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Prazo sugerido</label><input id="ba_prazo" placeholder="Ex.: 30 dias, 3 meses…"/></div>
+        <div class="form-group"><label>Tipo</label>
+          <select id="ba_tipo" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+            <option value="acao">Ação Prática</option><option value="treinamento">Treinamento</option>
+          </select>
+        </div>
+      </div>
+      <div id="baAlert" class="alert alert-e"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="abtn ab-ghost" onclick="closeModal('mNewBancoAcao')">Cancelar</button>
+      <button class="abtn ab-pri" onclick="saveBancoAcao()">Salvar ação</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTICIPANT: COPSOQ II CURTA -->
+<div id="sC2S" class="screen">
+  <div class="q-topbar">
+    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">COPSOQ II Curta — 41 questões</span></div>
+    <div class="pbwrap"><span class="plabel" id="c2sPct">0%</span><div class="ptrack"><div class="pfill" id="c2sFill" style="width:0%"></div></div></div>
+  </div>
+  <div class="qwrap">
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>COPSOQ II Curta — Avaliação Psicossocial</h3><p>Versão curta validada · 41 questões · Kristensen (2001) · Tradução: Silva et al. (2011)</p></div>
+      <div class="secbody"><div style="padding:15px 18px;font-size:13.5px;color:var(--muted);line-height:1.8"><strong style="color:var(--text)">Instruções:</strong> Responda com base na sua rotina de trabalho atual.</div></div>
+    </div>
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>Perfil</h3><p>Para análise estatística — totalmente anônimos.</p></div>
+      <div class="secbody">
+        <div class="drow"><div class="dlabel">Setor / Área</div><div style="flex:1"><input type="text" id="c2s_setor" placeholder="Ex.: Produção, RH…" class="tinput" style="resize:none;min-height:unset"/></div></div>
+        <div class="drow"><div class="dlabel">Faixa etária</div><div class="dopts" id="c2s_idade"><div class="opill" onclick="sp(this,'c2s_idade')">Até 27 anos</div><div class="opill" onclick="sp(this,'c2s_idade')">De 28 a 43 anos</div><div class="opill" onclick="sp(this,'c2s_idade')">De 44 a 59 anos</div><div class="opill" onclick="sp(this,'c2s_idade')">A partir de 60 anos</div></div></div>
+        <div class="drow"><div class="dlabel">Sexo</div><div class="dopts" id="c2s_sexo"><div class="opill" onclick="sp(this,'c2s_sexo')">Feminino</div><div class="opill" onclick="sp(this,'c2s_sexo')">Masculino</div><div class="opill" onclick="sp(this,'c2s_sexo')">Outro</div></div></div>
+      </div>
+    </div>
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>Questões</h3><p>Indique a frequência com que cada situação ocorre.</p></div>
+      <div class="secbody" style="overflow-x:auto">
+        <table class="ltable">
+          <thead><tr>
+            <th style="text-align:left;padding-left:18px">Questão</th>
+            <th class="colw"><div class="lhlabel">Sempre</div></th>
+            <th class="colw"><div class="lhlabel">Frequente-mente</div></th>
+            <th class="colw"><div class="lhlabel">Às vezes</div></th>
+            <th class="colw"><div class="lhlabel">Raramente</div></th>
+            <th class="colw"><div class="lhlabel">Nunca/ Quase nunca</div></th>
+          </tr></thead>
+          <tbody id="c2sLikert"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="qsubmit">
+      <h3>Pronto para enviar?</h3>
+      <p>Após o envio, não será possível editar.</p>
+      <button class="subbtn" onclick="submitForm('copsoq2s')">Enviar respostas ✓</button>
+      <p class="warnnote">Atenção: Cada colaborador pode responder este questionário apenas uma vez.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PARTICIPANT: COPSOQ III -->
+<div id="sC3" class="screen">
+  <div class="q-topbar">
+    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">COPSOQ III — 40 questões</span></div>
+    <div class="pbwrap"><span class="plabel" id="c3Pct">0%</span><div class="ptrack"><div class="pfill" id="c3Fill" style="width:0%"></div></div></div>
+  </div>
+  <div class="qwrap">
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>COPSOQ III — Avaliação Psicossocial (versão 2019+)</h3><p>40 questões · Escala: Sempre / Frequentemente / Às vezes / Raramente / Nunca</p></div>
+      <div class="secbody"><div style="padding:15px 18px;font-size:13.5px;color:var(--muted);line-height:1.8"><strong style="color:var(--text)">Instruções:</strong> Responda com base na sua rotina de trabalho atual.</div></div>
+    </div>
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>Perfil</h3><p>Para análise estatística — totalmente anônimos.</p></div>
+      <div class="secbody">
+        <div class="drow"><div class="dlabel">Setor / Área</div><div style="flex:1"><input type="text" id="c3_setor" placeholder="Ex.: Produção, RH…" class="tinput" style="resize:none;min-height:unset"/></div></div>
+        <div class="drow"><div class="dlabel">Faixa etária</div><div class="dopts" id="c3_idade"><div class="opill" onclick="sp(this,'c3_idade')">Até 27 anos</div><div class="opill" onclick="sp(this,'c3_idade')">De 28 a 43 anos</div><div class="opill" onclick="sp(this,'c3_idade')">De 44 a 59 anos</div><div class="opill" onclick="sp(this,'c3_idade')">A partir de 60 anos</div></div></div>
+        <div class="drow"><div class="dlabel">Sexo</div><div class="dopts" id="c3_sexo"><div class="opill" onclick="sp(this,'c3_sexo')">Feminino</div><div class="opill" onclick="sp(this,'c3_sexo')">Masculino</div><div class="opill" onclick="sp(this,'c3_sexo')">Outro</div></div></div>
+      </div>
+    </div>
+    <div class="qsec">
+      <div class="sechead" style="background:var(--accent)"><h3>Questões</h3><p>Indique a frequência com que cada situação ocorre.</p></div>
+      <div class="secbody" style="overflow-x:auto">
+        <table class="ltable">
+          <thead><tr>
+            <th style="text-align:left;padding-left:18px">Questão</th>
+            <th class="colw"><div class="lhlabel">Sempre</div></th>
+            <th class="colw"><div class="lhlabel">Frequente-mente</div></th>
+            <th class="colw"><div class="lhlabel">Às vezes</div></th>
+            <th class="colw"><div class="lhlabel">Raramente</div></th>
+            <th class="colw"><div class="lhlabel">Nunca/ Quase nunca</div></th>
+          </tr></thead>
+          <tbody id="c3Likert"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="qsubmit">
+      <h3>Pronto para enviar?</h3>
+      <p>Após o envio, não será possível editar.</p>
+      <button class="subbtn" onclick="submitForm('copsoq3')">Enviar respostas ✓</button>
+      <p class="warnnote">Atenção: Cada colaborador pode responder este questionário apenas uma vez.</p>
     </div>
   </div>
 </div>
@@ -5501,6 +5733,738 @@ function generateExportToken() {
   a.download = 'ambrac_export_' + Date.now() + '.json';
   a.click();
 })();
+
+// ═══════════════════════════════════════
+// COPSOQ II CURTA — 41 questões
+// ═══════════════════════════════════════
+// COPSOQ II Versão Curta — 41 questões
+// Kristensen, T. (2001) · Tradução e adaptação: Silva, C. et al. (2011)
+// scale groups: 'standard'=Nunca→Sempre | 'nada'=Nada→Extremamente | 'saude'=Excelente→Deficitária
+const C2S_Q=[
+  // Q0-Q2 · Exigências quantitativas
+  {t:'A sua carga de trabalho acumula-se por ser mal distribuída?',factor:'Exigências quantitativas',inv:false},
+  {t:'Com que frequência não tem tempo para completar todas as tarefas do seu trabalho?',factor:'Exigências quantitativas',inv:false},
+  {t:'Precisa trabalhar muito rapidamente?',factor:'Exigências quantitativas',inv:false},
+  // Q3-Q4 · Exigências cognitivas
+  {t:'O seu trabalho exige a sua atenção constante.',factor:'Exigências cognitivas',inv:false},
+  {t:'O seu trabalho exige que tome decisões difíceis?',factor:'Exigências cognitivas',inv:false},
+  // Q5 · Exigências emocionais
+  {t:'O seu trabalho exige emocionalmente de si?',factor:'Exigências emocionais',inv:false},
+  // Q6 · Influência no trabalho
+  {t:'Tem um elevado grau de influência no seu trabalho?',factor:'Influência no trabalho',inv:true},
+  // Q7-Q8 · Possibilidades de desenvolvimento
+  {t:'O seu trabalho exige que tenha iniciativa?',factor:'Possibilidades de desenvolvimento',inv:true},
+  {t:'O seu trabalho permite-lhe aprender coisas novas?',factor:'Possibilidades de desenvolvimento',inv:true},
+  // Q9-Q10 · Previsibilidade
+  {t:'No seu local de trabalho, é informado com antecedência sobre decisões importantes, mudanças ou planos para o futuro?',factor:'Previsibilidade',inv:true},
+  {t:'Recebe toda a informação de que necessita para fazer bem o seu trabalho?',factor:'Previsibilidade',inv:true},
+  // Q11 · Clareza de papel
+  {t:'Sabe exactamente quais as suas responsabilidades?',factor:'Clareza de papel',inv:true},
+  // Q12 · Reconhecimento
+  {t:'O seu trabalho é reconhecido e apreciado pela gerência?',factor:'Reconhecimento',inv:true},
+  // Q13 · Justiça
+  {t:'É tratado de forma justa no seu local de trabalho?',factor:'Justiça e respeito',inv:true},
+  // Q14 · Apoio do superior
+  {t:'Com que frequência tem ajuda e apoio do seu superior imediato?',factor:'Apoio social dos superiores',inv:true},
+  // Q15 · Comunidade social
+  {t:'Existe um bom ambiente de trabalho entre si e os seus colegas?',factor:'Comunidade social no trabalho',inv:true},
+  // Q16-Q17 · Qualidade da liderança — "Em relação à sua chefia directa..."
+  {t:'Oferece aos indivíduos e ao grupo boas oportunidades de desenvolvimento?',factor:'Qualidade da liderança',inv:true,sec:1},
+  {t:'É bom no planeamento do trabalho?',factor:'Qualidade da liderança',inv:true},
+  // Q18-Q19 · Confiança vertical
+  {t:'A gerência confia nos seus funcionários para fazerem o seu trabalho bem?',factor:'Confiança vertical',inv:true},
+  {t:'Confia na informação que lhe é transmitida pela gerência?',factor:'Confiança vertical',inv:true},
+  // Q20-Q21 · Justiça social
+  {t:'Os conflitos são resolvidos de uma forma justa?',factor:'Justiça social',inv:true},
+  {t:'O trabalho é igualmente distribuído pelos funcionários?',factor:'Justiça social',inv:true},
+  // Q22 · Autoeficácia
+  {t:'Sou sempre capaz de resolver problemas, se tentar o suficiente.',factor:'Autoeficácia',inv:true},
+  // Q23-Q24 · Significado — scale: nada→extremamente
+  {t:'O seu trabalho tem algum significado para si?',factor:'Significado do trabalho',inv:true,sec:2},
+  {t:'Sente que o seu trabalho é importante?',factor:'Significado do trabalho',inv:true},
+  // Q25 · Comprometimento
+  {t:'Sente que os problemas do seu local de trabalho são seus também?',factor:'Comprometimento com o trabalho',inv:true},
+  // Q26 · Satisfação
+  {t:'Quão satisfeito está com o seu trabalho de uma forma global?',factor:'Satisfação no trabalho',inv:true},
+  // Q27 · Insegurança laboral
+  {t:'Sente-se preocupado em ficar desempregado?',factor:'Insegurança laboral',inv:false},
+  // Q28 · Saúde geral — scale: excelente→deficitária
+  {t:'Em geral, sente que a sua saúde é:',factor:'Saúde geral',inv:false,sec:3},
+  // Q29-Q30 · Conflito trabalho/família — scale: nada→extremamente
+  {t:'Sente que o seu trabalho lhe exige muita energia que acaba por afectar a sua vida privada negativamente?',factor:'Conflito trabalho/família',inv:false,sec:4},
+  {t:'Sente que o seu trabalho lhe exige muito tempo que acaba por afectar a sua vida privada negativamente?',factor:'Conflito trabalho/família',inv:false},
+  // Q31 · Problemas de sono — scale: nunca→sempre
+  {t:'Acordou várias vezes durante a noite e depois não conseguia adormecer novamente?',factor:'Problemas de sono',inv:false,sec:5},
+  // Q32-Q33 · Burnout
+  {t:'Fisicamente exausto?',factor:'Burnout',inv:false},
+  {t:'Emocionalmente exausto?',factor:'Burnout',inv:false},
+  // Q34-Q36 · Estresse/afeto negativo
+  {t:'Irritado?',factor:'Estresse',inv:false},
+  {t:'Ansioso?',factor:'Estresse',inv:false},
+  {t:'Triste?',factor:'Estresse',inv:false},
+  // Q37-Q40 · Comportamentos ofensivos — scale: nunca→sempre
+  {t:'Tem sido alvo de insultos ou provocações verbais?',factor:'Comportamentos ofensivos',inv:false,sec:6},
+  {t:'Tem sido exposto ao assédio sexual indesejado?',factor:'Comportamentos ofensivos',inv:false},
+  {t:'Tem sido exposto a ameaças de violência?',factor:'Comportamentos ofensivos',inv:false},
+  {t:'Tem sido exposto à violência física?',factor:'Comportamentos ofensivos',inv:false},
+];
+
+// Section headers for scale changes within the questionnaire
+const C2S_SECTIONS={
+  0:{title:'Das seguintes afirmações indique a que mais se adequa à sua resposta de acordo com as instruções.',cols:['Nunca/<br>Quase nunca','Raramente','Às vezes','Frequente-<br>mente','Sempre']},
+  1:{title:'Em relação à sua chefia directa, até que ponto considera que...',cols:['Nunca/<br>Quase nunca','Raramente','Às vezes','Frequente-<br>mente','Sempre']},
+  2:{title:'Das seguintes afirmações, em que medida se aplica à sua situação...',cols:['Nada/<br>Quase nada','Um pouco','Modera-<br>damente','Muito','Extrema-<br>mente']},
+  3:{title:'',cols:['Excelente','Muito boa','Boa','Razoável','Deficitária']},
+  4:{title:'As próximas questões referem-se ao modo como o seu trabalho afecta a sua vida privada.',cols:['Nada/<br>Quase nada','Um pouco','Modera-<br>damente','Muito','Extrema-<br>mente']},
+  5:{title:'Com que frequência durante as últimas 4 semanas sentiu...',cols:['Nunca/<br>Quase nunca','Raramente','Às vezes','Frequente-<br>mente','Sempre']},
+  6:{title:'Nos últimos 12 meses, no seu local de trabalho...',cols:['Nunca/<br>Quase nunca','Raramente','Às vezes','Frequente-<br>mente','Sempre']},
+};
+
+const C2S_FACTORS=[
+  {name:'Exigências quantitativas',qs:[0,1,2],invertedQs:[]},
+  {name:'Exigências cognitivas',qs:[3,4],invertedQs:[]},
+  {name:'Exigências emocionais',qs:[5],invertedQs:[]},
+  {name:'Influência no trabalho',qs:[6],invertedQs:[6]},
+  {name:'Possibilidades de desenvolvimento',qs:[7,8],invertedQs:[7,8]},
+  {name:'Previsibilidade',qs:[9,10],invertedQs:[9,10]},
+  {name:'Clareza de papel',qs:[11],invertedQs:[11]},
+  {name:'Reconhecimento',qs:[12],invertedQs:[12]},
+  {name:'Justiça e respeito',qs:[13],invertedQs:[13]},
+  {name:'Apoio social dos superiores',qs:[14],invertedQs:[14]},
+  {name:'Comunidade social no trabalho',qs:[15],invertedQs:[15]},
+  {name:'Qualidade da liderança',qs:[16,17],invertedQs:[16,17]},
+  {name:'Confiança vertical',qs:[18,19],invertedQs:[18,19]},
+  {name:'Justiça social',qs:[20,21],invertedQs:[20,21]},
+  {name:'Autoeficácia',qs:[22],invertedQs:[22]},
+  {name:'Significado do trabalho',qs:[23,24],invertedQs:[23,24]},
+  {name:'Comprometimento com o trabalho',qs:[25],invertedQs:[25]},
+  {name:'Satisfação no trabalho',qs:[26],invertedQs:[26]},
+  {name:'Insegurança laboral',qs:[27],invertedQs:[]},
+  {name:'Saúde geral',qs:[28],invertedQs:[]},
+  {name:'Conflito trabalho/família',qs:[29,30],invertedQs:[]},
+  {name:'Problemas de sono',qs:[31],invertedQs:[]},
+  {name:'Burnout',qs:[32,33],invertedQs:[]},
+  {name:'Estresse',qs:[34,35,36],invertedQs:[]},
+  {name:'Comportamentos ofensivos',qs:[37,38,39,40],invertedQs:[]},
+];
+
+const C2S_DIMS=[
+  {id:'c2s_exig',name:'Exigências Laborais',factors:['Exigências quantitativas','Exigências cognitivas','Exigências emocionais'],desc:'Carga, ritmo e demandas cognitivas/emocionais'},
+  {id:'c2s_org',name:'Organização e Conteúdo do Trabalho',factors:['Influência no trabalho','Possibilidades de desenvolvimento','Previsibilidade','Clareza de papel'],desc:'Autonomia, desenvolvimento, clareza e previsibilidade'},
+  {id:'c2s_rel',name:'Relações Sociais e Liderança',factors:['Reconhecimento','Justiça e respeito','Apoio social dos superiores','Comunidade social no trabalho','Qualidade da liderança','Confiança vertical','Justiça social'],desc:'Suporte, reconhecimento, liderança e confiança'},
+  {id:'c2s_int',name:'Interface Trabalho-Indivíduo',factors:['Autoeficácia','Significado do trabalho','Comprometimento com o trabalho','Satisfação no trabalho','Insegurança laboral','Conflito trabalho/família'],desc:'Significado, comprometimento, satisfação e equilíbrio'},
+  {id:'c2s_sau',name:'Saúde e Bem-estar',factors:['Saúde geral','Problemas de sono','Burnout','Estresse'],desc:'Saúde geral, exaustão física/emocional e sintomas de estresse'},
+  {id:'c2s_ofe',name:'Comportamentos Ofensivos',factors:['Comportamentos ofensivos'],desc:'Exposição a violência, assédio e comportamentos hostis no trabalho'},
+];
+
+let c2sAns={};
+
+function calcC2S(resps){
+  const fs={};
+  C2S_FACTORS.forEach(f=>{
+    const inv=new Set(f.invertedQs||[]);
+    const v=[];
+    resps.forEach(r=>{
+      f.qs.forEach(qi=>{
+        const x=r.respostas['q'+qi];
+        if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);
+      });
+    });
+    fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  });
+  const ds={};
+  C2S_DIMS.forEach(d=>{
+    const v=d.factors.map(fn=>fs[fn]).filter(x=>x!=null);
+    ds[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  });
+  return{fs,ds};
+}
+
+function buildC2SLikert(){
+  const tb=$('c2sLikert');if(!tb)return;
+  tb.innerHTML='';
+  C2S_Q.forEach((q,i)=>{
+    const sec=q.sec!=null?C2S_SECTIONS[q.sec]:null;
+    if(sec){
+      if(sec.title){
+        const hr=document.createElement('tr');
+        hr.innerHTML=`<td colspan="6" style="background:#f0f4ff;font-weight:600;font-size:12.5px;color:#3d7aed;padding:10px 14px;border-top:2px solid #dbeafe;border-bottom:1px solid #dbeafe;">${sec.title}</td>`;
+        tb.appendChild(hr);
+      }
+      const hdr=document.createElement('tr');
+      hdr.innerHTML=`<th style="text-align:left;padding-left:14px;font-weight:500;font-size:12px;color:var(--muted);width:55%">Questão</th>`+
+        sec.cols.map(c=>`<th class="colw" style="font-size:11px;text-align:center;color:var(--muted)">${c}</th>`).join('');
+      tb.appendChild(hdr);
+    }
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}. ${q.t}</td>`+
+      [1,2,3,4,5].map(v=>`<td><div class="lradio" id="c2s_q${i}_${v}" onclick="selL('c2s',${i},${v})"></div></td>`).join('');
+    tb.appendChild(tr);
+  });
+}
+
+function renderC2S(){
+  const cf=$('c2sCoFilter')?.value||'all';
+  const sf=$('c2sSecFilter')?.value||'all';
+  let resps=STATE.responses.filter(r=>r.questionario==='copsoq2s');
+  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
+  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
+  const cont=$('c2sRepContent');if(!cont)return;
+  if(!resps.length){cont.innerHTML=`<div class="empty-st"><p>Nenhuma resposta COPSOQ II Curta recebida ainda.</p></div>`;return;}
+  const sc=calcC2S(resps);
+  const sf2=C2S_FACTORS.map(f=>({...f,score:sc.fs[f.name]})).filter(f=>f.score!=null).sort((a,b)=>b.score-a.score);
+  const c2sCo=STATE.companies.find(x=>x.id===(cf==='all'?null:cf));
+  cont.innerHTML=buildRepHTML(resps,sf2,sc.ds,C2S_DIMS,CQ_ACTIONS,'c2sDimCh','c2sFactCh','c2s',undefined,c2sCo);
+  setTimeout(()=>renderRepCharts('c2sDimCh','c2sFactCh',C2S_DIMS,sc.ds,sf2),80);
+}
+
+// ═══════════════════════════════════════
+// COPSOQ III — 40 questões
+// ═══════════════════════════════════════
+const C3_Q=[
+  // Exigências Laborais (Q0–Q7)
+  {t:'A sua carga de trabalho acumula-se por ser mal distribuída?',factor:'Exigências quantitativas',inv:false},
+  {t:'Com que frequência não tem tempo para completar todas as tarefas?',factor:'Exigências quantitativas',inv:false},
+  {t:'Precisa trabalhar muito rapidamente.',factor:'Ritmo de trabalho acelerado',inv:false},
+  {t:'O seu trabalho exige a sua atenção constante.',factor:'Exigências cognitivas',inv:false},
+  {t:'O seu trabalho requer que seja bom a propor novas ideias.',factor:'Exigências cognitivas',inv:false},
+  {t:'O seu trabalho exige emocionalmente de si.',factor:'Exigências emocionais',inv:false},
+  {t:'Tem de esconder os seus sentimentos no trabalho.',factor:'Exigências emocionais',inv:false},
+  {t:'O trabalho exige muita energia afetando negativamente sua vida privada.',factor:'Conflito trabalho–família',inv:false},
+  // Organização do Trabalho (Q8–Q15)
+  {t:'Tem um elevado grau de influência no seu trabalho.',factor:'Pouca influência no trabalho',inv:true},
+  {t:'Pode influenciar a quantidade de trabalho que lhe compete.',factor:'Pouca influência no trabalho',inv:true},
+  {t:'O seu trabalho permite-lhe aprender coisas novas.',factor:'Baixas possibilidades de desenvolvimento',inv:true},
+  {t:'O seu trabalho exige que tenha iniciativa.',factor:'Baixas possibilidades de desenvolvimento',inv:true},
+  {t:'O seu trabalho apresenta objetivos claros.',factor:'Pouca transparência do papel laboral',inv:true},
+  {t:'Sabe exatamente quais as suas responsabilidades.',factor:'Pouca transparência do papel laboral',inv:true},
+  {t:'É informado com antecedência sobre decisões importantes e mudanças.',factor:'Baixa previsibilidade',inv:true},
+  {t:'Recebe toda a informação necessária para fazer bem o seu trabalho.',factor:'Baixa previsibilidade',inv:true},
+  // Relações Sociais (Q16–Q26)
+  {t:'Com que frequência tem ajuda e apoio dos seus colegas?',factor:'Pouco apoio social de colegas',inv:true},
+  {t:'Existe uma boa cooperação entre os colegas de trabalho.',factor:'Pouco apoio social de colegas',inv:true},
+  {t:'Com que frequência tem ajuda e apoio do superior imediato?',factor:'Pouco apoio social dos superiores',inv:true},
+  {t:'Com que frequência o superior fala sobre o seu desempenho?',factor:'Pouco apoio social dos superiores',inv:true},
+  {t:'O seu trabalho é reconhecido e apreciado pela gerência.',factor:'Déficit nas recompensas',inv:true},
+  {t:'A gerência respeita-o no seu local de trabalho.',factor:'Déficit nas recompensas',inv:true},
+  {t:'É tratado de forma justa no seu local de trabalho.',factor:'Injustiça e desrespeito',inv:true},
+  {t:'Os conflitos são resolvidos de uma forma justa.',factor:'Injustiça e desrespeito',inv:true},
+  {t:'A gerência confia nos seus funcionários para fazerem o trabalho bem.',factor:'Baixa confiança na gerência',inv:true},
+  {t:'Confia na informação que lhe é transmitida pela gerência.',factor:'Baixa confiança na gerência',inv:true},
+  // Interface Trabalho–Indivíduo (Q27–Q32)
+  {t:'O seu trabalho tem algum significado para si.',factor:'Trabalho sem significado',inv:true},
+  {t:'Sente que o seu trabalho é importante.',factor:'Trabalho sem significado',inv:true},
+  {t:'Sente-se motivado e envolvido com o seu trabalho.',factor:'Pouco compromisso face ao trabalho',inv:true},
+  {t:'Sou sempre capaz de resolver problemas, se tentar o suficiente.',factor:'Baixa autoeficácia',inv:true},
+  {t:'Sente-se satisfeito com o seu trabalho de uma forma global?',factor:'Insatisfação no trabalho',inv:true},
+  {t:'Sente-se preocupado em ficar desempregado?',factor:'Insegurança laboral',inv:false},
+  // Saúde e Bem-estar (Q33–Q39)
+  {t:'Com que frequência tem dormido mal por causa do trabalho?',factor:'Problemas em dormir',inv:false},
+  {t:'Fisicamente exausto.',factor:'Burnout',inv:false},
+  {t:'Emocionalmente exausto.',factor:'Burnout',inv:false},
+  {t:'Irritado.',factor:'Estresse',inv:false},
+  {t:'Ansioso.',factor:'Estresse',inv:false},
+  {t:'Triste.',factor:'Sintomas depressivos',inv:false},
+  {t:'Falta de interesse por coisas cotidianas.',factor:'Sintomas depressivos',inv:false},
+  {t:'Tem sido alvo de insultos ou provocações verbais no trabalho?',factor:'Comportamentos ofensivos',inv:false},
+];
+
+const C3_FACTORS=[
+  {name:'Exigências quantitativas',qs:[0,1],invertedQs:[]},
+  {name:'Ritmo de trabalho acelerado',qs:[2],invertedQs:[]},
+  {name:'Exigências cognitivas',qs:[3,4],invertedQs:[]},
+  {name:'Exigências emocionais',qs:[5,6],invertedQs:[]},
+  {name:'Conflito trabalho–família',qs:[7],invertedQs:[]},
+  {name:'Pouca influência no trabalho',qs:[8,9],invertedQs:[8,9]},
+  {name:'Baixas possibilidades de desenvolvimento',qs:[10,11],invertedQs:[10,11]},
+  {name:'Pouca transparência do papel laboral',qs:[12,13],invertedQs:[12,13]},
+  {name:'Baixa previsibilidade',qs:[14,15],invertedQs:[14,15]},
+  {name:'Pouco apoio social de colegas',qs:[16,17],invertedQs:[16,17]},
+  {name:'Pouco apoio social dos superiores',qs:[18,19],invertedQs:[18,19]},
+  {name:'Déficit nas recompensas',qs:[20,21],invertedQs:[20,21]},
+  {name:'Injustiça e desrespeito',qs:[22,23],invertedQs:[22,23]},
+  {name:'Baixa confiança na gerência',qs:[24,25],invertedQs:[24,25]},
+  {name:'Trabalho sem significado',qs:[26,27],invertedQs:[26,27]},
+  {name:'Pouco compromisso face ao trabalho',qs:[28],invertedQs:[28]},
+  {name:'Baixa autoeficácia',qs:[29],invertedQs:[29]},
+  {name:'Insatisfação no trabalho',qs:[30],invertedQs:[30]},
+  {name:'Insegurança laboral',qs:[31],invertedQs:[]},
+  {name:'Problemas em dormir',qs:[32],invertedQs:[]},
+  {name:'Burnout',qs:[33,34],invertedQs:[]},
+  {name:'Estresse',qs:[35,36],invertedQs:[]},
+  {name:'Sintomas depressivos',qs:[37,38],invertedQs:[]},
+  {name:'Comportamentos ofensivos',qs:[39],invertedQs:[]},
+];
+
+const C3_DIMS=[
+  {id:'c3_exig',name:'Exigências Laborais',factors:['Exigências quantitativas','Ritmo de trabalho acelerado','Exigências cognitivas','Exigências emocionais'],desc:'Carga, ritmo e demandas cognitivas/emocionais'},
+  {id:'c3_tfam',name:'Trabalho–Família',factors:['Conflito trabalho–família'],desc:'Interferência do trabalho na vida pessoal e familiar'},
+  {id:'c3_org',name:'Organização do Trabalho',factors:['Pouca influência no trabalho','Baixas possibilidades de desenvolvimento','Pouca transparência do papel laboral','Baixa previsibilidade'],desc:'Autonomia, desenvolvimento, clareza de papel e previsibilidade'},
+  {id:'c3_rel',name:'Relações Sociais',factors:['Pouco apoio social de colegas','Pouco apoio social dos superiores','Déficit nas recompensas'],desc:'Suporte de colegas, liderança e reconhecimento'},
+  {id:'c3_just',name:'Justiça e Confiança',factors:['Injustiça e desrespeito','Baixa confiança na gerência'],desc:'Equidade organizacional e confiança na gestão'},
+  {id:'c3_ind',name:'Interface Indivíduo–Trabalho',factors:['Trabalho sem significado','Pouco compromisso face ao trabalho','Baixa autoeficácia','Insatisfação no trabalho','Insegurança laboral'],desc:'Significado, engajamento, autoeficácia e satisfação'},
+  {id:'c3_sau',name:'Saúde e Bem-estar',factors:['Problemas em dormir','Burnout','Estresse','Sintomas depressivos','Comportamentos ofensivos'],desc:'Saúde física, mental e comportamentos ofensivos'},
+];
+
+let c3Ans={};
+
+function calcC3(resps){
+  const fs={};
+  C3_FACTORS.forEach(f=>{
+    const inv=new Set(f.invertedQs||[]);
+    const v=[];
+    resps.forEach(r=>{
+      f.qs.forEach(qi=>{
+        const x=r.respostas['q'+qi];
+        if(x!=null)v.push(inv.has(qi)?1-(x-1)/4:(x-1)/4);
+      });
+    });
+    fs[f.name]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  });
+  const ds={};
+  C3_DIMS.forEach(d=>{
+    const v=d.factors.map(fn=>fs[fn]).filter(x=>x!=null);
+    ds[d.id]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  });
+  return{fs,ds};
+}
+
+function buildC3Likert(){
+  const tb=$('c3Likert');if(!tb)return;
+  tb.innerHTML='';
+  C3_Q.forEach((q,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}. ${q.t}</td>`+
+      [1,2,3,4,5].map(v=>`<td><div class="lradio" id="c3_q${i}_${v}" onclick="selL('c3',${i},${v})"></div></td>`).join('');
+    tb.appendChild(tr);
+  });
+}
+
+function renderC3(){
+  const cf=$('c3CoFilter')?.value||'all';
+  const sf=$('c3SecFilter')?.value||'all';
+  let resps=STATE.responses.filter(r=>r.questionario==='copsoq3');
+  if(cf!=='all')resps=resps.filter(r=>r.empresa===cf);
+  if(sf!=='all')resps=resps.filter(r=>(r.respostas?.setor||'').toLowerCase()===sf.toLowerCase());
+  const cont=$('c3RepContent');if(!cont)return;
+  if(!resps.length){cont.innerHTML=`<div class="empty-st"><p>Nenhuma resposta COPSOQ III recebida ainda.</p></div>`;return;}
+  const sc=calcC3(resps);
+  const sf2=C3_FACTORS.map(f=>({...f,score:sc.fs[f.name]})).filter(f=>f.score!=null).sort((a,b)=>b.score-a.score);
+  const c3Co=STATE.companies.find(x=>x.id===(cf==='all'?null:cf));
+  cont.innerHTML=buildRepHTML(resps,sf2,sc.ds,C3_DIMS,CQ_ACTIONS,'c3DimCh','c3FactCh','c3',undefined,c3Co);
+  setTimeout(()=>renderRepCharts('c3DimCh','c3FactCh',C3_DIMS,sc.ds,sf2),80);
+}
+
+// ═══════════════════════════════════════
+// selL extension for c2s and c3
+// ═══════════════════════════════════════
+const _origSelL=selL;
+selL=function(prefix,qi,val,maxV=5){
+  if(prefix==='c2s'){
+    Array.from({length:maxV},(_,i)=>i+1).forEach(v=>{const el=$(`c2s_q${qi}_${v}`);if(el)el.classList.remove('sel');});
+    const el=$(`c2s_q${qi}_${val}`);if(el)el.classList.add('sel');
+    c2sAns[`q${qi}`]=val;updP('c2s');
+  } else if(prefix==='c3'){
+    Array.from({length:maxV},(_,i)=>i+1).forEach(v=>{const el=$(`c3_q${qi}_${v}`);if(el)el.classList.remove('sel');});
+    const el=$(`c3_q${qi}_${val}`);if(el)el.classList.add('sel');
+    c3Ans[`q${qi}`]=val;updP('c3');
+  } else {
+    _origSelL(prefix,qi,val,maxV);
+  }
+};
+
+// ═══════════════════════════════════════
+// updP extension for c2s and c3
+// ═══════════════════════════════════════
+const _origUpdP=updP;
+updP=function(t){
+  if(t==='c2s'){
+    const p=Math.round(Object.keys(c2sAns).filter(k=>k.startsWith('q')).length/C2S_Q.length*100);
+    if($('c2sPct'))$('c2sPct').textContent=p+'%';
+    if($('c2sFill'))$('c2sFill').style.width=p+'%';
+  } else if(t==='c3'){
+    const p=Math.round(Object.keys(c3Ans).filter(k=>k.startsWith('q')).length/C3_Q.length*100);
+    if($('c3Pct'))$('c3Pct').textContent=p+'%';
+    if($('c3Fill'))$('c3Fill').style.width=p+'%';
+  } else {
+    _origUpdP(t);
+  }
+};
+
+// ═══════════════════════════════════════
+// startQ extension for copsoq2s and copsoq3
+// ═══════════════════════════════════════
+const _origStartQ=startQ;
+startQ=function(type){
+  if(type==='copsoq2s'){
+    if(done[CU.email+'_copsoq2s'])return;
+    c2sAns={};
+    buildC2SLikert();
+    showSc('sC2S');
+    updP('c2s');
+  } else if(type==='copsoq3'){
+    if(done[CU.email+'_copsoq3'])return;
+    c3Ans={};
+    buildC3Likert();
+    showSc('sC3');
+    updP('c3');
+  } else {
+    _origStartQ(type);
+  }
+};
+
+// ═══════════════════════════════════════
+// submitForm extension for copsoq2s and copsoq3
+// ═══════════════════════════════════════
+const _origSubmitFormBase=submitForm;
+submitForm=function(type){
+  if(type==='copsoq2s'){
+    done[CU.email+'_copsoq2s']=true;
+    const gp=gid=>{const el=document.querySelector(`#${gid} .opill.sel`);return el?el.textContent.trim():null;};
+    const perfil={idade:gp('c2s_idade'),sexo:gp('c2s_sexo')};
+    c2sAns.setor=$('c2s_setor')?.value||'';
+    const payload={id:'resp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),colaborador:CU.nome,email:CU.email,empresa:null,questionario:'copsoq2s',timestamp:new Date().toISOString(),respostas:{...c2sAns},perfil};
+    const co=STATE.companies.find(c=>c.colaboradores.find(col=>col.email===CU.email));if(co)payload.empresa=co.id;
+    try{const ex=JSON.parse(localStorage.getItem('ambrac_responses')||'[]');ex.push(payload);localStorage.setItem('ambrac_responses',JSON.stringify(ex));}catch(e){}
+    STATE.responses.push(payload);saveState();updateCards();showSc('sSucc');
+  } else if(type==='copsoq3'){
+    done[CU.email+'_copsoq3']=true;
+    const gp=gid=>{const el=document.querySelector(`#${gid} .opill.sel`);return el?el.textContent.trim():null;};
+    const perfil={idade:gp('c3_idade'),sexo:gp('c3_sexo')};
+    c3Ans.setor=$('c3_setor')?.value||'';
+    const payload={id:'resp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),colaborador:CU.nome,email:CU.email,empresa:null,questionario:'copsoq3',timestamp:new Date().toISOString(),respostas:{...c3Ans},perfil};
+    const co=STATE.companies.find(c=>c.colaboradores.find(col=>col.email===CU.email));if(co)payload.empresa=co.id;
+    try{const ex=JSON.parse(localStorage.getItem('ambrac_responses')||'[]');ex.push(payload);localStorage.setItem('ambrac_responses',JSON.stringify(ex));}catch(e){}
+    STATE.responses.push(payload);saveState();updateCards();showSc('sSucc');
+  } else {
+    _origSubmitFormBase(type);
+  }
+};
+
+// ═══════════════════════════════════════
+// updateCards extension for new instruments
+// ═══════════════════════════════════════
+const _origUpdateCards=updateCards;
+updateCards=function(){
+  _origUpdateCards();
+  const e=CU?CU.email:'';
+  const q=CU?.questionario||'ambos';
+  // Show/hide c2s card
+  const c2sCard=$('cC2s');
+  if(c2sCard){
+    const show=q==='copsoq2s'||q==='ambos';
+    c2sCard.style.display=show?'':'none';
+    const lbl=$('c2sLabel');
+    if(lbl)lbl.textContent=done[e+'_copsoq2s']?'✓ Já respondido':'Iniciar questionário →';
+    if(done[e+'_copsoq2s'])c2sCard.classList.add('done-card');else c2sCard.classList.remove('done-card');
+  }
+  // Show/hide c3 card
+  const c3Card=$('cC3');
+  if(c3Card){
+    const show=q==='copsoq3'||q==='ambos';
+    c3Card.style.display=show?'':'none';
+    const lbl=$('c3Label');
+    if(lbl)lbl.textContent=done[e+'_copsoq3']?'✓ Já respondido':'Iniciar questionário →';
+    if(done[e+'_copsoq3'])c3Card.classList.add('done-card');else c3Card.classList.remove('done-card');
+  }
+  // Academy section
+  renderSelAcademy(CU?.empresa);
+};
+
+// ═══════════════════════════════════════
+// ACADEMY — Cursos disponíveis para participante
+// ═══════════════════════════════════════
+function renderSelAcademy(coId){
+  const sec=$('selAcademySection');
+  const grid=$('selAcademyGrid');
+  if(!sec||!grid)return;
+  if(!coId){sec.style.display='none';return;}
+  const co=STATE.companies.find(x=>x.id===coId);
+  const courses=(co?.academy||[]);
+  if(!courses.length){sec.style.display='none';return;}
+  sec.style.display='';
+  grid.innerHTML=courses.map(c=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-weight:700;font-size:14px;color:var(--text)">${c.titulo||'Curso'}</div>
+      ${c.descricao?`<div style="font-size:12.5px;color:var(--muted);line-height:1.5">${c.descricao}</div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+        ${c.categoria?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(var(--accent-rgb),.12);color:var(--accent);font-weight:600">${c.categoria}</span>`:''}
+        ${c.cargaHoraria?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--surface3);color:var(--muted)">${c.cargaHoraria}</span>`:''}
+      </div>
+      ${c.link?`<a href="${c.link}" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;margin-top:2px">Acessar curso →</a>`:''}
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// INSTRUMENTO HELP / MANUAL MODAL
+// ═══════════════════════════════════════
+const INSTR_HELP_CONTENT={
+  aot:{
+    title:'AOT — Avaliação da Organização do Trabalho',
+    html:`<div style="font-size:13.5px;line-height:1.7;color:var(--text)">
+      <p><strong>Objetivo:</strong> O instrumento AOT avalia fatores de risco psicossocial relacionados à organização do trabalho, com foco em demandas, autonomia, relações sociais, reconhecimento, justiça e violência ocupacional.</p>
+      <p><strong>Questões:</strong> 24 itens, escala de frequência de 5 pontos (Nunca a Sempre).</p>
+      <p><strong>Fatores avaliados:</strong> Sobrecarga e pressão, Subocupação e monotonia, Falta de autonomia, Falta de suporte da liderança, Falta de suporte dos colegas, Conflito e ambiguidade de papel, Clima organizacional negativo, Falta de reconhecimento, Injustiça e desigualdade, Falha na comunicação, Violência e assédio, Altas exigências emocionais.</p>
+      <p><strong>Pontuação:</strong> 0–100%; maior pontuação = maior risco. Classificação: Verde &lt;40%, Amarelo 40–74%, Vermelho ≥75%.</p>
+      <p><strong>Base técnica:</strong> Desenvolvido para avaliação rápida de riscos psicossociais em conformidade com a NR-1 (Portaria MTE nº 1.419/2024).</p>
+    </div>`
+  },
+  copsoq:{
+    title:'COPSOQ II — Versão Média (76 questões)',
+    html:`<div style="font-size:13.5px;line-height:1.7;color:var(--text)">
+      <p><strong>Objetivo:</strong> O COPSOQ II (Copenhagen Psychosocial Questionnaire, 2ª edição) é um instrumento validado internacionalmente para avaliação abrangente de riscos psicossociais no trabalho.</p>
+      <p><strong>Questões:</strong> 76 itens organizados em 7 seções: Exigências Laborais, Organização do Trabalho, Relações Sociais e Liderança, Interface Trabalho–Indivíduo, Satisfação/Saúde/Segurança, Conflito Trabalho–Vida Pessoal, e Comportamentos Ofensivos.</p>
+      <p><strong>Pontuação:</strong> Escala de 5 pontos (Nunca a Sempre), convertida para 0–100%. Itens protetivos são revertidos antes da pontuação.</p>
+      <p><strong>Referência:</strong> Kristensen TS et al. (2005). Scandinavian Journal of Work, Environment &amp; Health. Adaptação brasileira validada.</p>
+    </div>`
+  },
+  copsoq2s:{
+    title:'COPSOQ II Curta — Versão Curta (41 questões)',
+    html:`<div style="font-size:13.5px;line-height:1.7;color:var(--text)">
+      <p><strong>Objetivo:</strong> Versão curta e validada do COPSOQ II para avaliação dos principais fatores de risco psicossocial. Desenvolvida por Kristensen (2001) e adaptada ao português por Silva et al. (2011).</p>
+      <p><strong>Questões:</strong> 41 itens organizados em 6 dimensões: Exigências Laborais (Q1–Q6), Organização e Conteúdo do Trabalho (Q7–Q12), Relações Sociais e Liderança (Q13–Q22), Interface Trabalho–Indivíduo (Q23–Q30), Saúde e Bem-estar (Q31–Q37), e Comportamentos Ofensivos (Q38–Q41).</p>
+      <p><strong>Escalas:</strong> O questionário utiliza 3 escalas conforme a seção: <em>Nunca → Sempre</em> (frequência); <em>Nada → Extremamente</em> (intensidade); <em>Excelente → Deficitária</em> (saúde geral).</p>
+      <p><strong>Pontuação:</strong> Escala convertida para 0–100% por dimensão. Itens protetivos são invertidos automaticamente. Quanto maior o score, maior o risco.</p>
+      <p><strong>Aplicação:</strong> Tempo médio de 10–12 minutos. Indicado para diagnósticos periódicos ou empresas que precisam de um instrumento equilibrado entre brevidade e completude.</p>
+      <p><strong>Como incluir no PGR:</strong> Utilize o relatório gerado para embasar a seção de Identificação e Avaliação de Perigos e Riscos Psicossociais. Apresente os escores por dimensão e destaque os fatores acima de 50% como riscos prioritários.</p>
+    </div>`
+  },
+  copsoq3:{
+    title:'COPSOQ III — Versão 2019+ (40 questões)',
+    html:`<div style="font-size:13.5px;line-height:1.7;color:var(--text)">
+      <p><strong>Objetivo:</strong> O COPSOQ III é a atualização de 2019 do instrumento, incorporando novas dimensões de relevância contemporânea como Conflito Trabalho–Família, Confiança na Gestão e Justiça Organizacional.</p>
+      <p><strong>Questões:</strong> 40 itens organizados em 7 dimensões: Exigências Laborais, Trabalho–Família, Organização do Trabalho, Relações Sociais, Justiça e Confiança, Interface Indivíduo–Trabalho, e Saúde e Bem-estar.</p>
+      <p><strong>Novidades vs. COPSOQ II:</strong> Dimensão de Conflito Trabalho–Família; subdivisão de Justiça e Confiança; inclusão de Autoeficácia.</p>
+      <p><strong>Referência:</strong> Burr H et al. (2019). COPSOQ III — revisão internacional. Indicado para empresas que buscam avaliação mais completa que o curto e mais ágil que o completo.</p>
+    </div>`
+  },
+  academy:{
+    title:'Academy — Cursos e Treinamentos',
+    html:`<div style="font-size:13.5px;line-height:1.7;color:var(--text)">
+      <p><strong>O que é:</strong> O módulo Academy permite que gestores associem cursos e treinamentos às empresas cadastradas. Os colaboradores visualizam os cursos disponíveis diretamente na tela de seleção de questionários.</p>
+      <p><strong>Como configurar:</strong> No painel de Gerenciamento de Empresas (editar empresa), acesse a aba Academy (ou adicione cursos via API de dados). Cada curso pode ter título, descrição, categoria, carga horária e link de acesso.</p>
+      <p><strong>Visibilidade:</strong> Os cursos aparecem apenas para colaboradores cujas empresas possuem cursos cadastrados.</p>
+      <p><strong>Integração:</strong> O Academy pode ser integrado a plataformas externas via link direto, sem necessidade de hospedar os conteúdos no sistema.</p>
+    </div>`
+  }
+};
+
+function showInstrHelp(type){
+  const c=INSTR_HELP_CONTENT[type];
+  if(!c)return;
+  const t=$('mInstrHelpTitle');
+  const b=$('mInstrHelpBody');
+  if(t)t.textContent=c.title;
+  if(b)b.innerHTML=c.html;
+  openModal('mInstrHelp');
+}
+
+// ═══════════════════════════════════════
+// BANCO DE AÇÕES
+// ═══════════════════════════════════════
+// Migrar STATE para incluir bancoAcoes
+if(!STATE.bancoAcoes)STATE.bancoAcoes=[];
+
+function renderBancoAcoes(){
+  const grid=$('bancoGrid');
+  const counts=$('bancoCounts');
+  if(!grid)return;
+  const srch=($('srchBanco')?.value||'').toLowerCase();
+  const fatorF=($('bancoFatorFilter')?.value||'all');
+  const priorF=($('bancoPriorFilter')?.value||'all');
+
+  // Combina ações do banco hardcoded + customizadas
+  let allAcoes=[];
+  // From DETAILED_ACTIONS
+  Object.entries(DETAILED_ACTIONS).forEach(([fator,data])=>{
+    (data.acoes||[]).forEach((a,i)=>{
+      allAcoes.push({
+        id:'da_'+fator+'_'+i,
+        titulo:a.titulo,
+        desc:a.desc,
+        fator,
+        prioridade:a.complexidade==='alta'?'Alta':a.complexidade==='media'?'Média':'Baixa',
+        tipo:a.tipo,
+        publico:a.publico,
+        fonte:'banco',
+        risco:data.risco||fator
+      });
+    });
+  });
+  // From STATE.bancoAcoes (custom)
+  (STATE.bancoAcoes||[]).forEach(a=>allAcoes.push({...a,fonte:'custom'}));
+
+  // Filter
+  if(srch)allAcoes=allAcoes.filter(a=>(a.titulo+a.desc+a.fator).toLowerCase().includes(srch));
+  if(fatorF!=='all')allAcoes=allAcoes.filter(a=>a.fator===fatorF);
+  if(priorF!=='all')allAcoes=allAcoes.filter(a=>a.prioridade===priorF);
+
+  // Counts
+  if(counts){
+    const total=allAcoes.length;
+    const alta=allAcoes.filter(a=>a.prioridade==='Alta').length;
+    const media=allAcoes.filter(a=>a.prioridade==='Média').length;
+    const baixa=allAcoes.filter(a=>a.prioridade==='Baixa').length;
+    const custom=(STATE.bancoAcoes||[]).length;
+    counts.innerHTML=`
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:var(--surface3);color:var(--muted);font-weight:600">${total} ações</span>
+        <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(239,68,68,.12);color:#ef4444;font-weight:600">${alta} Alta</span>
+        <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(234,179,8,.12);color:#ca8a04;font-weight:600">${media} Média</span>
+        <span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(34,197,94,.12);color:#16a34a;font-weight:600">${baixa} Baixa</span>
+        ${custom?`<span style="font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(var(--accent-rgb),.12);color:var(--accent);font-weight:600">${custom} personalizadas</span>`:''}
+      </div>`;
+  }
+
+  if(!allAcoes.length){grid.innerHTML='<div class="empty-st"><p>Nenhuma ação encontrada.</p></div>';return;}
+
+  grid.innerHTML=allAcoes.map(a=>{
+    const priorColor=a.prioridade==='Alta'?'#ef4444':a.prioridade==='Média'?'#ca8a04':'#16a34a';
+    const priorBg=a.prioridade==='Alta'?'rgba(239,68,68,.1)':a.prioridade==='Média'?'rgba(234,179,8,.1)':'rgba(34,197,94,.1)';
+    const isCustom=a.fonte==='custom';
+    return `<div class="da-card" style="position:relative">
+      ${isCustom?`<div style="position:absolute;top:10px;right:10px;display:flex;gap:4px">
+        <button class="icon-btn" onclick="editBancoAcao('${a.id}')" title="Editar">✏️</button>
+        <button class="icon-btn del" onclick="deleteBancoAcao('${a.id}')" title="Excluir">🗑</button>
+      </div>`:''}
+      <div style="font-weight:700;font-size:13.5px;color:var(--text);margin-bottom:5px;padding-right:${isCustom?'60px':'0'}">${a.titulo}</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:8px">${a.desc||''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:11px;padding:2px 7px;border-radius:99px;background:${priorBg};color:${priorColor};font-weight:700">${a.prioridade}</span>
+        ${a.fator?`<span style="font-size:11px;padding:2px 7px;border-radius:99px;background:var(--surface3);color:var(--muted)">${a.fator}</span>`:''}
+        ${a.tipo?`<span style="font-size:11px;padding:2px 7px;border-radius:99px;background:var(--surface3);color:var(--muted)">${a.tipo==='treinamento'?'Treinamento':'Ação Prática'}</span>`:''}
+        ${isCustom?`<span style="font-size:11px;padding:2px 7px;border-radius:99px;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-weight:600">Personalizada</span>`:''}
+      </div>
+      ${a.prazo?`<div style="font-size:11.5px;color:var(--muted);margin-top:6px">⏱ Prazo: ${a.prazo}</div>`:''}
+      ${a.filename?`<div style="font-size:11.5px;color:var(--accent);margin-top:4px">📎 ${a.filename}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Populate fator filter
+  const ff=$('bancoFatorFilter');
+  if(ff&&ff.options.length<=1){
+    const fatores=[...new Set(Object.keys(DETAILED_ACTIONS).concat((STATE.bancoAcoes||[]).map(a=>a.fator).filter(Boolean)))].sort();
+    ff.innerHTML=`<option value="all">Todos os fatores</option>`+fatores.map(f=>`<option value="${f}">${f}</option>`).join('');
+  }
+}
+
+function openNewBancoAcao(){
+  if($('ba_editId'))$('ba_editId').value='';
+  if($('ba_titulo'))$('ba_titulo').value='';
+  if($('ba_desc'))$('ba_desc').value='';
+  if($('ba_fator'))$('ba_fator').value='';
+  if($('ba_prioridade'))$('ba_prioridade').value='Alta';
+  if($('ba_prazo'))$('ba_prazo').value='';
+  if($('ba_tipo'))$('ba_tipo').value='acao';
+  if($('mNewBancoAcaoTitle'))$('mNewBancoAcaoTitle').textContent='Nova Ação — Banco de Ações';
+  const al=$('baAlert');if(al)al.className='alert alert-e';
+  openModal('mNewBancoAcao');
+}
+
+function saveBancoAcao(){
+  const id=$('ba_editId')?.value;
+  const titulo=($('ba_titulo')?.value||'').trim();
+  if(!titulo){showA('baAlert','e','Informe o título da ação.');return;}
+  const desc=($('ba_desc')?.value||'').trim();
+  const fator=($('ba_fator')?.value||'').trim();
+  const prioridade=$('ba_prioridade')?.value||'Alta';
+  const prazo=($('ba_prazo')?.value||'').trim();
+  const tipo=$('ba_tipo')?.value||'acao';
+  if(id){
+    const idx=(STATE.bancoAcoes||[]).findIndex(a=>a.id===id);
+    if(idx!==-1){STATE.bancoAcoes[idx]={...STATE.bancoAcoes[idx],titulo,desc,fator,prioridade,prazo,tipo};}
+  } else {
+    if(!STATE.bancoAcoes)STATE.bancoAcoes=[];
+    STATE.bancoAcoes.push({id:'ba_'+Date.now(),titulo,desc,fator,prioridade,prazo,tipo,criadoEm:new Date().toISOString()});
+  }
+  saveState();
+  closeModal('mNewBancoAcao');
+  renderBancoAcoes();
+}
+
+function editBancoAcao(id){
+  const a=(STATE.bancoAcoes||[]).find(x=>x.id===id);if(!a)return;
+  $('ba_editId').value=id;
+  $('ba_titulo').value=a.titulo||'';
+  $('ba_desc').value=a.desc||'';
+  $('ba_fator').value=a.fator||'';
+  $('ba_prioridade').value=a.prioridade||'Alta';
+  $('ba_prazo').value=a.prazo||'';
+  $('ba_tipo').value=a.tipo||'acao';
+  $('mNewBancoAcaoTitle').textContent='Editar Ação — '+a.titulo;
+  openModal('mNewBancoAcao');
+}
+
+function deleteBancoAcao(id){
+  if(!confirm('Excluir esta ação personalizada?'))return;
+  STATE.bancoAcoes=(STATE.bancoAcoes||[]).filter(a=>a.id!==id);
+  saveState();
+  renderBancoAcoes();
+}
+
+function bancoImportDoc(event){
+  const file=event.target.files?.[0];if(!file)return;
+  const isPdf=file.type==='application/pdf';
+  const MAX_SIZE=5*1024*1024; // 5MB
+  const titulo=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  if(isPdf&&file.size<=MAX_SIZE){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      if(!STATE.bancoAcoes)STATE.bancoAcoes=[];
+      STATE.bancoAcoes.push({id:'ba_'+Date.now(),titulo,desc:'Documento importado: '+file.name,fator:'',prioridade:'Média',prazo:'',tipo:'acao',filename:file.name,filedata:e.target.result,criadoEm:new Date().toISOString()});
+      saveState();renderBancoAcoes();
+      alert('✓ Documento "'+file.name+'" importado com sucesso.');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    if(!STATE.bancoAcoes)STATE.bancoAcoes=[];
+    STATE.bancoAcoes.push({id:'ba_'+Date.now(),titulo,desc:'Documento importado: '+file.name,fator:'',prioridade:'Média',prazo:'',tipo:'acao',filename:file.name,criadoEm:new Date().toISOString()});
+    saveState();renderBancoAcoes();
+    alert('✓ Documento "'+file.name+'" registrado (arquivo grande: apenas referência armazenada).');
+  }
+  event.target.value='';
+}
+
+// ═══════════════════════════════════════
+// PANEL_MAP extension
+// ═══════════════════════════════════════
+if(typeof PANEL_MAP!=='undefined'){
+  PANEL_MAP['pRC2S']={title:'Relatório COPSOQ II Curta',subtitle:'Avaliação Psicossocial — Versão Curta (41 questões) · Kristensen 2001'};
+  PANEL_MAP['pRC3']={title:'Relatório COPSOQ III',subtitle:'Avaliação Psicossocial — COPSOQ III (40 questões)'};
+  PANEL_MAP['pBancoAcoes']={title:'Banco de Ações',subtitle:'Biblioteca de intervenções e planos de ação psicossocial'};
+}
+
+// ═══════════════════════════════════════
+// navTo extension for new panels
+// ═══════════════════════════════════════
+const _origNavToNew=navTo;
+navTo=function(pid,btn){
+  _origNavToNew(pid,btn);
+  if(pid==='pRC2S'){updateMgrSelectsExt();renderC2S();}
+  else if(pid==='pRC3'){updateMgrSelectsExt();renderC3();}
+  else if(pid==='pBancoAcoes'){renderBancoAcoes();}
+};
+
+// ═══════════════════════════════════════
+// updateMgrSelects extension for c2s/c3 filters
+// ═══════════════════════════════════════
+const _origUpdateMgrSelectsNew=updateMgrSelects;
+updateMgrSelects=function(){
+  _origUpdateMgrSelectsNew();
+  updateMgrSelectsExt();
+};
+
+function updateMgrSelectsExt(){
+  const co=`<option value="all">Todas as empresas</option>`+STATE.companies.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  ['c2sCoFilter','c3CoFilter'].forEach(id=>{const el=$(id);if(el)el.innerHTML=co;});
+  const secs2s=[...new Set(STATE.responses.filter(r=>r.questionario==='copsoq2s').map(r=>r.respostas?.setor||'').filter(Boolean))];
+  const se2s=`<option value="all">Todos os setores</option>`+secs2s.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const c2sSec=$('c2sSecFilter');if(c2sSec)c2sSec.innerHTML=se2s;
+  const secs3=[...new Set(STATE.responses.filter(r=>r.questionario==='copsoq3').map(r=>r.respostas?.setor||'').filter(Boolean))];
+  const se3=`<option value="all">Todos os setores</option>`+secs3.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const c3Sec=$('c3SecFilter');if(c3Sec)c3Sec.innerHTML=se3;
+}
 
 // Wire renderWebhookList when navigating to pConfig
 const _origNavTo2 = navTo;
