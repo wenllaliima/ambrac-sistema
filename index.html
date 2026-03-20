@@ -1211,10 +1211,12 @@ body.manager-mode{
                 <option value="pendente">Pendente</option>
                 <option value="em_andamento">Em andamento</option>
                 <option value="concluido">Concluído</option>
+                <option value="arquivado">Arquivado</option>
               </select>
             </div>
             <button class="abtn ab-pri" onclick="openModal('mNewAction')">+ Nova Ação</button>
           </div>
+          <div id="planoStats" style="display:flex;gap:16px;margin-bottom:16px;padding:12px 16px;background:#f8fafc;border-radius:10px;font-size:13px"></div>
           <div id="planoContent"></div>
         </div>
 
@@ -1840,6 +1842,14 @@ body.manager-mode{
       <div class="form-grid">
         <div class="form-group"><label>Responsável</label><input id="pa_responsavel" placeholder="Nome ou cargo"/></div>
         <div class="form-group"><label>Prazo</label><input id="pa_prazo" type="date"/></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>E-mail do Responsável</label><input id="pa_email_resp" type="email" placeholder="responsavel@empresa.com"/></div>
+        <div class="form-group"><label>Prioridade</label>
+          <select id="pa_prioridade" style="width:100%;padding:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none">
+            <option value="Alta">Alta</option><option value="Média" selected>Média</option><option value="Baixa">Baixa</option>
+          </select>
+        </div>
       </div>
       <div class="form-grid">
         <div class="form-group"><label>Complexidade</label>
@@ -2480,6 +2490,7 @@ function doMgrLogin(){
   $('sbName').textContent=f.name;$('sbAv').textContent=f.name.charAt(0);
   $('sbRole').textContent=f.setor||'Gerenciador';
   syncExternalResponses();refreshMgr();showSc('sMgr');
+  setTimeout(checkOnboarding,800);
 }
 function visibleCompanies(){return STATE.companies;}
 function doMgrLogout(){currentMgr=null;setTheme('participant');showSc('sLogin');}
@@ -4969,7 +4980,65 @@ function loadActionPlans(){ return JSON.parse(localStorage.getItem('ambrac_actio
 function saveActionPlansStore(){ localStorage.setItem('ambrac_action_plans',JSON.stringify(ACTION_PLANS)); }
 let ACTION_PLANS = loadActionPlans();
 
+function isOverdue(action){
+  if(!action.prazo)return false;
+  if(action.status==='concluido'||action.status==='Concluído'||action.status==='arquivado'||action.status==='Arquivado')return false;
+  return new Date(action.prazo)<new Date();
+}
+
+function actionStatusBadge(status,isOv){
+  const map={pendente:'#6b7280','Pendente':'#6b7280',em_andamento:'#3b82f6','Em andamento':'#3b82f6','Em Andamento':'#3b82f6',concluido:'#22c55e','Concluído':'#22c55e',arquivado:'#9ca3af','Arquivado':'#9ca3af',cancelado:'#ef4444','Cancelado':'#ef4444'};
+  const labelMap={pendente:'Pendente',em_andamento:'Em Andamento',concluido:'Concluído',arquivado:'Arquivado',cancelado:'Cancelado'};
+  const color=map[status]||'#6b7280';
+  const label=labelMap[status]||status||'Pendente';
+  const badge=`<span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:${color}">${label}</span>`;
+  const overdue=isOv?`<span style="padding:2px 7px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:#ef4444;margin-left:4px">Atrasado</span>`:'';
+  return badge+overdue;
+}
+
+function notifyActionAssignee(action){
+  if(!action.email_resp||!action.email_resp.includes('@'))return;
+  const cfg=getEmailJSConfig();
+  if(!cfg||!cfg.serviceId||!cfg.templateId||!cfg.publicKey)return;
+  try{
+    if(window.emailjs){
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId,cfg.templateId,{
+        to_email:action.email_resp,
+        to_name:action.responsavel||'Responsável',
+        subject:`[AMBRAC] Ação atribuída: ${action.titulo||action.text||''}`,
+        message:`Uma ação do Plano de Ação foi atribuída a você.\n\nAção: ${action.titulo||action.text||''}\nPrazo: ${action.prazo||'Não definido'}\nPrioridade: ${action.prioridade||action.complexidade||'Não definida'}\n\nAcesse o sistema AMBRAC para mais detalhes.`,
+      });
+    }
+  }catch(e){}
+}
+
+function renderPlanoStats(){
+  const el=$('planoStats');if(!el)return;
+  const all=ACTION_PLANS||[];
+  const total=all.length;
+  const done=all.filter(a=>a.status==='concluido'||a.status==='Concluído').length;
+  const inprog=all.filter(a=>a.status==='em_andamento'||a.status==='Em Andamento'||a.status==='Em andamento').length;
+  const overdue=all.filter(a=>isOverdue(a)).length;
+  const pct=total?Math.round(done/total*100):0;
+  el.innerHTML=`
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:18px;color:var(--accent)">${done}/${total}</div>
+      <div style="color:var(--muted)">Concluídas</div>
+    </div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:18px;color:#3b82f6">${inprog}</div>
+      <div style="color:var(--muted)">Em andamento</div>
+    </div>
+    ${overdue?`<div style="flex:1"><div style="font-weight:700;font-size:18px;color:#ef4444">${overdue}</div><div style="color:var(--muted)">Atrasadas</div></div>`:''}
+    <div style="flex:2;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Progresso</span><span style="font-weight:600">${pct}%</span></div>
+      <div style="height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:#22c55e;border-radius:4px;transition:width .3s"></div></div>
+    </div>`;
+}
+
 function renderPlano(){
+  renderPlanoStats();
   const coFilter=$('planoCoFilter')?.value||'all';
   const statusFilter=$('planoStatusFilter')?.value||'all';
   let list=[...ACTION_PLANS];
@@ -4980,32 +5049,35 @@ function renderPlano(){
     cont.innerHTML=`<div class="empty-st"><p>Nenhum plano de ação cadastrado ainda.<br>Clique em "+ Nova Ação" para começar.</p></div>`;
     return;
   }
-  const statusColors={pendente:'#f59e0b',em_andamento:'#3d7aed',concluido:'#22c55e',cancelado:'#ef4444'};
-  const statusLabels={pendente:'Pendente',em_andamento:'Em Andamento',concluido:'Concluído',cancelado:'Cancelado'};
   const compLabels={baixa:'Baixa',media:'Média',alta:'Alta'};
+  const prioColors={Alta:'#ef4444',Média:'#f59e0b',Baixa:'#22c55e'};
   cont.innerHTML=`<div style="display:grid;gap:10px">${list.map(a=>{
     const co=STATE.companies.find(x=>x.id===a.empresa);
-    const sc=statusColors[a.status]||'#6b728f';
-    const sl=statusLabels[a.status]||a.status;
-    return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+    const ov=isOverdue(a);
+    return`<div style="background:var(--surface2);border:1px solid ${ov?'#ef4444':'var(--border)'};border-radius:10px;padding:14px 16px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
         <div style="flex:1">
-          <div style="font-weight:600;font-size:14px;margin-bottom:3px">${a.titulo}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <div style="font-weight:600;font-size:14px">${a.titulo}</div>
+            ${a.prioridade?`<span style="font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;color:#fff;background:${prioColors[a.prioridade]||'#6b7280'}">${a.prioridade}</span>`:''}
+          </div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${co?.nome||'—'} · ${a.fator||'—'}</div>
           ${a.desc?`<div style="font-size:12.5px;color:var(--text);margin-bottom:6px">${a.desc}</div>`:''}
           <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)">
             ${a.responsavel?`<span>👤 ${a.responsavel}</span>`:''}
-            ${a.prazo?`<span>📅 ${a.prazo}</span>`:''}
+            ${a.email_resp?`<span>✉ ${a.email_resp}</span>`:''}
+            ${a.prazo?`<span>📅 ${a.prazo}${ov?' ⚠️':''}</span>`:''}
             ${a.complexidade?`<span>⚡ ${compLabels[a.complexidade]||a.complexidade}</span>`:''}
             ${a.publico?`<span>🎯 ${a.publico}</span>`:''}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <span style="font-size:11px;padding:3px 9px;border-radius:99px;background:${sc}20;color:${sc};font-weight:600">${sl}</span>
+          <div>${actionStatusBadge(a.status,ov)}</div>
           <select style="font-size:11px;padding:3px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit" onchange="updateActionStatus('${a.id}',this.value)">
             <option value="pendente"${a.status==='pendente'?' selected':''}>Pendente</option>
             <option value="em_andamento"${a.status==='em_andamento'?' selected':''}>Em Andamento</option>
             <option value="concluido"${a.status==='concluido'?' selected':''}>Concluído</option>
+            <option value="arquivado"${a.status==='arquivado'?' selected':''}>Arquivado</option>
             <option value="cancelado"${a.status==='cancelado'?' selected':''}>Cancelado</option>
           </select>
           <button class="icon-btn del" onclick="deleteAction('${a.id}')">Excluir</button>
@@ -5025,7 +5097,9 @@ function saveAction(){
     titulo,
     desc:($('pa_desc')?.value||'').trim(),
     responsavel:($('pa_responsavel')?.value||'').trim(),
+    email_resp:($('pa_email_resp')?.value||'').trim(),
     prazo:$('pa_prazo')?.value||'',
+    prioridade:$('pa_prioridade')?.value||'Média',
     complexidade:$('pa_complexidade')?.value||'media',
     publico:$('pa_publico')?.value||'todos',
     status:'pendente',
@@ -5033,6 +5107,7 @@ function saveAction(){
   };
   ACTION_PLANS.unshift(action);
   saveActionPlansStore();
+  notifyActionAssignee(action);
   closeModal('mNewAction');
   renderPlano();
 }
@@ -5647,6 +5722,70 @@ buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factC
     return result + extra;
   }
   return result;
+};
+
+// ═══════════════════════════════════════
+// FEATURE 5 — EXECUTIVE SUMMARY
+// ═══════════════════════════════════════
+function buildExecSummaryHTML(co, resps, factors, dims, instrName){
+  if(!resps||resps.length<5)return'';
+  const validFactors=(factors||[]).filter(f=>f&&f.score!=null);
+  if(!validFactors.length)return'';
+  const top3=[...validFactors].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,3);
+  const avg=validFactors.reduce((s,f)=>s+(f.score||0),0)/(validFactors.length||1);
+  const avgPct=Math.round(avg*100);
+  const riskLevel=avgPct>=65?{label:'Alto',color:'#ef4444'}:avgPct>=40?{label:'Moderado',color:'#f59e0b'}:{label:'Baixo',color:'#22c55e'};
+  const dimEntries=dims&&typeof dims==='object'&&!Array.isArray(dims)?Object.entries(dims):[];
+  const topDim=dimEntries.sort((a,b)=>(b[1]||0)-(a[1]||0))[0];
+  return`<div style="border:2px solid var(--accent);border-radius:12px;padding:24px;margin-bottom:28px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Sumário Executivo</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text)">${co?.nome||'Empresa'}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px">${instrName||''} · ${resps.length} respondentes · ${new Date().toLocaleDateString('pt-BR')}</div>
+      </div>
+      <div style="text-align:center;background:${riskLevel.color}18;border:2px solid ${riskLevel.color};border-radius:12px;padding:12px 20px">
+        <div style="font-size:28px;font-weight:800;color:${riskLevel.color}">${avgPct}%</div>
+        <div style="font-size:12px;font-weight:700;color:${riskLevel.color}">Risco ${riskLevel.label}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Top 3 Fatores de Risco</div>
+        ${top3.map((f,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'#ef4444':i===1?'#f97316':'#f59e0b'};color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${f.name}</div>
+            <div style="height:5px;background:#e5e7eb;border-radius:3px;margin-top:3px"><div style="width:${Math.round((f.score||0)*100)}%;height:100%;background:${i===0?'#ef4444':i===1?'#f97316':'#f59e0b'};border-radius:3px"></div></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--muted)">${Math.round((f.score||0)*100)}%</div>
+        </div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Ações Recomendadas</div>
+        ${top3.map((f,i)=>`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px">
+          <span style="color:${i===0?'#ef4444':i===1?'#f97316':'#f59e0b'};font-weight:700;flex-shrink:0">${i+1}.</span>
+          <span>Intervir no fator <strong>${f.name}</strong> — prioridade ${i===0?'imediata':i===1?'alta':'média'}</span>
+        </div>`).join('')}
+        <div style="margin-top:12px;padding:10px;background:#f0f4ff;border-radius:8px;font-size:12px;color:var(--muted)">
+          Consulte o Plano de Ação no módulo correspondente para detalhes das intervenções recomendadas.
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px">
+      Avaliação realizada com instrumento validado internacionalmente conforme NR-1 (Port. MTE nº 1.419/2024). Este sumário é de uso interno — para o relatório completo acesse o painel de relatórios.
+    </div>
+  </div>`;
+}
+
+// Patch buildRepHTML to prepend executive summary
+const _origBuildRepHTML3 = buildRepHTML;
+buildRepHTML = function(resps, sortedF, dimScores, dims, actions, dimChId, factChId, prefix, nps, co){
+  const instrNames={cq:'COPSOQ II Completo',c2s:'COPSOQ II Curta',c3:'COPSOQ III',be:'AOT / Bem-Estar'};
+  const instrName=instrNames[prefix]||prefix||'';
+  const summary=buildExecSummaryHTML(co,resps,sortedF,dimScores,instrName);
+  const result=_origBuildRepHTML3(resps,sortedF,dimScores,dims,actions,dimChId,factChId,prefix,nps,co);
+  return summary+result;
 };
 
 // ═══════════════════════════════════════
@@ -7276,6 +7415,50 @@ function renderPGRPreview(){
           <tbody>${perigos.map(p=>{const r=calcRisco(p.prob,p.sev);const gheName=(STATE.ghes||[]).find(g=>g.id===p.ghe)?.nome||'Todos';return`<tr><td><span class="cat-badge">${p.cat}</span></td><td><strong>${p.nome}</strong>${p.fonte?`<div style="font-size:11px;color:var(--muted)">${p.fonte}</div>`:''}</td><td style="font-size:12px">${gheName}</td><td style="font-size:12px">${p.dano||'—'}</td><td style="font-size:11px">${p.nr||'—'}</td><td style="text-align:center">${p.prob}</td><td style="text-align:center">${p.sev}</td><td><span class="risk-badge risk-${r.cls}">${r.nivel}</span></td><td style="font-size:12px">${p.controles||'—'}</td></tr>`;}).join('')}</tbody>
         </table>
       </div>`:'<div class="pgr-section"><h3>4. Inventário de Riscos Ocupacionais</h3><p style="color:var(--muted)">Nenhum perigo cadastrado. Acesse o módulo "Inventário de Riscos" para adicionar.</p></div>'}
+      ${(()=>{
+        if(!ghes.length)return'';
+        const resps=(STATE.responses||[]).filter(r=>r.empresa===cf);
+        return`<div class="pgr-section">
+          <h3>4b. Análise por GHE — Spotlights</h3>
+          ${ghes.map(ghe=>{
+            const ghePerigos=perigos.filter(p=>p.ghe===ghe.id||p.ghe==='all');
+            const gheResps=resps.filter(r=>{const rs=r.respostas?.setor||r.setor||'';return rs.toLowerCase()===(ghe.setor||'').toLowerCase()&&ghe.setor;});
+            const gheAet=aets.find(a=>a.ghe===ghe.id);
+            const rcounts={Intolerável:0,Substancial:0,Moderado:0,Tolerável:0,Trivial:0};
+            ghePerigos.forEach(p=>{const r=calcRisco(p.prob,p.sev);rcounts[r.nivel]=(rcounts[r.nivel]||0)+1;});
+            const topRisk=ghePerigos.length?[...ghePerigos].sort((a,b)=>b.prob*b.sev-a.prob*a.sev)[0]:null;
+            const riskColorMap={Trivial:'#22c55e',Tolerável:'#84cc16',Moderado:'#f59e0b',Substancial:'#f97316',Intolerável:'#ef4444'};
+            return`<div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;page-break-inside:avoid">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                <div>
+                  <div style="font-size:15px;font-weight:700">${ghe.nome}</div>
+                  <div style="font-size:12px;color:var(--muted)">${ghe.cargo||''} · Setor: ${ghe.setor||'—'} · ${ghe.ntrab||'?'} trabalhadores</div>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  ${Object.entries(rcounts).filter(([,v])=>v>0).map(([k,v])=>`<span class="risk-badge risk-${k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}">${v} ${k}</span>`).join('')}
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:13px">
+                <div style="background:#f8fafc;border-radius:8px;padding:10px">
+                  <div style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:6px">Perigos identificados</div>
+                  <div style="font-size:20px;font-weight:700;color:var(--accent)">${ghePerigos.length}</div>
+                  ${topRisk?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Principal: ${topRisk.nome.slice(0,40)}</div>`:''}
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:10px">
+                  <div style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:6px">Respostas psicossociais</div>
+                  <div style="font-size:20px;font-weight:700;color:var(--accent)">${gheResps.length}</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:4px">${gheResps.length>=5?'Dados disponíveis':'Abaixo do mínimo (5)'}</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:10px">
+                  <div style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:6px">AET (NR-17)</div>
+                  ${gheAet?`<div style="font-size:14px;font-weight:700;color:${riskColorMap[gheAet.risco]||'#6b7280'}">${gheAet.risco}</div><div style="font-size:11px;color:var(--muted);margin-top:4px">${gheAet.data||''}</div>`:'<div style="color:var(--muted);font-size:12px">Não realizada</div>'}
+                </div>
+              </div>
+              ${gheAet?.rec?`<div style="margin-top:10px;padding:8px 12px;background:#fff8f0;border-left:3px solid #f59e0b;border-radius:4px;font-size:12px"><strong>Recomendação AET:</strong> ${gheAet.rec}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>`;
+      })()}
       <div class="pgr-section">
         <h3>5. Avaliação de Riscos Psicossociais</h3>
         ${respostas.length>=5?`<p>Foram coletadas <strong>${respostas.length} respostas</strong> de avaliação psicossocial para esta empresa, utilizando os instrumentos validados COPSOQ/AOT em conformidade com a NR-1.</p>
@@ -7343,6 +7526,163 @@ function exportPGRCompleto(){
   if(!cf)return alert('Selecione uma empresa primeiro.');
   renderPGRPreview();
   setTimeout(()=>window.print(),300);
+}
+
+// ═══════════════════════════════════════
+// FEATURE 7 — ONBOARDING WIZARD
+// ═══════════════════════════════════════
+const OB_STEPS=[
+  {
+    title:'Bem-vindo ao AMBRAC',
+    icon:'🎯',
+    desc:'O AMBRAC é sua plataforma completa de avaliação psicossocial e gestão de SST conforme NR-1. Vamos configurar sua primeira empresa em 4 passos.',
+    fields:`
+      <div style="background:#f0f4ff;border-radius:10px;padding:16px;margin-top:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">O que você vai poder fazer:</div>
+        <div style="font-size:13px;line-height:2;color:var(--text)">
+          ✓ Aplicar COPSOQ II, COPSOQ III e AOT validados<br>
+          ✓ Gerar PGR NR-1 completo com GHE e inventário<br>
+          ✓ Monitorar indicadores de saúde e bem-estar<br>
+          ✓ Exportar relatórios profissionais em PDF
+        </div>
+      </div>`
+  },
+  {
+    title:'Cadastre sua empresa',
+    icon:'🏢',
+    desc:'Informe os dados básicos da empresa que será avaliada.',
+    fields:`
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+        <input type="text" id="ob_nome" class="tinput" placeholder="Razão social da empresa *"/>
+        <input type="text" id="ob_cnpj" class="tinput" placeholder="CNPJ (ex.: 00.000.000/0001-00)"/>
+        <input type="text" id="ob_cnae" class="tinput" placeholder="CNAE (ex.: 6201-5/00) — para correlação NTEP"/>
+        <input type="text" id="ob_setor" class="tinput" placeholder="Setor de atividade (ex.: Tecnologia, Saúde)"/>
+      </div>`
+  },
+  {
+    title:'Defina o primeiro GHE',
+    icon:'👥',
+    desc:'Grupos Homogêneos de Exposição agrupam trabalhadores com riscos similares — exigência da NR-1.',
+    fields:`
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+        <input type="text" id="ob_ghe_nome" class="tinput" placeholder="Nome do GHE (ex.: Operadores de Produção) *"/>
+        <input type="text" id="ob_ghe_cargo" class="tinput" placeholder="Cargo / Função"/>
+        <input type="number" id="ob_ghe_ntrab" class="tinput" placeholder="Nº de trabalhadores neste GHE"/>
+      </div>`
+  },
+  {
+    title:'Escolha o instrumento',
+    icon:'📋',
+    desc:'Selecione qual instrumento de avaliação psicossocial será aplicado.',
+    fields:`
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+        <label style="display:flex;gap:12px;padding:12px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px" onclick="obSelectInstr('copsoq',this)">
+          <input type="radio" name="ob_instr" value="copsoq" style="margin-top:2px"/>
+          <div><strong>COPSOQ II Completo</strong> — 76 questões, padrão internacional, diagnóstico aprofundado</div>
+        </label>
+        <label style="display:flex;gap:12px;padding:12px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px" onclick="obSelectInstr('copsoq2s',this)">
+          <input type="radio" name="ob_instr" value="copsoq2s" style="margin-top:2px"/>
+          <div><strong>COPSOQ II Curta</strong> — 41 questões, validado, mais ágil para primeira aplicação</div>
+        </label>
+        <label style="display:flex;gap:12px;padding:12px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px" onclick="obSelectInstr('bemestar',this)">
+          <input type="radio" name="ob_instr" value="bemestar" style="margin-top:2px"/>
+          <div><strong>AOT</strong> — 24 questões, instrumento brasileiro NR-1, ideal para triagem inicial</div>
+        </label>
+      </div>`
+  },
+  {
+    title:'Tudo pronto!',
+    icon:'✅',
+    desc:'Sua empresa foi configurada. O próximo passo é importar os colaboradores e enviar os links de acesso.',
+    fields:`
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-top:16px">
+        <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:8px">Próximos passos:</div>
+        <div style="font-size:13px;line-height:2;color:#166534">
+          1. Acesse <strong>Empresas</strong> → importe os colaboradores via Excel<br>
+          2. Acesse <strong>Envio de Links</strong> → copie e envie os links individuais<br>
+          3. Acompanhe as respostas em tempo real no <strong>Dashboard</strong><br>
+          4. Gere o <strong>PGR Completo</strong> quando tiver mínimo 5 respostas
+        </div>
+      </div>`
+  }
+];
+
+let obStep=0;
+let obInstr='copsoq2s';
+
+function obSelectInstr(val,el){
+  obInstr=val;
+  document.querySelectorAll('[onclick^="obSelectInstr"]').forEach(l=>l.style.borderColor='var(--border)');
+  if(el)el.style.borderColor='var(--accent)';
+}
+
+function renderOBStep(){
+  const step=OB_STEPS[obStep];
+  const dots=$('obDots');
+  const cont=$('obContent');
+  const prev=$('obPrev');
+  const next=$('obNext');
+  if(!step||!cont)return;
+
+  if(dots)dots.innerHTML=OB_STEPS.map((_,i)=>
+    `<div style="width:${i===obStep?24:8}px;height:8px;border-radius:4px;background:${i===obStep?'var(--accent)':'#e5e7eb'};transition:all .2s"></div>`
+  ).join('');
+
+  cont.innerHTML=`
+    <div style="font-size:28px;margin-bottom:10px">${step.icon}</div>
+    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px">${step.title}</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.6">${step.desc}</div>
+    ${step.fields}`;
+
+  if(prev)prev.style.visibility=obStep===0?'hidden':'visible';
+  if(next)next.textContent=obStep===OB_STEPS.length-1?'Concluir ✓':'Próximo →';
+}
+
+function obNav(dir){
+  if(dir>0&&obStep===OB_STEPS.length-1){
+    finishOnboarding();return;
+  }
+  obStep=Math.max(0,Math.min(OB_STEPS.length-1,obStep+dir));
+  renderOBStep();
+}
+
+function skipOnboarding(){
+  STATE.onboardingDone=true;saveState();
+  const m=$('mOnboarding');if(m)m.style.display='none';
+}
+
+function finishOnboarding(){
+  const nome=$('ob_nome')?.value?.trim();
+  if(nome){
+    const coId='co_ob_'+Date.now();
+    const co={
+      id:coId,nome,cnpj:$('ob_cnpj')?.value||'',cnae:$('ob_cnae')?.value||'',
+      atividade:$('ob_setor')?.value||'',questionario:obInstr,
+      status:'ativo',colaboradores:[]
+    };
+    STATE.companies=STATE.companies||[];
+    STATE.companies.push(co);
+    const gheNome=$('ob_ghe_nome')?.value?.trim();
+    if(gheNome){
+      STATE.ghes=STATE.ghes||[];
+      STATE.ghes.push({id:'ghe_ob_'+Date.now(),empresa:coId,nome:gheNome,cargo:$('ob_ghe_cargo')?.value||'',ntrab:$('ob_ghe_ntrab')?.value||'',setor:'',desc:''});
+    }
+  }
+  STATE.onboardingDone=true;
+  saveState();
+  const m=$('mOnboarding');if(m)m.style.display='none';
+  if(typeof renderCo==='function')renderCo();
+  if(typeof renderNR1Compliance==='function')renderNR1Compliance();
+}
+
+function checkOnboarding(){
+  if(STATE.onboardingDone)return;
+  if((STATE.companies||[]).length>0)return;
+  obStep=0;
+  obInstr='copsoq2s';
+  renderOBStep();
+  const m=$('mOnboarding');
+  if(m)m.style.display='flex';
 }
 
 // ─── PANEL_MAP + navTo extension para painéis SST ──────────────
@@ -7699,6 +8039,24 @@ if ('serviceWorker' in navigator) {
       <div><div class="dlabel" style="margin-bottom:4px">Recomendações e medidas corretivas</div><textarea id="aet_rec" class="tinput" rows="3" placeholder="Descreva as intervenções recomendadas…"></textarea></div>
     </div>
     <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mAET')">Cancelar</button><button class="abtn ab-pri" onclick="saveAET()">Salvar AET</button></div>
+  </div>
+</div>
+
+<!-- MODAL: ONBOARDING WIZARD -->
+<div class="modal-overlay" id="mOnboarding" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:center;justify-content:center;padding:24px">
+  <div class="modal-box" style="max-width:560px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;padding:0;animation:modalIn .22s ease">
+    <!-- Progress dots -->
+    <div style="display:flex;padding:20px 24px 0;gap:8px;align-items:center">
+      <div id="obDots" style="display:flex;gap:6px;flex:1"></div>
+      <button onclick="skipOnboarding()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-family:inherit">Pular</button>
+    </div>
+    <!-- Step content -->
+    <div id="obContent" style="padding:24px"></div>
+    <!-- Navigation -->
+    <div style="display:flex;gap:10px;padding:0 24px 20px">
+      <button id="obPrev" class="abtn ab-ghost" style="flex:1" onclick="obNav(-1)">← Anterior</button>
+      <button id="obNext" class="abtn ab-pri" style="flex:2" onclick="obNav(1)">Próximo →</button>
+    </div>
   </div>
 </div>
 
