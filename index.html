@@ -779,6 +779,12 @@ body.manager-mode{
         <div class="qmeta"><div class="qchip">~12 min</div><div class="qchip">40 questões</div><div class="qchip">COPSOQ III 2019+</div></div>
         <div class="qcstart"><span id="c3Label">Iniciar questionário →</span></div>
       </div>
+      <div class="qcard" id="cPulso" style="display:none" onclick="startPulseSurvey()">
+        <div class="qtag" style="background:#8b5cf6;color:#fff">Monitoramento · Pulse</div>
+        <h3>Pulse Mensal</h3>
+        <p>10 questões de acompanhamento — aproximadamente 3 minutos.</p>
+        <div class="qmeta"><div class="qchip">~3 min</div><div class="qchip">10 questões</div><div class="qchip">Mensal</div></div>
+      </div>
     </div>
     <div id="assignedNotice" style="display:none;background:var(--accent-pale);border:1px solid rgba(30,77,58,.25);border-radius:12px;padding:13px 18px;font-size:13px;color:var(--accent);margin-bottom:16px;align-items:center;gap:10px">
       <p id="assignedNoticeText"></p>
@@ -972,6 +978,9 @@ body.manager-mode{
         </div>
         <div style="display:flex;gap:4px;align-items:center">
           <button class="nav-item" style="flex:1" onclick="navTo('pPGR',this)">PGR Completo</button>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="nav-item" style="flex:1" onclick="navTo('pPCMSO',this)">PCMSO (NR-7)</button>
         </div>
         <div class="nav-sec">Academy</div>
         <div style="display:flex;align-items:center;gap:4px;padding-right:4px">
@@ -1222,16 +1231,13 @@ body.manager-mode{
 
         <!-- PULSO MENSAL -->
         <div class="panel" id="pPulso">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
-            <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:6px">Pulso Mensal</div>
-            <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Envie uma pesquisa rápida (3–5 perguntas) mensalmente para acompanhar tendências entre os diagnósticos completos. Não substitui o diagnóstico — é um sinal de alerta precoce.</p>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
-              <select class="sel-s" id="pulsoCoSel" onchange="renderPulsoHistory()"><option value="">Selecione a empresa...</option></select>
-            </div>
-            <div id="pulsoFormQuestions" style="margin-bottom:14px"></div>
-            <button class="abtn ab-pri" onclick="sendPulso($('pulsoCoSel').value)" style="margin-bottom:8px">Enviar Pulso</button>
+          <div class="rep-toolbar">
+            <select class="sel-s" id="pulsoCoFilter" onchange="renderPulsoPanel()"><option value="">Selecione a empresa</option></select>
+            <select class="sel-s" id="pulsoCoSel" style="display:none"><option value="">Selecione a empresa...</option></select>
+            <button class="abtn ab-ghost" onclick="renderPulsoPanel()">↻ Atualizar</button>
           </div>
-          <div id="pulsoHistory" style="padding:8px 0"></div>
+          <div id="pulsoContent"><div class="empty-st"><p>Selecione uma empresa para gerenciar o Pulse mensal.</p></div></div>
+          <div id="pulsoHistory" style="padding:8px 0;display:none"></div>
         </div>
 
         <!-- CONFIGURAÇÕES -->
@@ -1457,6 +1463,16 @@ body.manager-mode{
             <button class="abtn ab-pri" onclick="exportPGRCompleto()">Gerar PGR (PDF/Impressão)</button>
           </div>
           <div id="pgrPreview"><div class="empty-st"><p>Selecione uma empresa para pré-visualizar o PGR.</p></div></div>
+        </div>
+
+        <!-- PCMSO (NR-7) -->
+        <div class="panel" id="pPCMSO">
+          <div class="rep-toolbar" style="flex-wrap:wrap;gap:8px">
+            <select class="sel-s" id="pcmsoCoFilter" onchange="renderPCMSO()"><option value="">Selecione a empresa</option></select>
+            <button class="abtn ab-pri" onclick="openASO()">+ Novo ASO</button>
+            <button class="abtn ab-ghost" onclick="openASO()">+ Agendar Exame</button>
+          </div>
+          <div id="pcmsoContent"><div class="empty-st"><p>Selecione uma empresa para gerenciar o PCMSO.</p></div></div>
         </div>
 
       </div>
@@ -2212,6 +2228,8 @@ STATE.ghes    = STATE.ghes    || [];  // Grupos Homogêneos de Exposição
 STATE.perigos = STATE.perigos || [];  // Inventário de Riscos
 STATE.aets    = STATE.aets    || [];  // AETs por posto de trabalho
 STATE.aeps    = STATE.aeps    || [];  // AEPs por GHE
+STATE.asos    = STATE.asos    || [];  // ASOs — Atestados de Saúde Ocupacional (NR-7)
+STATE.pulseResponses = STATE.pulseResponses || [];  // Pulse survey responses
 
 // ═══════════════════════════════════════
 // GOOGLE SIGN-IN
@@ -2641,13 +2659,54 @@ function renderCo(f){
 }
 function filterCo(){renderCo();}
 
+function showToast(msg, duration) {
+  duration = duration || 4000;
+  let t = $('globalToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'globalToast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;max-width:480px;text-align:center;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.25);transition:opacity .3s;line-height:1.5';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.display = 'block';
+  clearTimeout(t._to);
+  t._to = setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.style.display='none', 300); }, duration);
+}
+
+function onboardNTEPAlert(co) {
+  if (typeof getNTEPByCNAE !== 'function') return;
+  const ntep = getNTEPByCNAE(co.cnae);
+  if (!ntep) return;
+  showToast(`NTEP identificado: ${ntep.cids.length} doenças correlacionadas para CNAE ${co.cnae} (${ntep.desc_cnae}). Acesse o Inventário de Riscos para configurar os perigos prioritários.`, 6000);
+  const existing = (STATE.perigos||[]).filter(p=>p.empresa===co.id);
+  if (existing.length > 0) return;
+  const ntepGroups = new Set(ntep.cids.map(c=>c.grupo));
+  const catMap = {'Saúde Mental':'Psicossocial','Osteomuscular':'Ergonômico','Respiratório':'Físico','Auditivo':'Físico','Acidente':'Acidente','Infeccioso':'Biológico','Circulatório':'Ergonômico','Voz':'Ergonômico'};
+  const relevantCats = new Set([...ntepGroups].map(g=>catMap[g]).filter(Boolean));
+  const toAdd = (typeof CATALOGO_PERIGOS !== 'undefined' ? CATALOGO_PERIGOS : []).filter(c => relevantCats.has(c.cat)).slice(0,10);
+  toAdd.forEach(c => {
+    STATE.perigos = STATE.perigos || [];
+    STATE.perigos.push({
+      id: 'per_ntep_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+      empresa: co.id, ghe: 'all', cat: c.cat, nome: c.nome,
+      fonte: '', dano: c.dano, nr: c.nr, prob: '3', sev: '3',
+      controles: '', acao: ''
+    });
+  });
+  if (toAdd.length > 0) saveState();
+}
+
 function saveCo(){
   const nome=$('nc_nome').value.trim();if(!nome){alert('Informe o nome.');return;}
   const quest=$('nc_quest').value;if(!quest){alert('Selecione o questionário.');return;}
   const newId='c'+Date.now();
   const colabs=(window._ncColabs||[]).map((x,i)=>({...x,id:'col'+Date.now()+i}));
-  STATE.companies.push({id:newId,nome,cnpj:$('nc_cnpj').value,setor:$('nc_setor').value,cnae:$('nc_cnae')?.value||'',rh:$('nc_rh').value,email:$('nc_email').value,questionario:quest,info:$('nc_info').value,status:'ativo',colaboradores:colabs,unidades:[],ghes:[],createdAt:new Date().toISOString()});
+  const _newCo={id:newId,nome,cnpj:$('nc_cnpj').value,setor:$('nc_setor').value,cnae:$('nc_cnae')?.value||'',rh:$('nc_rh').value,email:$('nc_email').value,questionario:quest,info:$('nc_info').value,status:'ativo',colaboradores:colabs,unidades:[],ghes:[],createdAt:new Date().toISOString()};
+  STATE.companies.push(_newCo);
   saveState();closeModal('mNewCo');
+  if(_newCo.cnae) setTimeout(()=>onboardNTEPAlert(_newCo), 300);
   ['nc_nome','nc_cnpj','nc_setor','nc_cnae','nc_rh','nc_email','nc_info'].forEach(id=>{const el=$(id);if(el)el.value='';});
   $('nc_quest').value='';window._ncColabs=[];switchNcTab(1);renderNcColabList();
   renderCo();updateMgrSelects();
@@ -5408,6 +5467,131 @@ ${riskFactors.length?`<table>
 }
 
 // ═══════════════════════════════════════
+// PULSE SURVEY — COPSOQ II 10-item subset
+// ═══════════════════════════════════════
+const PULSE_Q = [
+  {t:'Com que frequência não tem tempo para completar todas as tarefas?', factor:'Exigências', inv:false},
+  {t:'Tem um elevado grau de influência no seu trabalho?', factor:'Autonomia', inv:true},
+  {t:'O seu trabalho tem algum significado para si?', factor:'Significado', inv:true},
+  {t:'É tratado de forma justa no seu local de trabalho?', factor:'Justiça', inv:true},
+  {t:'Com que frequência tem ajuda e apoio do seu superior imediato?', factor:'Suporte', inv:true},
+  {t:'Existe um bom ambiente de trabalho entre si e os seus colegas?', factor:'Clima', inv:true},
+  {t:'Quão satisfeito está com o seu trabalho de uma forma global?', factor:'Satisfação', inv:true},
+  {t:'Sente-se preocupado em ficar desempregado?', factor:'Insegurança', inv:false},
+  {t:'Emocionalmente exausto?', factor:'Burnout', inv:false},
+  {t:'Sente que o seu trabalho lhe exige muita energia afetando sua vida privada?', factor:'Equilíbrio', inv:false},
+];
+
+let pulseAns = {};
+
+function calcPulse(resps) {
+  const fs = {};
+  PULSE_Q.forEach((q, i) => {
+    const vals = resps.map(r => r.respostas?.['q' + i]).filter(v => v != null);
+    if (!vals.length) return;
+    const avg = vals.reduce((s,v)=>s+v,0)/vals.length;
+    fs[q.factor] = q.inv ? 1-(avg-1)/4 : (avg-1)/4;
+  });
+  return fs;
+}
+
+function renderPulsoPanel() {
+  const cf = $('pulsoCoFilter')?.value || '';
+  const cont = $('pulsoContent'); if (!cont) return;
+  if (!cf) { cont.innerHTML = '<div class="empty-st"><p>Selecione uma empresa.</p></div>'; return; }
+  const co = STATE.companies?.find(c => c.id === cf);
+  if (!co) return;
+  const allResps = (STATE.pulseResponses || []).filter(r => r.empresa === cf);
+  const byMonth = {};
+  allResps.forEach(r => { (byMonth[r.month] = byMonth[r.month]||[]).push(r); });
+  const months = Object.keys(byMonth).sort();
+
+  const activeToggle = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:#f8fafc;border-radius:10px">
+    <span style="font-size:13px;font-weight:600">Pulse ativo para ${co.nome}</span>
+    <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+      <input type="checkbox" id="pulseToggle" ${co.pulseActive?'checked':''} onchange="togglePulse('${cf}',this.checked)" style="opacity:0;width:0;height:0"/>
+      <span style="position:absolute;inset:0;background:${co.pulseActive?'var(--accent)':'#e5e7eb'};border-radius:12px;transition:.2s"></span>
+      <span style="position:absolute;top:3px;left:${co.pulseActive?'23':'3'}px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s"></span>
+    </label>
+    ${co.pulseActive?`<span style="font-size:12px;color:#22c55e;font-weight:600">Ativo — colaboradores veem o Pulse na tela de acesso</span>`:'<span style="font-size:12px;color:var(--muted)">Inativo</span>'}
+  </div>`;
+
+  if (!months.length) {
+    cont.innerHTML = activeToggle + '<div class="empty-st"><p>Nenhuma resposta de pulse recebida. Ative o Pulse e envie os links para os colaboradores.</p></div>';
+    return;
+  }
+
+  const factorNames = PULSE_Q.map(q => q.factor);
+  const trendData = months.map(m => ({ month: m, scores: calcPulse(byMonth[m]), n: byMonth[m].length }));
+  const canvasId = 'pulsoTrendChart';
+
+  cont.innerHTML = activeToggle + `
+    <div style="margin-bottom:20px">
+      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:10px">Tendência — últimos ${months.length} meses</div>
+      <canvas id="${canvasId}" height="180"></canvas>
+    </div>
+    <table class="pgr-table">
+      <thead><tr><th>Mês</th><th>N</th>${factorNames.map(f=>`<th>${f}</th>`).join('')}</tr></thead>
+      <tbody>${trendData.map(d=>`<tr>
+        <td>${d.month}</td><td>${d.n}</td>
+        ${factorNames.map(f=>{const s=d.scores[f];return s!=null?`<td style="color:${s>0.6?'#ef4444':s>0.4?'#f59e0b':'#22c55e'};font-weight:600">${Math.round(s*100)}%</td>`:'<td style="color:var(--muted)">—</td>';}).join('')}
+      </tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  setTimeout(() => {
+    const ctx = $('pulsoTrendChart')?.getContext('2d');
+    if (!ctx) return;
+    const colors = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#f97316','#ec4899','#10b981','#6366f1'];
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: factorNames.map((f,i) => ({
+          label: f,
+          data: trendData.map(d => d.scores[f] != null ? Math.round(d.scores[f]*100) : null),
+          borderColor: colors[i%colors.length],
+          backgroundColor: colors[i%colors.length]+'22',
+          tension: 0.4, fill: false, pointRadius: 5, spanGaps: true
+        }))
+      },
+      options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}} }
+    });
+  }, 80);
+}
+
+function togglePulse(coId, active) {
+  const co = STATE.companies?.find(c => c.id === coId);
+  if (!co) return;
+  co.pulseActive = active;
+  saveState();
+  renderPulsoPanel();
+  if (active) showToast(`Pulse ativado para ${co.nome}. Os colaboradores verão o questionário de pulse ao acessar o sistema.`, 5000);
+}
+
+function startPulseSurvey() {
+  const month = new Date().toISOString().slice(0,7);
+  const done = JSON.parse(localStorage.getItem('doneSurveys')||'{}');
+  if (done[CU?.email+'_pulse_'+month]) { alert('Você já respondeu o Pulse deste mês.'); return; }
+  pulseAns = {};
+  $('sqTitle').textContent = 'Pulse Mensal — 10 questões';
+  PQ.init('pulse', PULSE_Q, pulseAns, 'sSQ');
+  showSc('sSQ');
+}
+
+function submitPulse() {
+  const month = new Date().toISOString().slice(0,7);
+  const done = JSON.parse(localStorage.getItem('doneSurveys')||'{}');
+  done[CU?.email+'_pulse_'+month] = true;
+  localStorage.setItem('doneSurveys', JSON.stringify(done));
+  const payload = {id:'pulse_'+Date.now(), empresa:CU?.empresa||null, email:CU?.email, month, timestamp:new Date().toISOString(), respostas:{...pulseAns}};
+  STATE.pulseResponses = STATE.pulseResponses || [];
+  STATE.pulseResponses.push(payload);
+  saveState();
+  showSc('sSucc');
+}
+
+// ═══════════════════════════════════════
 // UPDATE navTo, PANEL_MAP, updateMgrSelects
 // ═══════════════════════════════════════
 // Extend PANEL_MAP
@@ -5422,7 +5606,7 @@ const _origNavTo = navTo;
 navTo = function(pid, btn){
   _origNavTo(pid, btn);
   if(pid==='pPlano') renderPlano();
-  if(pid==='pPulso') renderPulsoHistory();
+  if(pid==='pPulso') renderPulsoPanel();
 };
 
 // Patch updateMgrSelects to populate new selects
@@ -5431,6 +5615,8 @@ updateMgrSelects = function(){
   _origUpdateMgrSelects();
   const coOpts=`<option value="all">Todas as empresas</option>`+STATE.companies.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
   ['planoCoFilter','pa_empresa','pulsoCoSel'].forEach(id=>{const el=$(id);if(el)el.innerHTML=coOpts;});
+  const coOptsNoAll=`<option value="">Selecione a empresa</option>`+STATE.companies.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  ['pulsoCoFilter','pcmsoCoFilter'].forEach(id=>{const el=$(id);if(el)el.innerHTML=coOptsNoAll;});
 };
 
 // ═══════════════════════════════════════
@@ -6430,6 +6616,12 @@ updateCards=function(){
     const lbl=$('c3Label');
     if(lbl)lbl.textContent=done[e+'_copsoq3']?'✓ Já respondido':'Iniciar questionário →';
     if(done[e+'_copsoq3'])c3Card.classList.add('done-card');else c3Card.classList.remove('done-card');
+  }
+  // Pulse card
+  const cPulsoCard = $('cPulso');
+  if (cPulsoCard) {
+    const co = CU?.empresa ? STATE.companies?.find(c => c.id === CU.empresa) : null;
+    cPulsoCard.style.display = (co?.pulseActive) ? '' : 'none';
   }
   // Academy section
   renderSelAcademy(CU?.empresa);
@@ -7692,12 +7884,13 @@ if(typeof PANEL_MAP!=='undefined'){
   PANEL_MAP['pMatriz']=['Matriz de Risco','Probabilidade × Severidade — visualização e priorização de riscos'];
   PANEL_MAP['pAET']=['AET — Análise Ergonômica do Trabalho','Avaliação de postos de trabalho conforme NR-17'];
   PANEL_MAP['pPGR']=['PGR — Programa de Gerenciamento de Riscos','Documento completo NR-1 integrando todos os dados SST'];
+  PANEL_MAP['pPCMSO']={title:'PCMSO — Controle Médico de Saúde Ocupacional', subtitle:'Gestão de ASOs e exames médicos ocupacionais conforme NR-7'};
 }
 
 const _origNavToSST=navTo;
 navTo=function(pid,btn){
   _origNavToSST(pid,btn);
-  const coFilterMap={pGHE:'gheCoFilter',pInventario:'invCoFilter',pMatriz:'matrizCoFilter',pAET:'aetCoFilter',pPGR:'pgrCoFilter'};
+  const coFilterMap={pGHE:'gheCoFilter',pInventario:'invCoFilter',pMatriz:'matrizCoFilter',pAET:'aetCoFilter',pPGR:'pgrCoFilter',pPCMSO:'pcmsoCoFilter'};
   const cfId=coFilterMap[pid];
   if(cfId){
     const sel=$(cfId);if(!sel)return;
@@ -7710,6 +7903,7 @@ navTo=function(pid,btn){
   else if(pid==='pMatriz')renderMatriz();
   else if(pid==='pAET')renderAETList();
   else if(pid==='pPGR')renderPGRPreview();
+  else if(pid==='pPCMSO')renderPCMSO();
 };
 
 // ═══════════════════════════════════════════════════════
@@ -7813,7 +8007,11 @@ const PQ = {
       this.render();
       window.scrollTo(0, 0);
     } else {
-      submitForm(this.type);
+      if (this.type === 'pulse') {
+        submitPulse();
+      } else {
+        submitForm(this.type);
+      }
     }
   }
 };
@@ -7862,6 +8060,109 @@ const PQ = {
 })();
 
 // ═══════════════════════════════════════════════════════
+// PCMSO — NR-7 ASO Management
+// ═══════════════════════════════════════════════════════
+function renderPCMSO() {
+  const cf = $('pcmsoCoFilter')?.value || '';
+  const cont = $('pcmsoContent'); if (!cont) return;
+  if (!cf) { cont.innerHTML = '<div class="empty-st"><p>Selecione uma empresa.</p></div>'; return; }
+
+  const asos = (STATE.asos || []).filter(a => a.empresa === cf);
+  const today = new Date();
+
+  const total = asos.length;
+  const apto = asos.filter(a => a.resultado === 'Apto').length;
+  const vencidos = asos.filter(a => a.prox && new Date(a.prox) < today).length;
+  const venc30 = asos.filter(a => { if (!a.prox) return false; const d = new Date(a.prox); return d >= today && d <= new Date(today.getTime()+30*86400000); }).length;
+
+  if (!asos.length) {
+    cont.innerHTML = '<div class="empty-st"><p>Nenhum ASO cadastrado. Clique em "+ Novo ASO" para registrar.</p></div>';
+    return;
+  }
+
+  cont.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div style="background:#f0f4ff;border-radius:8px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--accent)">${total}</div><div style="font-size:12px;color:var(--muted)">Total de ASOs</div></div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#22c55e">${apto}</div><div style="font-size:12px;color:var(--muted)">Aptos</div></div>
+      ${vencidos ? `<div style="background:#fef2f2;border-radius:8px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">${vencidos}</div><div style="font-size:12px;color:var(--muted)">Vencidos</div></div>` : ''}
+      ${venc30 ? `<div style="background:#fff7ed;border-radius:8px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f97316">${venc30}</div><div style="font-size:12px;color:var(--muted)">Vencendo em 30d</div></div>` : ''}
+    </div>
+    <table class="pgr-table">
+      <thead><tr><th>Trabalhador</th><th>GHE</th><th>Tipo</th><th>Data</th><th>Próximo</th><th>Resultado</th><th>Médico</th><th></th></tr></thead>
+      <tbody>${asos.map(a => {
+        const gheName = (STATE.ghes||[]).find(g=>g.id===a.ghe)?.nome || '—';
+        const expired = a.prox && new Date(a.prox) < today;
+        const soon = a.prox && !expired && new Date(a.prox) <= new Date(today.getTime()+30*86400000);
+        const resColor = {Apto:'#22c55e','Apto com restrições':'#f59e0b',Inapto:'#ef4444'}[a.resultado]||'#6b7280';
+        return `<tr style="${expired?'background:#fef2f2':''}">
+          <td><strong>${a.nome||'—'}</strong>${a.cpf?`<div style="font-size:11px;color:var(--muted)">${a.cpf}</div>`:''}</td>
+          <td style="font-size:12px">${gheName}</td>
+          <td style="font-size:12px">${a.tipo||'—'}</td>
+          <td style="font-size:12px">${a.data||'—'}</td>
+          <td style="font-size:12px">
+            ${a.prox||'—'}
+            ${expired?'<span style="margin-left:4px;padding:1px 6px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700">Vencido</span>':''}
+            ${soon?'<span style="margin-left:4px;padding:1px 6px;background:#f97316;color:#fff;border-radius:8px;font-size:10px;font-weight:700">30d</span>':''}
+          </td>
+          <td><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:${resColor}">${a.resultado||'—'}</span></td>
+          <td style="font-size:12px">${a.medico||'—'}${a.crm?`<div style="font-size:10px;color:var(--muted)">${a.crm}</div>`:''}</td>
+          <td>
+            <button class="abtn ab-ghost" style="padding:2px 6px;font-size:11px" onclick="editASO('${a.id}')">Ed.</button>
+            <button class="abtn ab-ghost" style="padding:2px 6px;font-size:11px;color:#ef4444" onclick="deleteASO('${a.id}')">✕</button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+}
+
+function openASO(id) {
+  const m = $('mASO'); if (!m) return;
+  $('asoEditId').value = id || '';
+  $('asoModalTitle').textContent = id ? 'Editar ASO' : 'Novo ASO';
+  $('aso_data').value = new Date().toISOString().slice(0,10);
+  const esel = $('aso_empresa'); esel.innerHTML = '<option value="">— Selecione —</option>';
+  visibleCompanies().forEach(c => { esel.innerHTML += `<option value="${c.id}">${c.nome}</option>`; });
+  if (id) {
+    const a = (STATE.asos||[]).find(x=>x.id===id);
+    if (a) {
+      esel.value = a.empresa;
+      const gsel = $('aso_ghe'); gsel.innerHTML = '<option value="">— Selecione —</option>';
+      (STATE.ghes||[]).filter(g=>g.empresa===a.empresa).forEach(g=>{gsel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});
+      gsel.value = a.ghe||'';
+      $('aso_nome').value=a.nome||''; $('aso_cpf').value=a.cpf||'';
+      $('aso_tipo').value=a.tipo||'Periódico'; $('aso_data').value=a.data||'';
+      $('aso_prox').value=a.prox||''; $('aso_medico').value=a.medico||'';
+      $('aso_crm').value=a.crm||''; $('aso_resultado').value=a.resultado||'Apto';
+      $('aso_exames').value=a.exames||''; $('aso_obs').value=a.obs||'';
+    }
+  } else {
+    ['aso_nome','aso_cpf','aso_medico','aso_crm','aso_exames','aso_obs'].forEach(x=>{const el=$(x);if(el)el.value='';});
+    $('aso_tipo').value='Periódico'; $('aso_prox').value='';
+    $('aso_resultado').value='Apto';
+    const cf = $('pcmsoCoFilter')?.value;
+    if (cf) {
+      esel.value=cf;
+      const gsel=$('aso_ghe'); gsel.innerHTML='<option value="">— Selecione —</option>';
+      (STATE.ghes||[]).filter(g=>g.empresa===cf).forEach(g=>{gsel.innerHTML+=`<option value="${g.id}">${g.nome}</option>`;});
+    }
+  }
+  m.style.display = 'flex';
+}
+
+function saveASO() {
+  const id = $('asoEditId').value || ('aso_'+Date.now());
+  const a = {id,empresa:$('aso_empresa').value,ghe:$('aso_ghe').value,nome:$('aso_nome').value.trim(),cpf:$('aso_cpf').value.trim(),tipo:$('aso_tipo').value,data:$('aso_data').value,prox:$('aso_prox').value,medico:$('aso_medico').value.trim(),crm:$('aso_crm').value.trim(),resultado:$('aso_resultado').value,exames:$('aso_exames').value.trim(),obs:$('aso_obs').value.trim()};
+  if (!a.empresa || !a.nome) return alert('Informe empresa e nome do trabalhador.');
+  STATE.asos = STATE.asos||[];
+  const idx = STATE.asos.findIndex(x=>x.id===id);
+  if (idx>=0) STATE.asos[idx]=a; else STATE.asos.push(a);
+  saveState(); $('mASO').style.display='none'; renderPCMSO();
+}
+
+function editASO(id) { openASO(id); }
+function deleteASO(id) { if(!confirm('Excluir este ASO?'))return; STATE.asos=(STATE.asos||[]).filter(x=>x.id!==id); saveState(); renderPCMSO(); }
+
+// ═══════════════════════════════════════════════════════
 // NR-1 COMPLIANCE DASHBOARD
 // ═══════════════════════════════════════════════════════
 function renderNR1Compliance() {
@@ -7876,6 +8177,7 @@ function renderNR1Compliance() {
     const plano = (ACTION_PLANS || []).filter(a => !a.empresa || a.empresa === co.id);
     const aets = (STATE.aets || []).filter(a => a.empresa === co.id);
 
+    const asos = (STATE.asos || []).filter(a => a.empresa === co.id);
     const checks = [
       { label: 'Avaliação psicossocial realizada', done: resps.length >= 5, tip: `${resps.length} respostas coletadas (mín. 5)` },
       { label: 'GHEs definidos', done: ghes.length > 0, tip: `${ghes.length} GHE(s) cadastrado(s)` },
@@ -7883,6 +8185,7 @@ function renderNR1Compliance() {
       { label: 'CNAE informado (NTEP)', done: !!co.cnae, tip: co.cnae ? `CNAE: ${co.cnae}` : 'Informe o CNAE na ficha da empresa' },
       { label: 'Plano de ação elaborado', done: plano.length > 0, tip: `${plano.length} ação(ões) no plano` },
       { label: 'AET (NR-17) realizada', done: aets.length > 0, tip: `${aets.length} AET(s) cadastrada(s)` },
+      { label: 'PCMSO (ASOs registrados)', done: asos.length > 0, tip: `${asos.length} ASO(s) registrado(s)` },
     ];
 
     const doneCount = checks.filter(c => c.done).length;
@@ -7910,6 +8213,7 @@ function renderNR1Compliance() {
             <span style="color:${c.done ? 'var(--text)' : 'var(--muted)'}">${c.label}</span>
           </div>`).join('')}
       </div>
+      ${(()=>{if(!co.cnae)return '';const ntepNR1=typeof getNTEPByCNAE==='function'?getNTEPByCNAE(co.cnae):null;if(!ntepNR1)return '';return `<div style="margin-top:10px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1d4ed8;display:flex;align-items:center;gap:8px"><span style="font-weight:700">NTEP:</span> <span>${ntepNR1.cids.length} doenças correlacionadas para CNAE ${co.cnae} (${ntepNR1.desc_cnae}). <a href="#" onclick="event.preventDefault();showNTEP('${co.cnae}','${co.nome}')" style="color:#1d4ed8;font-weight:600;text-decoration:underline">Ver CIDs →</a></span></div>`;})()}
     </div>`;
   }).join('');
 }
@@ -7988,6 +8292,14 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
+<!-- PULSE SURVEY SCREEN (reuses sSQ engine) -->
+<div id="sPulse" class="screen">
+  <div class="q-topbar">
+    <div class="q-tl"><button class="back-btn" onclick="goBack()">← Voltar</button><span class="q-ttitle">Pulse Mensal — 10 questões</span></div>
+  </div>
+  <div id="sqPulseContainer" class="sq-page"></div>
+</div>
+
 <!-- PAGINATED SURVEY SCREEN -->
 <div id="sSQ" class="screen">
   <div class="q-topbar">
@@ -8039,6 +8351,54 @@ if ('serviceWorker' in navigator) {
       <div><div class="dlabel" style="margin-bottom:4px">Recomendações e medidas corretivas</div><textarea id="aet_rec" class="tinput" rows="3" placeholder="Descreva as intervenções recomendadas…"></textarea></div>
     </div>
     <div class="modal-footer"><button class="abtn ab-ghost" onclick="closeModal('mAET')">Cancelar</button><button class="abtn ab-pri" onclick="saveAET()">Salvar AET</button></div>
+  </div>
+</div>
+
+<!-- MODAL: ASO (PCMSO NR-7) -->
+<div class="modal-ov" id="mASO" onclick="if(event.target===this)closeModal('mASO')">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-hdr"><h3 id="asoModalTitle">Novo ASO</h3><button class="modal-close" onclick="closeModal('mASO')">×</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="asoEditId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Empresa</div><select id="aso_empresa" class="tinput" onchange="(function(){var gsel=document.getElementById('aso_ghe');gsel.innerHTML='<option value=\\'\\'>— Selecione —</option>';(STATE.ghes||[]).filter(g=>g.empresa===document.getElementById('aso_empresa').value).forEach(g=>{gsel.innerHTML+='<option value=\\''+g.id+'\\'>'+g.nome+'</option>';});})()"><option value="">— Selecione —</option></select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">GHE / Função</div><select id="aso_ghe" class="tinput"><option value="">— Selecione —</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Nome do trabalhador</div><input type="text" id="aso_nome" class="tinput" placeholder="Nome completo"/></div>
+        <div><div class="dlabel" style="margin-bottom:4px">CPF</div><input type="text" id="aso_cpf" class="tinput" placeholder="000.000.000-00" maxlength="14"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Tipo de ASO</div>
+          <select id="aso_tipo" class="tinput">
+            <option value="Admissional">Admissional</option>
+            <option value="Periódico" selected>Periódico</option>
+            <option value="Demissional">Demissional</option>
+            <option value="Retorno ao trabalho">Retorno ao trabalho</option>
+            <option value="Mudança de função">Mudança de função</option>
+          </select></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Data do exame</div><input type="date" id="aso_data" class="tinput"/></div>
+        <div><div class="dlabel" style="margin-bottom:4px">Próximo exame</div><input type="date" id="aso_prox" class="tinput"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div class="dlabel" style="margin-bottom:4px">Médico responsável</div><input type="text" id="aso_medico" class="tinput" placeholder="Nome do médico do trabalho"/></div>
+        <div><div class="dlabel" style="margin-bottom:4px">CRM</div><input type="text" id="aso_crm" class="tinput" placeholder="CRM/UF 00000"/></div>
+      </div>
+      <div><div class="dlabel" style="margin-bottom:4px">Resultado</div>
+        <select id="aso_resultado" class="tinput">
+          <option value="Apto">Apto</option>
+          <option value="Apto com restrições">Apto com restrições</option>
+          <option value="Inapto">Inapto</option>
+        </select></div>
+      <div><div class="dlabel" style="margin-bottom:4px">Exames realizados</div>
+        <input type="text" id="aso_exames" class="tinput" placeholder="Ex.: Clínico, Audiometria, Espirometria, Acuidade visual"/></div>
+      <div><div class="dlabel" style="margin-bottom:4px">Observações</div>
+        <textarea id="aso_obs" class="tinput" rows="2" placeholder="Observações médicas, restrições, recomendações…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="abtn ab-ghost" onclick="closeModal('mASO')">Cancelar</button>
+      <button class="abtn ab-pri" onclick="saveASO()">Salvar ASO</button>
+    </div>
   </div>
 </div>
 
